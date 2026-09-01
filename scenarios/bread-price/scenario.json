@@ -1,0 +1,398 @@
+{
+  "formatVersion": 1,
+  "meta": {
+    "id": "bread-price",
+    "title": "パンの値段を下げろ！",
+    "version": "0.1.0",
+    "locale": "ja-JP",
+    "author": "economic-choices",
+    "summary": "小麦不足でパン価格が高騰した都市。市長として、価格・供給・財政の均衡を探る短編です。",
+    "estimatedMinutes": 5,
+    "tags": ["price-control", "subsidy", "shortage"]
+  },
+  "characters": [
+    { "id": "narrator", "name": "", "color": "#9aa3b5" },
+    { "id": "aide", "name": "財政補佐官 リーゼ", "color": "#efb366" },
+    { "id": "citizen", "name": "パン屋の店主", "color": "#78d6b0" }
+  ],
+  "parameters": [
+    { "id": "popularity", "label": "支持率", "min": 0, "max": 100, "integer": true, "display": { "visible": true, "order": 1, "unit": "%", "goodDirection": "up" } },
+    { "id": "budget", "label": "市財政", "min": -200, "max": 500, "integer": true, "display": { "visible": true, "order": 2, "unit": "億", "goodDirection": "up" } },
+    { "id": "supply", "label": "パン供給量", "min": 0, "max": 200, "integer": true, "display": { "visible": true, "order": 3, "goodDirection": "up" } },
+    { "id": "price", "label": "パン価格", "min": 0, "max": 2000, "integer": true, "display": { "visible": true, "order": 4, "unit": "円", "goodDirection": "down" } },
+    { "id": "blackMarket", "label": "闇市場規模", "min": 0, "max": 100, "integer": true, "display": { "visible": true, "order": 5, "goodDirection": "down" } }
+  ],
+  "initialState": {
+    "startScene": "intro",
+    "params": {
+      "popularity": 50,
+      "budget": 100,
+      "supply": 80,
+      "price": 320,
+      "blackMarket": 5
+    },
+    "flags": {
+      "priceControl": false,
+      "subsidy": false,
+      "deregulated": false,
+      "rationing": false,
+      "targetedSupport": false,
+      "crackdown": false,
+      "waitedSecond": false,
+      "expandedRationing": false
+    }
+  },
+  "scenes": [
+    {
+      "id": "intro",
+      "background": "city-hall-morning.png",
+      "lines": [
+        { "id": "intro-1", "speaker": "narrator", "text": "小麦の不作から三週間。都市のパンは、平時のほぼ二倍になった。" },
+        { "id": "intro-2", "speaker": "citizen", "text": "市長！ パンが高すぎます。このままでは朝食を買えません！" },
+        { "id": "intro-3", "speaker": "aide", "text": "現在の価格は {{param.price}} 円、供給量は {{param.supply}}。最初の一手が今後を決めます。" }
+      ],
+      "next": { "type": "goto", "scene": "first-decision" }
+    },
+    {
+      "id": "first-decision",
+      "background": "mayors-office.png",
+      "lines": [
+        { "id": "first-1", "speaker": "aide", "text": "値段だけを下げるのか、供給を支えるのか。それとも市場へ荷を呼び込むのか。" }
+      ],
+      "next": {
+        "type": "choices",
+        "prompt": "最初の政策を選んでください",
+        "choices": [
+          {
+            "id": "price-cap",
+            "text": "価格を規制する",
+            "description": "上限価格を条例で定める。すぐ安くなる一方、店側は仕入れを減らす。",
+            "effects": [
+              { "param": "price", "op": "mul", "value": 0.6 },
+              { "param": "popularity", "op": "add", "value": 12 },
+              { "param": "supply", "op": "add", "value": -25 },
+              { "flag": "priceControl", "value": true }
+            ],
+            "next": { "type": "goto", "scene": "after-price-cap" }
+          },
+          {
+            "id": "subsidy",
+            "text": "補助金を出す",
+            "description": "パン屋の仕入れを支える。供給は増えるが、市の金庫は軽くなる。",
+            "condition": { "param": "budget", "op": ">=", "value": 45 },
+            "ifUnmet": "disable",
+            "unmetText": "財政が不足しています（45億必要）",
+            "effects": [
+              { "param": "budget", "op": "add", "value": -45 },
+              { "param": "supply", "op": "add", "value": 25 },
+              { "param": "price", "op": "add", "value": -75 },
+              { "param": "popularity", "op": "add", "value": 6 },
+              { "flag": "subsidy", "value": true }
+            ],
+            "next": { "type": "goto", "scene": "after-subsidy" }
+          },
+          {
+            "id": "deregulate",
+            "text": "輸入・流通規制を緩和する",
+            "description": "他都市からの搬入を認める。供給は増えるが、既存業者の反発を招く。",
+            "effects": [
+              { "param": "supply", "op": "add", "value": 30 },
+              { "param": "price", "op": "add", "value": -40 },
+              { "param": "popularity", "op": "add", "value": -5 },
+              { "flag": "deregulated", "value": true }
+            ],
+            "next": { "type": "goto", "scene": "after-deregulate" }
+          }
+        ]
+      }
+    },
+    {
+      "id": "after-price-cap",
+      "background": "empty-bakery.png",
+      "onEnter": [
+        { "param": "blackMarket", "op": "add", "value": 25 }
+      ],
+      "lines": [
+        { "id": "cap-1", "speaker": "narrator", "text": "翌朝、値札は安くなった。そして昼前には棚が空になった。" },
+        { "id": "cap-2", "speaker": "citizen", "text": "決められた値段では焼くほど赤字です。裏では別の値段がついています。" }
+      ],
+      "next": { "type": "goto", "scene": "second-decision" }
+    },
+    {
+      "id": "after-subsidy",
+      "background": "busy-bakery.png",
+      "lines": [
+        { "id": "subsidy-1", "speaker": "narrator", "text": "パン屋の窯に火が戻り、店頭価格も下がった。" },
+        { "id": "subsidy-2", "speaker": "aide", "text": "供給は {{param.supply}} まで戻りました。ただし財政は残り {{param.budget}} 億です。" }
+      ],
+      "next": { "type": "goto", "scene": "second-decision" }
+    },
+    {
+      "id": "after-deregulate",
+      "background": "city-gate.png",
+      "lines": [
+        { "id": "deregulate-1", "speaker": "narrator", "text": "市門を通る荷車は増えた。価格の下落は、まだ緩やかだった。" },
+        { "id": "deregulate-2", "speaker": "aide", "text": "供給は改善していますが、地元業者から抗議文が届いています。" }
+      ],
+      "next": { "type": "goto", "scene": "second-decision" }
+    },
+    {
+      "id": "second-decision",
+      "background": "council-room.png",
+      "lines": [
+        { "id": "second-1", "speaker": "aide", "text": "一週間が経ちました。次は、届いたパンを誰にどう渡すか決める必要があります。" }
+      ],
+      "next": {
+        "type": "choices",
+        "prompt": "二つ目の政策を選んでください",
+        "choices": [
+          {
+            "id": "crackdown",
+            "text": "闇市場を取り締まる",
+            "description": "非公式な売買を止める。闇市場は縮むが、表裏を合わせた供給も減る。",
+            "condition": { "param": "blackMarket", "op": ">=", "value": 20 },
+            "ifUnmet": "hide",
+            "effects": [
+              { "param": "blackMarket", "op": "add", "value": -20 },
+              { "param": "supply", "op": "add", "value": -10 },
+              { "param": "popularity", "op": "add", "value": -8 },
+              { "flag": "crackdown", "value": true }
+            ],
+            "next": { "type": "goto", "scene": "second-results" }
+          },
+          {
+            "id": "targeted-support",
+            "text": "低所得世帯だけを支援する",
+            "description": "支援を必要な世帯へ絞る。効果は小さいが副作用も抑えられる。",
+            "condition": { "param": "budget", "op": ">=", "value": 20 },
+            "ifUnmet": "disable",
+            "unmetText": "財政が不足しています（20億必要）",
+            "effects": [
+              { "param": "budget", "op": "add", "value": -20 },
+              { "param": "popularity", "op": "add", "value": 5 },
+              { "flag": "targetedSupport", "value": true }
+            ],
+            "next": { "type": "goto", "scene": "second-results" }
+          },
+          {
+            "id": "rationing",
+            "text": "配給制を導入する",
+            "description": "一人あたりの購入量を制限する。公平感は生まれるが、運用費と抜け道も増える。",
+            "effects": [
+              { "param": "budget", "op": "add", "value": -35 },
+              { "param": "popularity", "op": "add", "value": 8 },
+              { "param": "blackMarket", "op": "add", "value": 15 },
+              { "flag": "rationing", "value": true }
+            ],
+            "next": { "type": "goto", "scene": "second-results" }
+          },
+          {
+            "id": "wait-second",
+            "text": "もう一週間、様子を見る",
+            "description": "財政は温存できるが、待たされる市民の不満は増える。",
+            "effects": [
+              { "param": "popularity", "op": "add", "value": -4 },
+              { "flag": "waitedSecond", "value": true }
+            ],
+            "next": { "type": "goto", "scene": "second-results" }
+          }
+        ]
+      }
+    },
+    {
+      "id": "second-results",
+      "background": "market-week-two.png",
+      "lines": [
+        { "id": "second-result-ration", "speaker": "citizen", "text": "列は整いました。でも配給券を買い取る人が現れています。", "condition": { "flag": "rationing" } },
+        { "id": "second-result-target", "speaker": "citizen", "text": "必要な家には券が届きました。全員が安く買えるわけではありませんが。", "condition": { "flag": "targetedSupport" } },
+        { "id": "second-result-crack", "speaker": "citizen", "text": "裏通りは静かになりました。そのぶん、手に入るパンも減りました。", "condition": { "flag": "crackdown" } },
+        { "id": "second-result-wait", "speaker": "narrator", "text": "市庁舎が待つあいだにも、市民の一週間は過ぎていった。", "condition": { "flag": "waitedSecond" } }
+      ],
+      "next": {
+        "type": "branch",
+        "branches": [
+          { "when": { "flag": "priceControl", "value": true }, "then": { "type": "goto", "scene": "shortage-deepens" } }
+        ],
+        "else": { "type": "goto", "scene": "market-shifts" }
+      }
+    },
+    {
+      "id": "shortage-deepens",
+      "background": "back-alley.png",
+      "onEnter": [
+        { "param": "supply", "op": "add", "value": -10 },
+        { "param": "blackMarket", "op": "add", "value": 10 }
+      ],
+      "lines": [
+        { "id": "shortage-1", "speaker": "narrator", "text": "安い公定価格の横で、裏通りの相場だけが育っていった。" },
+        { "id": "shortage-2", "speaker": "aide", "text": "表の供給は {{param.supply}}、闇市場規模は {{param.blackMarket}}。数字のずれが広がっています。" }
+      ],
+      "next": { "type": "goto", "scene": "third-decision" }
+    },
+    {
+      "id": "market-shifts",
+      "background": "market-recovering.png",
+      "onEnter": [
+        { "param": "supply", "op": "add", "value": 5 },
+        { "param": "price", "op": "add", "value": -10 }
+      ],
+      "lines": [
+        { "id": "market-1", "speaker": "narrator", "text": "新しい荷が市場へ届き、価格は少しずつ動いた。" },
+        { "id": "market-2", "speaker": "aide", "text": "価格は {{param.price}} 円、供給は {{param.supply}}。最後の判断です。" }
+      ],
+      "next": { "type": "goto", "scene": "third-decision" }
+    },
+    {
+      "id": "third-decision",
+      "background": "mayors-office-night.png",
+      "lines": [
+        { "id": "third-1", "speaker": "aide", "text": "危機対策を仕上げます。どの代償を引き受けますか。" }
+      ],
+      "next": {
+        "type": "choices",
+        "prompt": "最後の政策を選んでください",
+        "choices": [
+          {
+            "id": "stabilize-imports",
+            "text": "輸送費を限定支援する",
+            "description": "追加の荷を確保しつつ、支出に上限を設ける。",
+            "condition": { "param": "budget", "op": ">=", "value": 25 },
+            "ifUnmet": "disable",
+            "unmetText": "財政が不足しています（25億必要）",
+            "effects": [
+              { "param": "budget", "op": "add", "value": -25 },
+              { "param": "supply", "op": "add", "value": 10 },
+              { "param": "price", "op": "add", "value": -15 },
+              { "param": "popularity", "op": "add", "value": 1 }
+            ],
+            "next": { "type": "goto", "scene": "finale" }
+          },
+          {
+            "id": "emergency-subsidy",
+            "text": "大規模な緊急補助金を出す",
+            "description": "供給と価格を一気に改善する。来年度の予算まで使い込む危険がある。",
+            "condition": { "param": "budget", "op": ">=", "value": 20 },
+            "ifUnmet": "disable",
+            "unmetText": "実施のための信用余力がありません",
+            "effects": [
+              { "param": "budget", "op": "add", "value": -60 },
+              { "param": "supply", "op": "add", "value": 20 },
+              { "param": "price", "op": "add", "value": -40 },
+              { "param": "popularity", "op": "add", "value": 6 }
+            ],
+            "next": { "type": "goto", "scene": "finale" }
+          },
+          {
+            "id": "expand-rationing",
+            "text": "配給網を全市へ広げる",
+            "description": "公平な配分を優先する。運用費と非公式取引がさらに増える。",
+            "effects": [
+              { "param": "budget", "op": "add", "value": -25 },
+              { "param": "supply", "op": "add", "value": -5 },
+              { "param": "blackMarket", "op": "add", "value": 35 },
+              { "param": "popularity", "op": "add", "value": 8 },
+              { "flag": "expandedRationing", "value": true }
+            ],
+            "next": { "type": "goto", "scene": "finale" }
+          },
+          {
+            "id": "withdraw-price-cap",
+            "text": "価格規制を撤回する",
+            "description": "表の供給を戻す代わりに、値上がりと政治的な反発を受け入れる。",
+            "condition": { "flag": "priceControl", "value": true },
+            "ifUnmet": "hide",
+            "effects": [
+              { "param": "price", "op": "add", "value": 45 },
+              { "param": "supply", "op": "add", "value": 25 },
+              { "param": "blackMarket", "op": "add", "value": -15 },
+              { "param": "popularity", "op": "add", "value": -8 },
+              { "flag": "priceControl", "value": false }
+            ],
+            "next": { "type": "goto", "scene": "finale" }
+          },
+          {
+            "id": "observe",
+            "text": "追加策は行わない",
+            "description": "財政を温存する。状況が自然に整うか、悪化するかを受け入れる。",
+            "effects": [
+              { "param": "popularity", "op": "add", "value": -2 }
+            ],
+            "next": { "type": "goto", "scene": "finale" }
+          }
+        ]
+      }
+    },
+    {
+      "id": "finale",
+      "background": "city-dawn.png",
+      "lines": [
+        { "id": "finale-1", "speaker": "narrator", "text": "一か月が過ぎた。都市は、あなたが選んだ均衡の上で朝を迎える。" },
+        { "id": "finale-2", "speaker": "aide", "text": "棚の不足は数字以上に深刻です。", "condition": { "visited": "shortage-deepens" } },
+        { "id": "finale-3", "speaker": "aide", "text": "あとは結果を受け止めましょう。", "condition": { "not": { "visited": "shortage-deepens" } } }
+      ],
+      "next": { "type": "resolveEnding" }
+    }
+  ],
+  "endings": [
+    {
+      "id": "fiscal-crisis",
+      "title": "支払えない約束",
+      "rank": "bad",
+      "condition": { "param": "budget", "op": "<", "value": 0 },
+      "lines": [
+        { "id": "fiscal-1", "speaker": "narrator", "text": "パンは増えた。しかし市は、来年度に支払う金まで使い切っていた。" }
+      ],
+      "summary": "短期の安心と引き換えに財政が破綻した。次の危機へ備える余力は残っていない。"
+    },
+    {
+      "id": "shortage-collapse",
+      "title": "空の棚",
+      "rank": "bad",
+      "condition": {
+        "all": [
+          { "param": "supply", "op": "<", "value": 50 },
+          { "param": "blackMarket", "op": ">=", "value": 40 }
+        ]
+      },
+      "lines": [
+        { "id": "shortage-ending-1", "speaker": "narrator", "text": "値札の数字は小さい。だが、その値段で買えるパンはどこにもなかった。" }
+      ],
+      "summary": "公定価格は下がったが供給が崩れ、取引は裏通りへ移った。"
+    },
+    {
+      "id": "black-market-city",
+      "title": "裏通りの相場",
+      "rank": "bad",
+      "condition": { "param": "blackMarket", "op": ">=", "value": 50 },
+      "lines": [
+        { "id": "black-market-1", "speaker": "narrator", "text": "表の制度が公平を約束するほど、裏の値段が都市の本当の相場になった。" }
+      ],
+      "summary": "供給は保たれたが、複雑な配分制度が大きな非公式市場を生んだ。"
+    },
+    {
+      "id": "soft-landing",
+      "title": "静かな朝",
+      "rank": "good",
+      "condition": {
+        "all": [
+          { "param": "price", "op": "<=", "value": 250 },
+          { "param": "supply", "op": ">=", "value": 90 },
+          { "param": "popularity", "op": ">=", "value": 55 }
+        ]
+      },
+      "lines": [
+        { "id": "soft-landing-1", "speaker": "narrator", "text": "行列は消えた。誰も市長を称えなかった。それが、うまくいった証拠だった。" }
+      ],
+      "summary": "供給を守りながら価格を戻した。ただし財政の余裕と一部業者の利益は静かに失われた。"
+    },
+    {
+      "id": "muddle-through",
+      "title": "とりあえずの均衡",
+      "rank": "normal",
+      "lines": [
+        { "id": "normal-1", "speaker": "narrator", "text": "劇的な解決はなかった。それでも明日も店は開き、市は次の判断を待つ。" }
+      ],
+      "summary": "都市は持ちこたえたが、価格か支持、あるいは未解決の不満を残した。"
+    }
+  ]
+}

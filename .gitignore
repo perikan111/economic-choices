@@ -1,0 +1,15 @@
+node_modules/
+.pnpm-store/
+.next/
+next-env.d.ts
+out/
+coverage/
+.env
+.env.*
+*.pem
+*.key
+*.log
+*.tsbuildinfo
+.DS_Store
+public/voice/**
+!public/voice/.gitkeep
