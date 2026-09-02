@@ -2236,7 +2236,7 @@
         "choices": [
           {
             "id": "d3-permanent",
-            "text": "緊急措置を恒久制度にする",
+            "text": "現在の緊急措置を恒久制度にする",
             "description": "期限を外し、制度として続ける。市民は計画を立てられる。市も、同じ額を毎年払い続ける。",
             "condition": {
               "any": [
@@ -2289,21 +2289,11 @@
             }
           },
           {
-            "id": "d3-phase-out",
-            "text": "三か月かけて段階的に終了する",
-            "description": "価格と供給を市場へ戻す。棚は戻る。負担も戻る。",
+            "id": "d3-phase-out-price",
+            "text": "価格上限を三か月かけて解除する",
+            "description": "価格上限を段階的に外し、価格と供給を市場へ戻す。棚は戻る。負担も戻る。",
             "condition": {
-              "any": [
-                {
-                  "flag": "priceCapActive"
-                },
-                {
-                  "flag": "subsidyActive"
-                },
-                {
-                  "flag": "rationingActive"
-                }
-              ]
+              "flag": "priceCapActive"
             },
             "ifUnmet": "hide",
             "effects": [
@@ -2370,16 +2360,112 @@
             }
           },
           {
-            "id": "d3-targeted-permanent",
-            "text": "価格は市場に戻し、困窮世帯支援を恒久化する",
-            "description": "価格には触れず、必要な世帯だけを支える。「誰が必要か」を決める仕事が、毎年ここに残る。",
+            "id": "d3-phase-out-support",
+            "text": "補助と購入制限を三か月かけて終了する",
+            "description": "現在の補助や購入制限を段階的に終える。支援を受ける側にも、売る側にも、三か月の準備期間を置く。",
             "condition": {
-              "param": "budget",
-              "op": ">=",
-              "value": 20
+              "all": [
+                {
+                  "not": {
+                    "flag": "priceCapActive"
+                  }
+                },
+                {
+                  "any": [
+                    {
+                      "flag": "subsidyActive"
+                    },
+                    {
+                      "flag": "rationingActive"
+                    }
+                  ]
+                }
+              ]
             },
-            "ifUnmet": "disable",
-            "unmetText": "政策余力が足りません（20 必要）",
+            "ifUnmet": "hide",
+            "effects": [
+              {
+                "param": "price",
+                "op": "add",
+                "value": 20
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 6
+              },
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": -10
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 1
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": -9
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": -3
+              },
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -4
+              },
+              {
+                "param": "policyChanges",
+                "op": "add",
+                "value": 1
+              },
+              {
+                "flag": "subsidyActive",
+                "value": false
+              },
+              {
+                "flag": "rationingActive",
+                "value": false
+              },
+              {
+                "flag": "everReversed",
+                "value": true
+              }
+            ],
+            "next": {
+              "type": "goto",
+              "scene": "d3-results"
+            }
+          },
+          {
+            "id": "d3-market-return-with-support",
+            "text": "価格は市場に戻し、困窮世帯支援へ切り替える",
+            "description": "一律の措置を終えて価格を市場に戻し、必要な世帯だけを支える。「誰が必要か」を決める仕事が、毎年ここに残る。",
+            "condition": {
+              "all": [
+                {
+                  "any": [
+                    {
+                      "flag": "priceCapActive"
+                    },
+                    {
+                      "flag": "rationingActive"
+                    }
+                  ]
+                },
+                {
+                  "param": "budget",
+                  "op": ">=",
+                  "value": 20
+                }
+              ]
+            },
+            "ifUnmet": "hide",
             "effects": [
               {
                 "param": "budget",
@@ -2434,8 +2520,160 @@
                 "value": false
               },
               {
+                "flag": "subsidyActive",
+                "value": false
+              },
+              {
                 "flag": "rationingActive",
                 "value": false
+              },
+              {
+                "flag": "everReversed",
+                "value": true
+              }
+            ],
+            "next": {
+              "type": "goto",
+              "scene": "d3-results"
+            }
+          },
+          {
+            "id": "d3-support-permanent",
+            "text": "現在の限定支援を恒久制度にする",
+            "description": "すでに行っている困窮世帯への限定支援を、毎年続く制度にする。価格や流通には新たに介入しない。",
+            "condition": {
+              "all": [
+                {
+                  "flag": "targetedSupportActive"
+                },
+                {
+                  "not": {
+                    "any": [
+                      {
+                        "flag": "priceCapActive"
+                      },
+                      {
+                        "flag": "rationingActive"
+                      },
+                      {
+                        "flag": "subsidyActive"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "param": "budget",
+                  "op": ">=",
+                  "value": 15
+                }
+              ]
+            },
+            "ifUnmet": "hide",
+            "effects": [
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -15
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 5
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 1
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": -1
+              },
+              {
+                "flag": "permanentized",
+                "value": true
+              }
+            ],
+            "next": {
+              "type": "goto",
+              "scene": "d3-results"
+            }
+          },
+          {
+            "id": "d3-support-new",
+            "text": "価格には介入せず、困窮世帯支援を恒久制度として始める",
+            "description": "価格と流通には手を加えず、困窮世帯への限定支援だけを新しい恒久制度として始める。",
+            "condition": {
+              "all": [
+                {
+                  "not": {
+                    "any": [
+                      {
+                        "flag": "priceCapActive"
+                      },
+                      {
+                        "flag": "rationingActive"
+                      },
+                      {
+                        "flag": "targetedSupportActive"
+                      },
+                      {
+                        "flag": "subsidyActive"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "param": "budget",
+                  "op": ">=",
+                  "value": 20
+                }
+              ]
+            },
+            "ifUnmet": "hide",
+            "effects": [
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -20
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 8
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 2
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 2
+              },
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": -3
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": -1
+              },
+              {
+                "flag": "targetedSupportActive",
+                "value": true
+              },
+              {
+                "flag": "everTargetedSupport",
+                "value": true
+              },
+              {
+                "flag": "permanentized",
+                "value": true
               }
             ],
             "next": {
@@ -2445,7 +2683,7 @@
           },
           {
             "id": "d3-monitor",
-            "text": "介入は行わず、価格と在庫の公表を続ける",
+            "text": "価格には介入せず、在庫と価格の公表を続ける",
             "description": "市がやるのは、数字を毎日出すことだけ。安上がりで、劇的でもない。",
             "condition": {
               "not": {
@@ -2502,8 +2740,8 @@
           },
           {
             "id": "d3-nothing",
-            "text": "決めない。期限まで、このままにする",
-            "description": "今日は何も変わらない。期限の日に、説明のないまま変わる。",
+            "text": "決めない。今日は何も動かさない",
+            "description": "新しい決定はしない。今ある制度はそのまま進み、期限のあるものは期限を迎える。",
             "effects": [
               {
                 "param": "popularity",

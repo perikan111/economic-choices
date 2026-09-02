@@ -250,6 +250,10 @@ UI は `goodDirection` を使って増減を「良い変化／悪い変化」に
 「三か月後が分からない街」であること自体が業者と市民のコストになる（§14 `policy-drift`）。
 発生条件は **3回以上の転換 かつ 支持率 45 以下** とし、一度や二度では発生しない。
 
+Decision 3では、価格上限から市場価格へ戻す、補助・配給を終了する、または価格上限・配給から
+市場価格と限定支援へ切り替える場合だけ `policyChanges` を +1 する。
+限定支援の恒久化・新規開始、情報公開、現状維持、現在の緊急措置の単純な恒久化では増やさない。
+
 ---
 
 ## 6. Scene 一覧
@@ -284,7 +288,7 @@ UI は `goodDirection` を使って増減を「良い変化／悪い変化」に
 | 26 | `m6-market` | 6か月後 | `market-street.png` | narrator, kuroda, misaki, yamada, fujii | 5 | goto `m6-council` |
 | 27 | `m6-common` | 6か月後 | `market-street.png` | narrator, misaki, yamada, takahashi, fujii | 5 | goto `m6-council` |
 | 28 | `m6-council` | 共通 | `council-room.png` | narrator, fujii, takahashi | 5 | goto `decision-3` |
-| 29 | `decision-3` | 判断③ | `mayors-office-night.png` | narrator, fujii, takahashi | 3 | choices ×5 |
+| 29 | `decision-3` | 判断③ | `mayors-office-night.png` | narrator, fujii, takahashi | 3 | choices ×8 |
 | 30 | `d3-results` | 結果 | `council-room.png` | narrator, yamada, misaki, takahashi, fujii | 6 | goto `m9-epilogue` |
 | 31 | `m9-epilogue` | 3か月後 | `street-morning.png` | narrator, misaki, yamada, kuroda, takahashi, fujii | 8 | `resolveEnding` |
 
@@ -1007,7 +1011,9 @@ next: goto `decision-3`
 
 next: `type: "choices"` / prompt: **「緊急措置の出口を決めてください」**
 
-#### `d3-permanent` 「緊急措置を恒久制度にする」
+Decision 3のchoice定義は8件。現在の制度状態と予算で絞り込み、実際の表示数は3〜4件とする。
+
+#### `d3-permanent` 「現在の緊急措置を恒久制度にする」
 
 > 期限を外し、制度として続ける。市民は計画を立てられる。
 > 市も、同じ額を毎年払い続ける。
@@ -1020,11 +1026,12 @@ flag `permanentized`=true
 
 next: goto `d3-results`
 
-#### `d3-phase-out` 「三か月かけて段階的に終了する」
+#### `d3-phase-out-price` 「価格上限を三か月かけて解除する」
 
-> 価格と供給を市場へ戻す。棚は戻る。負担も戻る。
+> 価格上限を段階的に外し、価格と供給を市場へ戻す。
+> 棚は戻る。負担も戻る。
 
-condition: `d3-permanent` と同一の `any` / ifUnmet: `hide`
+condition: `{ "flag": "priceCapActive" }` / ifUnmet: `hide`
 
 `price` +40 / `supply` +22 / `informalMarket` −18 / `foodAccess` +6 / `popularity` **−9** /
 `marketRisk` −5 / `budget` −8 / `policyChanges` **+1** /
@@ -1032,21 +1039,64 @@ flag `priceCapActive`=false, `subsidyActive`=false, `rationingActive`=false, `ev
 
 next: goto `d3-results`
 
-#### `d3-targeted-permanent` 「価格は市場に戻し、困窮世帯支援を恒久化する」
+#### `d3-phase-out-support` 「補助と購入制限を三か月かけて終了する」
 
-> 価格には触れず、必要な世帯だけを支える。
-> 「誰が必要か」を決める仕事が、毎年ここに残る。
+> 現在の補助や購入制限を段階的に終える。
+> 支援を受ける側にも、売る側にも、三か月の準備期間を置く。
 
-condition: `{ "param": "budget", "op": ">=", "value": 20 }` / ifUnmet: `disable`
-unmetText: 「政策余力が足りません（20 必要）」
+condition: `not priceCapActive` **かつ** (`subsidyActive` **または** `rationingActive`) / ifUnmet: `hide`
 
-`budget` −20 / `supply` +14 / `price` +20 / `informalMarket` −12 / `foodAccess` +9 /
-`popularity` −3 / `marketRisk` −3 / `policyChanges` **+1** /
-flag `targetedSupportActive`=true, `everTargetedSupport`=true, `priceCapActive`=false, `rationingActive`=false
+`price` +20 / `supply` +6 / `informalMarket` −10 / `foodAccess` +1 / `popularity` −9 /
+`marketRisk` −3 / `budget` −4 / `policyChanges` **+1** /
+flag `subsidyActive`=false, `rationingActive`=false, `everReversed`=true
 
 next: goto `d3-results`
 
-#### `d3-monitor` 「介入は行わず、価格と在庫の公表を続ける」
+#### `d3-market-return-with-support` 「価格は市場に戻し、困窮世帯支援へ切り替える」
+
+> 一律の措置を終えて価格を市場に戻し、必要な世帯だけを支える。
+> 「誰が必要か」を決める仕事が、毎年ここに残る。
+
+condition: (`priceCapActive` **または** `rationingActive`) **かつ** `budget >= 20` / ifUnmet: `hide`
+
+`budget` −20 / `supply` +14 / `price` +20 / `informalMarket` −12 / `foodAccess` +9 /
+`popularity` −3 / `marketRisk` −3 / `policyChanges` **+1** /
+flag `targetedSupportActive`=true, `everTargetedSupport`=true, `priceCapActive`=false,
+`subsidyActive`=false, `rationingActive`=false, `everReversed`=true
+
+next: goto `d3-results`
+
+#### `d3-support-permanent` 「現在の限定支援を恒久制度にする」
+
+> すでに行っている困窮世帯への限定支援を、毎年続く制度にする。
+> 価格や流通には新たに介入しない。
+
+condition: `targetedSupportActive` **かつ**
+`not any(priceCapActive, rationingActive, subsidyActive)` **かつ** `budget >= 15` / ifUnmet: `hide`
+
+`budget` −15 / `foodAccess` +5 / `popularity` +1 / `marketRisk` −1 /
+flag `permanentized`=true
+
+`price` / `supply` / `informalMarket` / `policyChanges` は変化させない。
+
+next: goto `d3-results`
+
+#### `d3-support-new` 「価格には介入せず、困窮世帯支援を恒久制度として始める」
+
+> 価格と流通には手を加えず、困窮世帯への限定支援だけを新しい恒久制度として始める。
+
+condition: `not any(priceCapActive, rationingActive, targetedSupportActive, subsidyActive)` **かつ**
+`budget >= 20` / ifUnmet: `hide`
+
+`budget` −20 / `foodAccess` +8 / `popularity` +2 / `supply` +2 /
+`informalMarket` −3 / `marketRisk` −1 /
+flag `targetedSupportActive`=true, `everTargetedSupport`=true, `permanentized`=true
+
+`price` / `policyChanges` は変化させない。補助金が有効な状態では、文言との矛盾を避けるため表示しない。
+
+next: goto `d3-results`
+
+#### `d3-monitor` 「価格には介入せず、在庫と価格の公表を続ける」
 
 > 市がやるのは、数字を毎日出すことだけ。
 > 安上がりで、劇的でもない。
@@ -1059,9 +1109,9 @@ condition: `{ "not": { "any": [ { "flag": "priceCapActive" }, { "flag": "subsidy
 
 next: goto `d3-results`
 
-#### `d3-nothing` 「決めない。期限まで、このままにする」
+#### `d3-nothing` 「決めない。今日は何も動かさない」
 
-> 今日は何も変わらない。期限の日に、説明のないまま変わる。
+> 新しい決定はしない。今ある制度はそのまま進み、期限のあるものは期限を迎える。
 
 condition: なし（**無条件選択肢**）
 
@@ -1129,19 +1179,19 @@ next: `{ "type": "resolveEnding" }`
 | A統制→維持→**黙認**→恒久化 | 58 | 57 | 16 | 160 | 66 | **57** | 27 | 1 | 表の市場、裏の市場 |
 | A統制→維持→**摘発**→恒久化 | 53 | 48 | 18 | 160 | 34 | **27** | 15 | 0 | 安いパン、空の棚 |
 | A統制→配給→黙認→恒久化 | 69 | 42 | 15 | 160 | 78 | **62** | 29 | 2 | 表の市場、裏の市場 |
-| A統制→配給→価格緩和→段階終了 | 43 | 64 | 75 | 250 | 16 | 62 | 9 | **3** | 政策迷走 |
+| A統制→配給→価格緩和→補助・購入制限終了 | 43 | 68 | 59 | 230 | 24 | 57 | 11 | **3** | 政策迷走 |
 | A統制→緩和→情報公開 | 47 | 82 | 68 | 195 | 13 | 60 | 8 | 1 | 混ざった帳簿 |
 | B補助→補助増額→恒久化 | 64 | **0** | 96 | 175 | 8 | 79 | 12 | 0 | 市が払います |
-| B補助→維持→段階終了 | 40 | 23 | 108 | 235 | 0 | 77 | 5 | 1 | 高値が呼んだパン |
+| B補助→維持→補助終了 | 40 | 27 | 92 | 215 | 0 | 72 | 7 | 1 | 高値が呼んだパン |
 | C緩和→維持→情報公開 | **39** | 88 | 106 | 165 | 2 | **78** | 12 | 0 | 高値が呼んだパン |
-| C緩和→限定支援→限定恒久 | 43 | 53 | 116 | 195 | 0 | **93** | 12 | 1 | 必要な人へ |
+| C緩和→限定支援→限定恒久 | 47 | 58 | 102 | 175 | 2 | **89** | 14 | 0 | 必要な人へ |
 | C緩和→配給→何もしない | 44 | 75 | 89 | 180 | 35 | 73 | 19 | 1 | 混ざった帳簿 |
-| D限定→維持→限定恒久 | 41 | 50 | 83 | 245 | 0 | 77 | 7 | 1 | 必要な人へ |
-| D限定→価格統制→段階終了 | 50 | 55 | 59 | 205 | 19 | 65 | 9 | 2 | 必要な人へ |
+| D限定→維持→限定恒久 | 45 | 55 | 69 | 225 | 2 | 73 | 9 | 0 | 必要な人へ |
+| D限定→価格統制→価格上限解除 | 50 | 55 | 59 | 205 | 19 | 65 | 9 | 2 | 必要な人へ |
 
 **全 7 エンディングが到達可能。** そして、
 
-- **完全勝利は存在しない。** 最高の `foodAccess` 93 を出す経路は支持率 43（低い）。
+- **完全勝利は存在しない。** 表中で最高の `foodAccess` 89 を出す経路は支持率 47。
   支持率最高の 69 を出す経路は正規供給 15。`budget` 88 を残す経路は支持率 39。
 - **同じ「価格統制」から、正反対の結末に分かれる。**（1行目と2行目）
 - **`informalMarket` が高く `marketRisk` が中程度**の状態（66/27）が成立する。

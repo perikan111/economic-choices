@@ -26,7 +26,7 @@ describe("scenario validation", () => {
 
   test("本番設計のシーン・選択肢・エンディング数を維持する", () => {
     expect(breadPriceScenario.scenes).toHaveLength(31);
-    expect(breadPriceScenario.scenes.reduce((total, scene) => total + countChoices(scene.next), 0)).toBe(18);
+    expect(breadPriceScenario.scenes.reduce((total, scene) => total + countChoices(scene.next), 0)).toBe(21);
     expect(breadPriceScenario.endings).toHaveLength(7);
   });
 
