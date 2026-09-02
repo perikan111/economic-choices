@@ -41,7 +41,7 @@ const DESIGN_ROUTES: RouteExpectation[] = [
     name: "A-hold-tolerate-permanent",
     choices: ["d1-price-cap", "d2-hold", "informal-tolerate", "d3-permanent"],
     endingId: "two-markets",
-    parameters: { popularity: 58, budget: 57, supply: 16, price: 160, informalMarket: 66, foodAccess: 57, marketRisk: 27, policyChanges: 1 },
+    parameters: { popularity: 58, budget: 57, supply: 16, price: 160, informalMarket: 66, foodAccess: 57, marketRisk: 27, policyChanges: 0 },
   },
   {
     name: "A-hold-crackdown-permanent",
@@ -53,7 +53,7 @@ const DESIGN_ROUTES: RouteExpectation[] = [
     name: "A-ration-tolerate-permanent",
     choices: ["d1-price-cap", "d2-rationing", "informal-tolerate", "d3-permanent"],
     endingId: "two-markets",
-    parameters: { popularity: 69, budget: 42, supply: 15, price: 160, informalMarket: 78, foodAccess: 62, marketRisk: 29, policyChanges: 2 },
+    parameters: { popularity: 69, budget: 42, supply: 15, price: 160, informalMarket: 78, foodAccess: 62, marketRisk: 29, policyChanges: 1 },
   },
   {
     name: "A-ration-relax-phaseout",
@@ -76,7 +76,7 @@ const DESIGN_ROUTES: RouteExpectation[] = [
   {
     name: "B-hold-phaseout",
     choices: ["d1-subsidy", "d2-hold", "d3-phase-out-support"],
-    endingId: "price-called-bread",
+    endingId: "mixed-ledger",
     parameters: { popularity: 40, budget: 27, supply: 92, price: 215, informalMarket: 0, foodAccess: 72, marketRisk: 7, policyChanges: 1 },
   },
   {
@@ -94,8 +94,8 @@ const DESIGN_ROUTES: RouteExpectation[] = [
   {
     name: "C-ration-nothing",
     choices: ["d1-deregulate", "d2-rationing", "d3-nothing"],
-    endingId: "mixed-ledger",
-    parameters: { popularity: 44, budget: 75, supply: 89, price: 180, informalMarket: 35, foodAccess: 73, marketRisk: 19, policyChanges: 1 },
+    endingId: "price-called-bread",
+    parameters: { popularity: 37, budget: 76, supply: 93, price: 194, informalMarket: 24, foodAccess: 72, marketRisk: 17, policyChanges: 1 },
   },
   {
     name: "D-hold-targeted",
@@ -117,7 +117,7 @@ const ADDITIONAL_ROUTES: RouteExpectation[] = [
     name: "A-subsidy-tolerate-phaseout",
     choices: ["d1-price-cap", "d2-subsidy", "informal-tolerate", "d3-phase-out-price"],
     endingId: "mixed-ledger",
-    parameters: { popularity: 54, budget: 46, supply: 56, price: 180, informalMarket: 42, foodAccess: 71, marketRisk: 20, policyChanges: 2 },
+    parameters: { popularity: 54, budget: 46, supply: 56, price: 180, informalMarket: 42, foodAccess: 71, marketRisk: 20, policyChanges: 1 },
   },
   {
     name: "A-targeted-crackdown-targeted",
@@ -129,7 +129,7 @@ const ADDITIONAL_ROUTES: RouteExpectation[] = [
     name: "A-targeted-tolerate-permanent",
     choices: ["d1-price-cap", "d2-targeted", "informal-tolerate", "d3-permanent"],
     endingId: "two-markets",
-    parameters: { popularity: 66, budget: 37, supply: 18, price: 160, informalMarket: 66, foodAccess: 67, marketRisk: 27, policyChanges: 1 },
+    parameters: { popularity: 66, budget: 37, supply: 18, price: 160, informalMarket: 66, foodAccess: 67, marketRisk: 27, policyChanges: 0 },
   },
   {
     name: "B-cap-permanent",

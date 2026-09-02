@@ -25,7 +25,7 @@ describe("scenario validation", () => {
   });
 
   test("本番設計のシーン・選択肢・エンディング数を維持する", () => {
-    expect(breadPriceScenario.scenes).toHaveLength(31);
+    expect(breadPriceScenario.scenes).toHaveLength(34);
     expect(breadPriceScenario.scenes.reduce((total, scene) => total + countChoices(scene.next), 0)).toBe(21);
     expect(breadPriceScenario.endings).toHaveLength(7);
   });
@@ -45,11 +45,11 @@ describe("scenario validation", () => {
       ]),
     );
 
-    expect(baseLines).toHaveLength(210);
+    expect(baseLines).toHaveLength(222);
     expect(analystLines).toHaveLength(28);
-    expect(lines).toHaveLength(238);
-    expect(speakerCounts).toEqual({ narrator: 62, misaki: 40, fujii: 39, yamada: 30, takahashi: 25, kuroda: 14 });
-    expect(baseLines.filter((line) => line.text.includes("{{param."))).toHaveLength(21);
+    expect(lines).toHaveLength(250);
+    expect(speakerCounts).toEqual({ narrator: 67, misaki: 40, fujii: 43, yamada: 30, takahashi: 27, kuroda: 15 });
+    expect(baseLines.filter((line) => line.text.includes("{{param."))).toHaveLength(24);
     expect(lineIds.every((id) => id !== undefined)).toBe(true);
     expect(new Set(lineIds).size).toBe(lines.length);
   });
@@ -100,8 +100,14 @@ describe("scenario validation", () => {
     expect(JSON.stringify(breadPriceRaw)).not.toContain("blackMarket");
   });
 
-  test("分岐専用router sceneは空のまま維持する", () => {
-    for (const sceneId of ["d2-router", "m6-router"]) {
+  test("分岐・条件付きeffect専用sceneは空のまま維持する", () => {
+    for (const sceneId of [
+      "d2-router",
+      "m6-router",
+      "d3-nothing-expire-price",
+      "d3-nothing-expire-support",
+      "d3-nothing-no-expiry",
+    ]) {
       expect(breadPriceScenario.scenes.find((scene) => scene.id === sceneId)?.lines).toEqual([]);
     }
   });

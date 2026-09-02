@@ -3,7 +3,7 @@
   "meta": {
     "id": "bread-price",
     "title": "パンの値段を下げろ！",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "locale": "ja-JP",
     "author": "economic-choices",
     "summary": "小麦不足でパン価格が高騰した都市。市長として、価格・供給・財政の均衡を探る短編です。",
@@ -181,6 +181,7 @@
       "everCrackdown": false,
       "everTolerated": false,
       "everReversed": false,
+      "justEnded": false,
       "illicitGoodsAppeared": false
     }
   },
@@ -1694,11 +1695,6 @@
                 "value": -3
               },
               {
-                "param": "policyChanges",
-                "op": "add",
-                "value": 1
-              },
-              {
                 "flag": "informalTolerated",
                 "value": true
               },
@@ -2147,7 +2143,44 @@
         {
           "id": "m6n-01",
           "speaker": "narrator",
-          "text": "六か月後。劇的なことは、何も起きなかった。"
+          "text": "六か月後。劇的なことは、何も起きなかった。",
+          "condition": {
+            "not": {
+              "any": [
+                {
+                  "flag": "everReversed"
+                },
+                {
+                  "visited": "informal-intro"
+                },
+                {
+                  "param": "policyChanges",
+                  "op": ">=",
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "m6n-01-changed",
+          "speaker": "narrator",
+          "text": "六か月後。方針を変えた街は、まだ落ち着いていない。",
+          "condition": {
+            "any": [
+              {
+                "flag": "everReversed"
+              },
+              {
+                "visited": "informal-intro"
+              },
+              {
+                "param": "policyChanges",
+                "op": ">=",
+                "value": 1
+              }
+            ]
+          }
         },
         {
           "id": "m6n-02",
@@ -2180,29 +2213,194 @@
       "background": "council-room.png",
       "lines": [
         {
-          "id": "mc-01",
+          "id": "mc-01-active",
           "speaker": "narrator",
-          "text": "緊急対応として始めたものには、たいてい期限が書いてある。"
+          "text": "緊急対応として始めたものには、たいてい期限が書いてある。",
+          "condition": {
+            "any": [
+              {
+                "flag": "priceCapActive"
+              },
+              {
+                "flag": "subsidyActive"
+              },
+              {
+                "flag": "rationingActive"
+              }
+            ]
+          }
         },
         {
-          "id": "mc-02",
+          "id": "mc-02-active",
           "speaker": "fujii",
-          "text": "条例と補助の期限が、三か月後に来ます。"
+          "text": "現在の臨時措置は、三か月後に期限を迎えます。",
+          "condition": {
+            "any": [
+              {
+                "flag": "priceCapActive"
+              },
+              {
+                "flag": "subsidyActive"
+              },
+              {
+                "flag": "rationingActive"
+              }
+            ]
+          }
         },
         {
-          "id": "mc-03",
+          "id": "mc-03-active",
           "speaker": "fujii",
-          "text": "延ばすなら議会の議決が要ります。止めるなら、止める説明が要ります。"
+          "text": "延ばすなら議会の議決が要ります。止めるなら、止める説明が要ります。",
+          "condition": {
+            "any": [
+              {
+                "flag": "priceCapActive"
+              },
+              {
+                "flag": "subsidyActive"
+              },
+              {
+                "flag": "rationingActive"
+              }
+            ]
+          }
         },
         {
-          "id": "mc-04",
+          "id": "mc-04-active",
           "speaker": "takahashi",
-          "text": "決めない、という選択もあります。期限が来れば、勝手に終わります。"
+          "text": "決めない、という選択もあります。期限が来れば、勝手に終わります。",
+          "condition": {
+            "any": [
+              {
+                "flag": "priceCapActive"
+              },
+              {
+                "flag": "subsidyActive"
+              },
+              {
+                "flag": "rationingActive"
+              }
+            ]
+          }
         },
         {
-          "id": "mc-05",
+          "id": "mc-05-active",
           "speaker": "fujii",
-          "text": "それも決定です。ただ、誰も説明しなかった決定になります。"
+          "text": "それも決定です。ただ、誰も説明しなかった決定になります。",
+          "condition": {
+            "any": [
+              {
+                "flag": "priceCapActive"
+              },
+              {
+                "flag": "subsidyActive"
+              },
+              {
+                "flag": "rationingActive"
+              }
+            ]
+          }
+        },
+        {
+          "id": "mc-01-open",
+          "speaker": "narrator",
+          "text": "緊急措置のないまま、年度の終わりが近づいていた。",
+          "condition": {
+            "not": {
+              "any": [
+                {
+                  "flag": "priceCapActive"
+                },
+                {
+                  "flag": "subsidyActive"
+                },
+                {
+                  "flag": "rationingActive"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "mc-02-open",
+          "speaker": "fujii",
+          "text": "今年度の緊急対応枠は、来月で締めます。新しく始めるなら、今です。",
+          "condition": {
+            "not": {
+              "any": [
+                {
+                  "flag": "priceCapActive"
+                },
+                {
+                  "flag": "subsidyActive"
+                },
+                {
+                  "flag": "rationingActive"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "mc-03-open",
+          "speaker": "fujii",
+          "text": "制度を始めるなら予算が要ります。始めないなら、その理由を残す必要があります。",
+          "condition": {
+            "not": {
+              "any": [
+                {
+                  "flag": "priceCapActive"
+                },
+                {
+                  "flag": "subsidyActive"
+                },
+                {
+                  "flag": "rationingActive"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "mc-04-open",
+          "speaker": "takahashi",
+          "text": "新しい措置を始めない、という選択もあります。今の暮らしを見続けることは必要です。",
+          "condition": {
+            "not": {
+              "any": [
+                {
+                  "flag": "priceCapActive"
+                },
+                {
+                  "flag": "subsidyActive"
+                },
+                {
+                  "flag": "rationingActive"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "mc-05-open",
+          "speaker": "fujii",
+          "text": "それも決定です。何を始めなかったかまで、記録に残します。",
+          "condition": {
+            "not": {
+              "any": [
+                {
+                  "flag": "priceCapActive"
+                },
+                {
+                  "flag": "subsidyActive"
+                },
+                {
+                  "flag": "rationingActive"
+                }
+              ]
+            }
+          }
         }
       ],
       "next": {
@@ -2215,24 +2413,123 @@
       "background": "mayors-office-night.png",
       "lines": [
         {
-          "id": "d3-01",
+          "id": "d3-01-active",
           "speaker": "narrator",
-          "text": "三度目の判断は、始めることではなく、終わらせることについてだった。"
+          "text": "三度目の判断は、始めることではなく、終わらせることについてだった。",
+          "condition": {
+            "any": [
+              {
+                "flag": "priceCapActive"
+              },
+              {
+                "flag": "subsidyActive"
+              },
+              {
+                "flag": "rationingActive"
+              }
+            ]
+          }
         },
         {
-          "id": "d3-02",
+          "id": "d3-02-active",
           "speaker": "fujii",
-          "text": "緊急措置を、どうしますか。"
+          "text": "現在の緊急措置を、どうしますか。",
+          "condition": {
+            "any": [
+              {
+                "flag": "priceCapActive"
+              },
+              {
+                "flag": "subsidyActive"
+              },
+              {
+                "flag": "rationingActive"
+              }
+            ]
+          }
         },
         {
-          "id": "d3-03",
+          "id": "d3-03-active",
           "speaker": "takahashi",
-          "text": "今の暮らしが、この措置の上に載っている人がいます。そこだけは忘れないでください。"
+          "text": "今の暮らしが、この措置の上に載っている人がいます。そこだけは忘れないでください。",
+          "condition": {
+            "any": [
+              {
+                "flag": "priceCapActive"
+              },
+              {
+                "flag": "subsidyActive"
+              },
+              {
+                "flag": "rationingActive"
+              }
+            ]
+          }
+        },
+        {
+          "id": "d3-01-open",
+          "speaker": "narrator",
+          "text": "三度目の判断は、この一年の方針をどう続けるかについてだった。",
+          "condition": {
+            "not": {
+              "any": [
+                {
+                  "flag": "priceCapActive"
+                },
+                {
+                  "flag": "subsidyActive"
+                },
+                {
+                  "flag": "rationingActive"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "d3-02-open",
+          "speaker": "fujii",
+          "text": "緊急措置のない今、次に何を続け、何を始めますか。",
+          "condition": {
+            "not": {
+              "any": [
+                {
+                  "flag": "priceCapActive"
+                },
+                {
+                  "flag": "subsidyActive"
+                },
+                {
+                  "flag": "rationingActive"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "d3-03-open",
+          "speaker": "takahashi",
+          "text": "新しく始める支援にも、始めずに見守ることにも、暮らしへの責任があります。",
+          "condition": {
+            "not": {
+              "any": [
+                {
+                  "flag": "priceCapActive"
+                },
+                {
+                  "flag": "subsidyActive"
+                },
+                {
+                  "flag": "rationingActive"
+                }
+              ]
+            }
+          }
         }
       ],
       "next": {
         "type": "choices",
-        "prompt": "緊急措置の出口を決めてください",
+        "prompt": "この先の方針を決めてください",
         "choices": [
           {
             "id": "d3-permanent",
@@ -2290,8 +2587,8 @@
           },
           {
             "id": "d3-phase-out-price",
-            "text": "価格上限を三か月かけて解除する",
-            "description": "価格上限を段階的に外し、価格と供給を市場へ戻す。棚は戻る。負担も戻る。",
+            "text": "価格上限を解除し、臨時の補助・購入制限も終了する",
+            "description": "価格上限を三か月かけて外す。補助や購入制限が有効なら、それらも同じ期限で終え、価格と供給を市場へ戻す。",
             "condition": {
               "flag": "priceCapActive"
             },
@@ -2351,6 +2648,10 @@
               },
               {
                 "flag": "everReversed",
+                "value": true
+              },
+              {
+                "flag": "justEnded",
                 "value": true
               }
             ],
@@ -2434,6 +2735,10 @@
               },
               {
                 "flag": "everReversed",
+                "value": true
+              },
+              {
+                "flag": "justEnded",
                 "value": true
               }
             ],
@@ -2529,6 +2834,10 @@
               },
               {
                 "flag": "everReversed",
+                "value": true
+              },
+              {
+                "flag": "justEnded",
                 "value": true
               }
             ],
@@ -2742,34 +3051,202 @@
             "id": "d3-nothing",
             "text": "決めない。今日は何も動かさない",
             "description": "新しい決定はしない。今ある制度はそのまま進み、期限のあるものは期限を迎える。",
-            "effects": [
-              {
-                "param": "popularity",
-                "op": "add",
-                "value": -5
-              },
-              {
-                "param": "foodAccess",
-                "op": "add",
-                "value": -2
-              },
-              {
-                "param": "informalMarket",
-                "op": "add",
-                "value": 4
-              },
-              {
-                "param": "budget",
-                "op": "add",
-                "value": -3
-              }
-            ],
             "next": {
-              "type": "goto",
-              "scene": "d3-results"
+              "type": "branch",
+              "branches": [
+                {
+                  "when": {
+                    "flag": "priceCapActive"
+                  },
+                  "then": {
+                    "type": "goto",
+                    "scene": "d3-nothing-expire-price"
+                  }
+                },
+                {
+                  "when": {
+                    "any": [
+                      {
+                        "flag": "subsidyActive"
+                      },
+                      {
+                        "flag": "rationingActive"
+                      }
+                    ]
+                  },
+                  "then": {
+                    "type": "goto",
+                    "scene": "d3-nothing-expire-support"
+                  }
+                }
+              ],
+              "else": {
+                "type": "goto",
+                "scene": "d3-nothing-no-expiry"
+              }
             }
           }
         ]
+      }
+    },
+    {
+      "id": "d3-nothing-expire-price",
+      "lines": [],
+      "onEnter": [
+        {
+          "param": "price",
+          "op": "add",
+          "value": 28
+        },
+        {
+          "param": "supply",
+          "op": "add",
+          "value": 14
+        },
+        {
+          "param": "informalMarket",
+          "op": "add",
+          "value": -12
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": 2
+        },
+        {
+          "param": "marketRisk",
+          "op": "add",
+          "value": -3
+        },
+        {
+          "param": "popularity",
+          "op": "add",
+          "value": -12
+        },
+        {
+          "param": "budget",
+          "op": "add",
+          "value": -3
+        },
+        {
+          "flag": "priceCapActive",
+          "value": false
+        },
+        {
+          "flag": "subsidyActive",
+          "value": false
+        },
+        {
+          "flag": "rationingActive",
+          "value": false
+        },
+        {
+          "flag": "everReversed",
+          "value": true
+        },
+        {
+          "flag": "justEnded",
+          "value": true
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "d3-results"
+      }
+    },
+    {
+      "id": "d3-nothing-expire-support",
+      "lines": [],
+      "onEnter": [
+        {
+          "param": "price",
+          "op": "add",
+          "value": 14
+        },
+        {
+          "param": "supply",
+          "op": "add",
+          "value": 4
+        },
+        {
+          "param": "informalMarket",
+          "op": "add",
+          "value": -7
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": -3
+        },
+        {
+          "param": "marketRisk",
+          "op": "add",
+          "value": -2
+        },
+        {
+          "param": "popularity",
+          "op": "add",
+          "value": -12
+        },
+        {
+          "param": "budget",
+          "op": "add",
+          "value": -2
+        },
+        {
+          "flag": "priceCapActive",
+          "value": false
+        },
+        {
+          "flag": "subsidyActive",
+          "value": false
+        },
+        {
+          "flag": "rationingActive",
+          "value": false
+        },
+        {
+          "flag": "everReversed",
+          "value": true
+        },
+        {
+          "flag": "justEnded",
+          "value": true
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "d3-results"
+      }
+    },
+    {
+      "id": "d3-nothing-no-expiry",
+      "lines": [],
+      "onEnter": [
+        {
+          "param": "popularity",
+          "op": "add",
+          "value": -5
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": -2
+        },
+        {
+          "param": "informalMarket",
+          "op": "add",
+          "value": 4
+        },
+        {
+          "param": "budget",
+          "op": "add",
+          "value": -3
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "d3-results"
       }
     },
     {
@@ -2794,7 +3271,7 @@
           "speaker": "misaki",
           "text": "終わるんですね。……分かりました。準備します。",
           "condition": {
-            "flag": "everReversed"
+            "flag": "justEnded"
           }
         },
         {
@@ -2816,7 +3293,7 @@
                   "flag": "permanentized"
                 },
                 {
-                  "flag": "everReversed"
+                  "flag": "justEnded"
                 },
                 {
                   "flag": "targetedSupportActive"
@@ -2880,9 +3357,35 @@
           "speaker": "kuroda",
           "text": "私は次の街へ行きます。ここはもう、普通の相場に戻ったので。",
           "condition": {
-            "param": "supply",
-            "op": ">=",
-            "value": 85
+            "all": [
+              {
+                "param": "supply",
+                "op": ">=",
+                "value": 85
+              },
+              {
+                "not": {
+                  "flag": "subsidyActive"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "ep-06-subsidy",
+          "speaker": "kuroda",
+          "text": "補助が続くうちは、うちも運びます。それだけです。",
+          "condition": {
+            "all": [
+              {
+                "param": "supply",
+                "op": ">=",
+                "value": 85
+              },
+              {
+                "flag": "subsidyActive"
+              }
+            ]
           }
         },
         {
@@ -2913,9 +3416,24 @@
       },
       "lines": [
         {
-          "id": "tcp-01",
+          "id": "tcp-01-stocked",
           "speaker": "narrator",
-          "text": "パンはあった。値段も、危機の前ほどではないが落ち着いた。"
+          "text": "パンはあった。値段も、危機の前ほどではないが落ち着いた。",
+          "condition": {
+            "param": "supply",
+            "op": ">=",
+            "value": 70
+          }
+        },
+        {
+          "id": "tcp-01-short",
+          "speaker": "narrator",
+          "text": "市は払い続けた。それでも棚は十分には戻らなかった。",
+          "condition": {
+            "param": "supply",
+            "op": "<",
+            "value": 70
+          }
         },
         {
           "id": "tcp-02",
@@ -2937,7 +3455,7 @@
           "speaker": "yamada",
           "text": "補助が切れたら、その日から二百四十円に戻します。戻すしかありません。",
           "condition": {
-            "flag": "everSubsidy"
+            "flag": "subsidyActive"
           }
         },
         {
@@ -2966,7 +3484,7 @@
           "text": "【ECONOMICS：「値段」と「手に入るか」は別の数字】\nこのゲームには、価格と foodAccess という二つの数字がありました。\n公定価格が最も低かった結末で、市民が最も食べられていたわけではありません。\n合法な価格、実際に払われた価格、実際に手に入ったかどうか。この三つは、いつも同じではありません。"
         }
       ],
-      "summary": "供給と生活は守られた。その費用は、まだ来ていない年度から前借りされている。"
+      "summary": "市は支払いを続けた。その成果の大小にかかわらず、費用はまだ来ていない年度から前借りされている。"
     },
     {
       "id": "policy-drift",
@@ -3060,9 +3578,22 @@
       },
       "lines": [
         {
-          "id": "tm-01",
+          "id": "tm-01-cap",
           "speaker": "narrator",
-          "text": "商店街の値札は百六十円のままだ。棚は、たいてい空だ。"
+          "text": "商店街の値札は {{param.price}} 円のままだ。価格上限は残り、棚はたいてい空だ。",
+          "condition": {
+            "flag": "priceCapActive"
+          }
+        },
+        {
+          "id": "tm-01-market",
+          "speaker": "narrator",
+          "text": "価格上限を外した後も、商店街の値札は {{param.price}} 円だ。正規の棚は、十分に戻らなかった。",
+          "condition": {
+            "not": {
+              "flag": "priceCapActive"
+            }
+          }
         },
         {
           "id": "tm-02",
@@ -3120,7 +3651,10 @@
         {
           "id": "two-markets-e10",
           "speaker": "analyst",
-          "text": "【ECONOMICS：非公式市場】\n取引を禁じても、需要と供給そのものは消えません。\n買いたい人と売りたい人が残っていれば、取引は別の場所へ移ります。\n公民館の駐車場に人が集まったのは、そこにしか市場が残っていなかったからです。"
+          "text": "【ECONOMICS：非公式市場】\n取引を禁じても、需要と供給そのものは消えません。\n買いたい人と売りたい人が残っていれば、取引は別の場所へ移ります。\n公民館の駐車場に人が集まったのは、そこにしか市場が残っていなかったからです。",
+          "condition": {
+            "visited": "informal-intro"
+          }
         },
         {
           "id": "two-markets-e11",
@@ -3133,7 +3667,7 @@
           "text": "【ECONOMICS：「値段」と「手に入るか」は別の数字】\nこのゲームには、価格と foodAccess という二つの数字がありました。\n公定価格が最も低かった結末で、市民が最も食べられていたわけではありません。\n合法な価格、実際に払われた価格、実際に手に入ったかどうか。この三つは、いつも同じではありません。"
         }
       ],
-      "summary": "公定価格は低いまま、実際の取引は別の場所へ移った。多くの市民はそこで食料を確保しているが、そこに市の保証はない。"
+      "summary": "正規市場が細り、実際の取引は別の場所へ移った。多くの市民はそこで食料を確保しているが、そこに市の保証はない。"
     },
     {
       "id": "cheap-bread-empty-shelves",
@@ -3155,7 +3689,7 @@
         {
           "id": "ces-01",
           "speaker": "narrator",
-          "text": "条例は守られた。価格は百六十円のままだ。"
+          "text": "条例は守られた。価格は {{param.price}} 円のままだ。"
         },
         {
           "id": "ces-02",
@@ -3208,7 +3742,10 @@
         {
           "id": "cheap-bread-empty-shelves-e10",
           "speaker": "analyst",
-          "text": "【ECONOMICS：非公式市場】\n取引を禁じても、需要と供給そのものは消えません。\n買いたい人と売りたい人が残っていれば、取引は別の場所へ移ります。\n公民館の駐車場に人が集まったのは、そこにしか市場が残っていなかったからです。"
+          "text": "【ECONOMICS：非公式市場】\n取引を禁じても、需要と供給そのものは消えません。\n買いたい人と売りたい人が残っていれば、取引は別の場所へ移ります。\n公民館の駐車場に人が集まったのは、そこにしか市場が残っていなかったからです。",
+          "condition": {
+            "visited": "informal-intro"
+          }
         },
         {
           "id": "cheap-bread-empty-shelves-e12",
@@ -3318,6 +3855,9 @@
             "not": {
               "flag": "rationingActive"
             }
+          },
+          {
+            "flag": "everDeregulate"
           }
         ]
       },
