@@ -3,7 +3,7 @@
   "meta": {
     "id": "bread-price",
     "title": "パンの値段を下げろ！",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "locale": "ja-JP",
     "author": "economic-choices",
     "summary": "小麦不足でパン価格が高騰した都市。市長として、価格・供給・財政の均衡を探る短編です。",
@@ -171,6 +171,7 @@
       "targetedSupportActive": false,
       "rationingActive": false,
       "informalTolerated": false,
+      "informalRegistered": false,
       "crackdownActive": false,
       "permanentized": false,
       "everPriceCap": false,
@@ -715,7 +716,7 @@
         {
           "param": "marketRisk",
           "op": "add",
-          "value": 5
+          "value": 8
         },
         {
           "param": "budget",
@@ -1295,7 +1296,7 @@
               {
                 "param": "marketRisk",
                 "op": "add",
-                "value": 2
+                "value": 3
               },
               {
                 "param": "policyChanges",
@@ -1618,7 +1619,7 @@
           {
             "id": "informal-crackdown",
             "text": "徹底的に摘発する",
-            "description": "一斉の指導と告発を行う。詐欺的な販売や出所不明の商品は減る。そこで買っていた人の、今日の分も減る。",
+            "description": "一斉の指導と告発を行う。取引上の不確実性は大きく下がり、正規市場へ少し戻る。ただし、そこで買っていた人の今日の分も減る。",
             "effects": [
               {
                 "param": "informalMarket",
@@ -1628,27 +1629,27 @@
               {
                 "param": "foodAccess",
                 "op": "add",
-                "value": -12
+                "value": -10
               },
               {
                 "param": "budget",
                 "op": "add",
-                "value": -12
+                "value": -16
               },
               {
                 "param": "marketRisk",
                 "op": "add",
-                "value": -6
+                "value": -12
               },
               {
                 "param": "popularity",
                 "op": "add",
-                "value": -3
+                "value": -1
               },
               {
                 "param": "supply",
                 "op": "add",
-                "value": 2
+                "value": 4
               },
               {
                 "flag": "crackdownActive",
@@ -1657,6 +1658,10 @@
               {
                 "flag": "everCrackdown",
                 "value": true
+              },
+              {
+                "flag": "illicitGoodsAppeared",
+                "value": false
               }
             ],
             "next": {
@@ -1665,14 +1670,83 @@
             }
           },
           {
-            "id": "informal-tolerate",
-            "text": "食品の取引に限って、当面は黙認する",
-            "description": "食品衛生の最低限だけ示し、摘発はしない。買える人は増える。「どこまで許すのか」を、これから毎週決めることになる。",
+            "id": "informal-register",
+            "text": "届出と表示を条件に、食品の非公式販売を認める",
+            "description": "売り手に届出と表示を求め、そのうえで食品の取引は認める。買える人は増え、誰が売っているかも分かる。境界線を引き、維持する仕事が市に残る。",
+            "condition": {
+              "param": "budget",
+              "op": ">=",
+              "value": 20
+            },
+            "ifUnmet": "disable",
+            "unmetText": "行政コストを負担できません（20 必要）",
             "effects": [
               {
                 "param": "informalMarket",
                 "op": "add",
-                "value": 10
+                "value": 8
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 12
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": -2
+              },
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -20
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 2
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 0
+              },
+              {
+                "param": "policyChanges",
+                "op": "add",
+                "value": 0
+              },
+              {
+                "flag": "informalTolerated",
+                "value": true
+              },
+              {
+                "flag": "everTolerated",
+                "value": true
+              },
+              {
+                "flag": "informalRegistered",
+                "value": true
+              },
+              {
+                "flag": "illicitGoodsAppeared",
+                "value": false
+              }
+            ],
+            "next": {
+              "type": "goto",
+              "scene": "informal-register-after"
+            }
+          },
+          {
+            "id": "informal-tolerate",
+            "text": "食品の取引に限って、当面は黙認する",
+            "description": "市は積極的な取締りを見送り、最低限の注意喚起に留める。買える人は最も増えるが、売り手の届出も取引の保証も求めない。",
+            "effects": [
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": 12
               },
               {
                 "param": "foodAccess",
@@ -1682,17 +1756,22 @@
               {
                 "param": "marketRisk",
                 "op": "add",
-                "value": 6
+                "value": 14
               },
               {
                 "param": "popularity",
                 "op": "add",
-                "value": 2
+                "value": 1
               },
               {
                 "param": "budget",
                 "op": "add",
-                "value": -3
+                "value": -4
+              },
+              {
+                "param": "policyChanges",
+                "op": "add",
+                "value": 0
               },
               {
                 "flag": "informalTolerated",
@@ -1809,18 +1888,53 @@
       }
     },
     {
+      "id": "informal-register-after",
+      "background": "back-lot.png",
+      "lines": [
+        {
+          "id": "irg-01",
+          "speaker": "narrator",
+          "text": "届出制が始まった翌週、公民館の机には売り手の名前と食品の表示が並んだ。"
+        },
+        {
+          "id": "irg-02",
+          "speaker": "takahashi",
+          "text": "食品を売る人には届け出てもらいました。何を、誰が売っているかは確認できます。"
+        },
+        {
+          "id": "irg-03",
+          "speaker": "misaki",
+          "text": "販売は続いています。仕事の帰りにも買えるので、前より助かる人は増えました。"
+        },
+        {
+          "id": "irg-04",
+          "speaker": "fujii",
+          "text": "食べ物の話と、それ以外の話を分けて決めた。その境界を保つ確認作業は、市に残ります。"
+        },
+        {
+          "id": "irg-05",
+          "speaker": "takahashi",
+          "text": "非公式だから無秩序、とは限りません。ただ、表示を確かめ続けなければ、この制度は保てません。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "m6-router"
+      }
+    },
+    {
       "id": "informal-tolerate-after",
       "background": "back-lot.png",
       "lines": [
         {
           "id": "ita-01",
           "speaker": "narrator",
-          "text": "市は、食品の非公式販売について、当面の指導を見送ると決めた。"
+          "text": "市は非公式販売への積極的な取締りを見送り、最低限の注意喚起に留めた。"
         },
         {
           "id": "ita-02",
           "speaker": "takahashi",
-          "text": "手洗い設備と表示だけ、紙一枚でお願いしました。断る人はいませんでした。"
+          "text": "売り手の届け出も、商品の表示も義務にはしていません。現場へ注意書きを渡しただけです。"
         },
         {
           "id": "ita-03",
@@ -1835,7 +1949,7 @@
         {
           "id": "ita-05",
           "speaker": "fujii",
-          "text": "「どこまでを食品と呼ぶか」で、毎週会議をすることになりました。"
+          "text": "線を引かなかった分、取引は早く広がりました。市が確認できない範囲も、同じ速さで広がっています。"
         }
       ],
       "next": {
@@ -3039,7 +3153,7 @@
               {
                 "param": "marketRisk",
                 "op": "add",
-                "value": -3
+                "value": -5
               }
             ],
             "next": {
@@ -3624,13 +3738,23 @@
           }
         },
         {
-          "id": "tm-07",
+          "id": "tm-07-ordered",
           "speaker": "takahashi",
-          "text": "売っている人の顔は、だいたい分かるようになりました。それが良いことなのかは、まだ分かりません。",
+          "text": "売り手の顔と常連のつながりは見えています。悪い商品を売れば次から相手にされない。繰り返す取引と評判が、保証の代わりになっています。",
           "condition": {
             "param": "marketRisk",
             "op": "<",
-            "value": 35
+            "value": 28
+          }
+        },
+        {
+          "id": "tm-07-risky",
+          "speaker": "misaki",
+          "text": "品質は、その場では確かめきれません。買った場所も言いたくないです。明日そこまで無くなるのが怖いので。",
+          "condition": {
+            "param": "marketRisk",
+            "op": ">=",
+            "value": 28
           }
         },
         {
@@ -3659,7 +3783,7 @@
         {
           "id": "two-markets-e11",
           "speaker": "analyst",
-          "text": "【ECONOMICS：非公式市場のもう一つの側面】\n非公式市場は、正規市場が届かなくなった食料を人々へ届けることがあります。\n同時に、そこでの取引には返品も保証も届出もありません。\nそして同じ流通経路には、食品以外の、規制の対象になる商品も入り込むことがあります。\n食料が非公式に流れることと、犯罪市場ができることは、同じではありません。\nただし、経路が同じになると、区別する仕事は行政の側に残ります。"
+          "text": "【ECONOMICS：非公式市場の秩序と保証】\n非公式市場は犯罪市場と同義ではなく、正規市場からこぼれた需要と供給を再接続することがあります。\n顔の見える地域では、繰り返す取引、評判、共同体からの排除が、一定の秩序を作ることもあります。\n一方で、通常の契約・返品・品質保証は弱くなりがちです。\n届出や表示は、市の費用と引き換えに、市場の規模を保ちながら取引上の不確実性だけを下げることがあります。"
         },
         {
           "id": "two-markets-e12",
@@ -3715,6 +3839,23 @@
           }
         },
         {
+          "id": "ces-05-quiet",
+          "speaker": "narrator",
+          "text": "裏通りも静かになった。静かなだけで、棚は空のままだ。",
+          "condition": {
+            "all": [
+              {
+                "flag": "everCrackdown"
+              },
+              {
+                "param": "marketRisk",
+                "op": "<=",
+                "value": 12
+              }
+            ]
+          }
+        },
+        {
           "id": "ces-06",
           "speaker": "narrator",
           "text": "一部の市民は、まだどこかで手に入れている。多くは、そうではない。",
@@ -3754,6 +3895,86 @@
         }
       ],
       "summary": "合法な価格は最後まで低く保たれた。ただし、その価格で買える機会そのものが減っていった。"
+    },
+    {
+      "id": "order-without-bread",
+      "title": "秩序は戻った、棚は戻らない",
+      "rank": "normal",
+      "condition": {
+        "all": [
+          {
+            "flag": "everCrackdown"
+          },
+          {
+            "param": "marketRisk",
+            "op": "<=",
+            "value": 12
+          },
+          {
+            "param": "foodAccess",
+            "op": "<=",
+            "value": 50
+          }
+        ]
+      },
+      "lines": [
+        {
+          "id": "owb-01",
+          "speaker": "narrator",
+          "text": "非公式販売の折りたたみ机は、通りから消えた。"
+        },
+        {
+          "id": "owb-02",
+          "speaker": "takahashi",
+          "text": "偽の支給券と出所を説明できない商品は、目に見えて減りました。"
+        },
+        {
+          "id": "owb-03",
+          "speaker": "narrator",
+          "text": "取引上の不確実性は大きく下がった。誰から何を買うのか分からない取引も減った。"
+        },
+        {
+          "id": "owb-04",
+          "speaker": "misaki",
+          "text": "でも、買う場所そのものも減りました。正規のお店の棚は、まだ朝で空になります。"
+        },
+        {
+          "id": "owb-05",
+          "speaker": "yamada",
+          "text": "店へ戻ってきた分はあります。足りない分まで戻ったわけではありません。"
+        },
+        {
+          "id": "owb-06",
+          "speaker": "fujii",
+          "text": "法律を守らせることと、商品を手に入るようにすることは、同じ仕事ではありませんでした。"
+        },
+        {
+          "id": "owb-07",
+          "speaker": "narrator",
+          "text": "秩序は得た。しかし供給は戻らなかった。"
+        },
+        {
+          "id": "order-without-bread-e10",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：非公式市場】\n取引を禁じても、需要と供給そのものは消えません。\n買いたい人と売りたい人が残っていれば、取引は別の場所へ移るか、成立しなくなります。\n摘発で机が消えた後も、食料を必要とする人は残りました。"
+        },
+        {
+          "id": "order-without-bread-e11",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：非公式市場の秩序と保証】\n非公式市場は犯罪市場と同義ではなく、正規市場からこぼれた需要と供給を再接続することがあります。\n顔の見える地域では、繰り返す取引、評判、共同体からの排除が、一定の秩序を作ることもあります。\n一方で、通常の契約・返品・品質保証は弱くなりがちです。\n届出や表示は、市の費用と引き換えに、市場の規模を保ちながら取引上の不確実性だけを下げることがあります。"
+        },
+        {
+          "id": "order-without-bread-e14",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：取引の安全と食料アクセス】\n摘発は、詐欺的な販売や品質を確かめにくい取引を減らし、取引上の不確実性を下げます。\n同時に、取引の場そのものを閉じれば、そこで食料を得ていた人の経路も消えます。\n安全性と入手しやすさは別の指標で、一方だけを改善する政策にも正当な理由と明確な代償があります。"
+        },
+        {
+          "id": "order-without-bread-e12",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：「値段」と「手に入るか」は別の数字】\nこのゲームには、価格と foodAccess という二つの数字がありました。\n公定価格が最も低かった結末で、市民が最も食べられていたわけではありません。\n合法な価格、実際に払われた価格、実際に手に入ったかどうか。この三つは、いつも同じではありません。"
+        }
+      ],
+      "summary": "取引上の不確実性は下がった。しかし食料を買える場所も減り、正規の供給は不足を埋めなかった。"
     },
     {
       "id": "for-those-who-need",

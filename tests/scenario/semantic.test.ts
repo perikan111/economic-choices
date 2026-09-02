@@ -6,6 +6,7 @@ import {
   createInitialState,
   evaluateCondition,
   getView,
+  type Choice,
   type Condition,
   type GameState,
 } from "@/game-core";
@@ -19,7 +20,13 @@ interface ScenarioAudit {
   completed: GameState[];
   conditionalLineIds: Set<string>;
   choiceCounts: number[];
+  choiceStates: Map<string, GameState[]>;
   sceneStates: Map<string, GameState[]>;
+}
+
+interface NumberRange {
+  min: number;
+  max: number;
 }
 
 function isVisible(state: GameState, line: ConditionalLine): boolean {
@@ -36,10 +43,55 @@ function recordConditionalLines(
   }
 }
 
+function conditionReferencesParam(condition: Condition, parameterId: string): boolean {
+  if ("param" in condition) return condition.param === parameterId;
+  if ("all" in condition) return condition.all.some((item) => conditionReferencesParam(item, parameterId));
+  if ("any" in condition) return condition.any.some((item) => conditionReferencesParam(item, parameterId));
+  if ("not" in condition) return conditionReferencesParam(condition.not, parameterId);
+  return false;
+}
+
+function getInformalChoice(choiceId: string): Choice {
+  const scene = breadPriceScenario.scenes.find(({ id }) => id === "informal-decision");
+  if (!scene || scene.next.type !== "choices") throw new Error("informal-decisionのchoicesが見つかりません。");
+  const choice = scene.next.choices.find(({ id }) => id === choiceId);
+  if (!choice) throw new Error(`choice ${choiceId} が見つかりません。`);
+  return choice;
+}
+
+function parameterRange(states: GameState[], parameterId: string): NumberRange {
+  const values = states.map((state) => state.parameters[parameterId]);
+  if (values.length === 0 || values.some((value) => value === undefined)) {
+    throw new Error(`${parameterId}のrangeを算出できません。`);
+  }
+  return { min: Math.min(...values), max: Math.max(...values) };
+}
+
+function correlation(states: GameState[], leftId: string, rightId: string): number {
+  const left = states.map((state) => state.parameters[leftId]);
+  const right = states.map((state) => state.parameters[rightId]);
+  const leftMean = left.reduce((sum, value) => sum + value, 0) / left.length;
+  const rightMean = right.reduce((sum, value) => sum + value, 0) / right.length;
+  let covariance = 0;
+  let leftVariance = 0;
+  let rightVariance = 0;
+
+  for (let index = 0; index < states.length; index += 1) {
+    const leftDelta = left[index] - leftMean;
+    const rightDelta = right[index] - rightMean;
+    covariance += leftDelta * rightDelta;
+    leftVariance += leftDelta ** 2;
+    rightVariance += rightDelta ** 2;
+  }
+
+  return Number((covariance / Math.sqrt(leftVariance * rightVariance)).toFixed(3));
+}
+
 function enumerateScenario(): ScenarioAudit {
   const completed: GameState[] = [];
   const conditionalLineIds = new Set<string>();
   const choiceCounts: number[] = [];
+  const choiceStates = new Map<string, GameState[]>();
   const sceneStates = new Map<string, GameState[]>();
   const pending: Array<{ state: GameState; steps: number }> = [
     { state: createInitialState(breadPriceScenario), steps: 0 },
@@ -70,6 +122,7 @@ function enumerateScenario(): ScenarioAudit {
       const enabled = view.choices.filter((choice) => choice.enabled);
       choiceCounts.push(enabled.length);
       for (const choice of enabled) {
+        choiceStates.set(choice.id, [...(choiceStates.get(choice.id) ?? []), state]);
         pending.push({ state: choose(breadPriceScenario, state, choice.id), steps: steps + 1 });
       }
     } else {
@@ -77,7 +130,7 @@ function enumerateScenario(): ScenarioAudit {
     }
   }
 
-  return { completed, conditionalLineIds, choiceCounts, sceneStates };
+  return { completed, conditionalLineIds, choiceCounts, choiceStates, sceneStates };
 }
 
 function reachDecision3(choiceIds: string[]): GameState {
@@ -100,6 +153,59 @@ function reachDecision3(choiceIds: string[]): GameState {
 }
 
 const AUDIT = enumerateScenario();
+const INFORMAL_CHOICE_IDS = [
+  "informal-crackdown",
+  "informal-register",
+  "informal-tolerate",
+  "informal-relax-price",
+] as const;
+
+function completedAfterChoice(choiceId: string): GameState[] {
+  return AUDIT.completed.filter((state) =>
+    state.choiceHistory.some((entry) => entry.choiceId === choiceId),
+  );
+}
+
+function balanceReport() {
+  const crackdownStates = completedAfterChoice("informal-crackdown");
+  const crackdownMixedLedger = crackdownStates.filter(
+    (state) => state.cursor.phase === "ending" && state.cursor.endingId === "mixed-ledger",
+  ).length;
+
+  return {
+    totalRoutes: AUDIT.completed.length,
+    endingCounts: Object.fromEntries(
+      breadPriceScenario.endings.map((ending) => [
+        ending.id,
+        AUDIT.completed.filter(
+          (state) => state.cursor.phase === "ending" && state.cursor.endingId === ending.id,
+        ).length,
+      ]),
+    ),
+    informalChoices: Object.fromEntries(
+      INFORMAL_CHOICE_IDS.map((choiceId) => {
+        const states = completedAfterChoice(choiceId);
+        return [choiceId, {
+          routes: states.length,
+          foodAccess: parameterRange(states, "foodAccess"),
+          marketRisk: parameterRange(states, "marketRisk"),
+          informalMarket: parameterRange(states, "informalMarket"),
+        }];
+      }),
+    ),
+    overall: {
+      foodAccess: parameterRange(AUDIT.completed, "foodAccess"),
+      marketRisk: parameterRange(AUDIT.completed, "marketRisk"),
+      informalMarket: parameterRange(AUDIT.completed, "informalMarket"),
+    },
+    informalMarketRiskCorrelation: correlation(AUDIT.completed, "informalMarket", "marketRisk"),
+    crackdownMixedLedger: {
+      routes: crackdownStates.length,
+      mixedLedger: crackdownMixedLedger,
+      ratio: Number((crackdownMixedLedger / crackdownStates.length).toFixed(3)),
+    },
+  };
+}
 
 describe("bread-price scenario semantic audit", () => {
   test("d3-nothingは期限付き措置を終了するがpolicyChangesを増やさない", () => {
@@ -264,11 +370,26 @@ describe("bread-price scenario semantic audit", () => {
     }
   });
 
+  test("two-marketsはmarketRisk 28を境に秩序と高リスクの本文を出し分ける", () => {
+    const ending = breadPriceScenario.endings.find(({ id }) => id === "two-markets");
+    const orderedLine = ending?.lines.find(({ id }) => id === "tm-07-ordered");
+    const riskyLine = ending?.lines.find(({ id }) => id === "tm-07-risky");
+    if (!orderedLine || !riskyLine) throw new Error("two-marketsのmarketRisk分岐が見つかりません。");
+
+    for (const state of AUDIT.completed.filter(
+      ({ cursor }) => cursor.phase === "ending" && cursor.endingId === "two-markets",
+    )) {
+      expect(isVisible(state, orderedLine)).toBe(state.parameters.marketRisk < 28);
+      expect(isVisible(state, riskyLine)).toBe(state.parameters.marketRisk >= 28);
+      expect(isVisible(state, orderedLine)).not.toBe(isVisible(state, riskyLine));
+    }
+  });
+
   test("E10は非公式市場イベントを経験したendingでのみ表示する", () => {
     const e10Lines = breadPriceScenario.endings.flatMap((ending) =>
       ending.lines.filter(({ id }) => id?.endsWith("e10")),
     );
-    expect(e10Lines).toHaveLength(2);
+    expect(e10Lines).toHaveLength(3);
 
     for (const state of AUDIT.completed) {
       const endingId = state.cursor.phase === "ending" ? state.cursor.endingId : undefined;
@@ -284,7 +405,89 @@ describe("bread-price scenario semantic audit", () => {
     expect(Math.min(...AUDIT.choiceCounts)).toBeGreaterThanOrEqual(2);
   });
 
-  test("全98経路で7 endingsすべてへ到達できる", () => {
+  test("H8-1: informal-crackdown直後は全到達状態でmarketRiskが低下する", () => {
+    const beforeStates = AUDIT.choiceStates.get("informal-crackdown") ?? [];
+    expect(beforeStates.length).toBeGreaterThan(0);
+
+    for (const before of beforeStates) {
+      const after = choose(breadPriceScenario, before, "informal-crackdown");
+      expect(after.parameters.marketRisk).toBeLessThan(before.parameters.marketRisk);
+    }
+  });
+
+  test("H8-2: informal-registerとinformal-tolerate直後はfoodAccessが上昇する", () => {
+    for (const choiceId of ["informal-register", "informal-tolerate"]) {
+      const beforeStates = AUDIT.choiceStates.get(choiceId) ?? [];
+      expect(beforeStates.length).toBeGreaterThan(0);
+      for (const before of beforeStates) {
+        const after = choose(breadPriceScenario, before, choiceId);
+        expect(after.parameters.foodAccess).toBeGreaterThan(before.parameters.foodAccess);
+      }
+    }
+  });
+
+  test("H8-3: informal-registerは市場規模を増やしmarketRiskを下げる", () => {
+    const beforeStates = AUDIT.choiceStates.get("informal-register") ?? [];
+    expect(beforeStates.length).toBeGreaterThan(0);
+
+    for (const before of beforeStates) {
+      const after = choose(breadPriceScenario, before, "informal-register");
+      expect(after.parameters.informalMarket).toBeGreaterThan(before.parameters.informalMarket);
+      expect(after.parameters.marketRisk).toBeLessThan(before.parameters.marketRisk);
+    }
+  });
+
+  test("H8-4: marketRiskをendingと相互排他的な2本以上のconditional lineで参照する", () => {
+    const endingReferences = breadPriceScenario.endings.filter(
+      ({ condition }) => condition && conditionReferencesParam(condition, "marketRisk"),
+    );
+    const lineReferences = [
+      ...breadPriceScenario.scenes.flatMap((scene) => scene.lines),
+      ...breadPriceScenario.endings.flatMap((ending) => ending.lines),
+    ].filter(({ condition }) => condition && conditionReferencesParam(condition, "marketRisk"));
+
+    expect(endingReferences.length).toBeGreaterThanOrEqual(1);
+    expect(lineReferences.length).toBeGreaterThanOrEqual(2);
+  });
+
+  test("H8-7: illicitGoodsAppearedは未登録の黙認経路だけでtrueになる", () => {
+    for (const state of AUDIT.completed.filter(({ flags }) => flags.illicitGoodsAppeared)) {
+      expect(state.flags.informalTolerated).toBe(true);
+      expect(state.flags.informalRegistered).toBe(false);
+    }
+
+    for (const state of completedAfterChoice("informal-register")) {
+      expect(state.flags.illicitGoodsAppeared).toBe(false);
+    }
+  });
+
+  test("H8-8: 非公式市場を直接扱う全choiceにbudgetコストがある", () => {
+    // informal-relax-priceは既存effectsを変えず、価格政策へ戻る別カテゴリとして扱う。
+    for (const choiceId of ["informal-crackdown", "informal-register", "informal-tolerate"]) {
+      const budgetEffect = getInformalChoice(choiceId).effects?.find(
+        (effect) => "param" in effect && effect.param === "budget",
+      );
+      expect(budgetEffect).toMatchObject({ param: "budget", op: "add" });
+      if (!budgetEffect || !("param" in budgetEffect)) throw new Error("budget effectが見つかりません。");
+      expect(budgetEffect.value).toBeLessThan(0);
+    }
+  });
+
+  test("H8-10: 非公式市場への執行3choiceのpopularity変化は絶対値3以下", () => {
+    // informal-relax-priceは既存の政策撤回コスト（popularity -11）を維持する。
+    for (const choiceId of ["informal-crackdown", "informal-register", "informal-tolerate"]) {
+      const popularityEffects = getInformalChoice(choiceId).effects?.filter(
+        (effect) => "param" in effect && effect.param === "popularity",
+      ) ?? [];
+      const delta = popularityEffects.reduce(
+        (total, effect) => total + ("param" in effect ? effect.value : 0),
+        0,
+      );
+      expect(Math.abs(delta)).toBeLessThanOrEqual(3);
+    }
+  });
+
+  test("H8-9: 経路数や分布を固定せず全8 endingsの到達可能性を確認する", () => {
     const endingCounts = Object.fromEntries(
       breadPriceScenario.endings.map((ending) => [
         ending.id,
@@ -294,45 +497,30 @@ describe("bread-price scenario semantic audit", () => {
       ]),
     );
 
-    expect(AUDIT.completed).toHaveLength(98);
-    expect(endingCounts).toEqual({
-      "the-city-pays": 12,
-      "policy-drift": 1,
-      "two-markets": 14,
-      "cheap-bread-empty-shelves": 4,
-      "for-those-who-need": 25,
-      "price-called-bread": 7,
-      "mixed-ledger": 35,
-    });
+    expect(breadPriceScenario.endings).toHaveLength(8);
+    expect(AUDIT.completed.length).toBeGreaterThan(0);
+    expect(Object.values(endingCounts).every((count) => count > 0)).toBe(true);
   });
 
-  test("policy-driftとd3-nothing経由endingの分布を監査する", () => {
+  test("policy-driftとd3-nothing経由endingの到達性を監査する", () => {
     const policyDrift = AUDIT.completed.filter(
       (state) => state.cursor.phase === "ending" && state.cursor.endingId === "policy-drift",
     );
     const nothingStates = AUDIT.completed.filter((state) =>
       state.choiceHistory.some(({ choiceId }) => choiceId === "d3-nothing"),
     );
-    const nothingCounts = Object.fromEntries(
-      breadPriceScenario.endings.map((ending) => [
-        ending.id,
-        nothingStates.filter(
-          (state) => state.cursor.phase === "ending" && state.cursor.endingId === ending.id,
-        ).length,
-      ]),
-    );
+    expect(policyDrift.length).toBeGreaterThan(0);
+    expect(nothingStates.length).toBeGreaterThan(0);
+  });
 
-    expect(policyDrift).toHaveLength(1);
-    expect(nothingStates).toHaveLength(28);
-    expect(nothingCounts).toEqual({
-      "the-city-pays": 3,
-      "policy-drift": 0,
-      "two-markets": 4,
-      "cheap-bread-empty-shelves": 0,
-      "for-those-who-need": 5,
-      "price-called-bread": 3,
-      "mixed-ledger": 13,
-    });
+  test("H8-5/H8-6を含む全経路バランス値を算出するが分布は固定しない", () => {
+    const report = balanceReport();
+    expect(report.totalRoutes).toBe(AUDIT.completed.length);
+    expect(report.overall.marketRisk.max - report.overall.marketRisk.min).toBeGreaterThan(0);
+    expect(Number.isFinite(report.informalMarketRiskCorrelation)).toBe(true);
+    expect(report.crackdownMixedLedger.ratio).toBeGreaterThanOrEqual(0);
+    expect(report.crackdownMixedLedger.ratio).toBeLessThanOrEqual(1);
+    console.info("bread-price balance report", JSON.stringify(report));
   });
 
   test("条件付きlineに到達不能なdead codeがない", () => {

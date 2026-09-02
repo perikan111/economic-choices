@@ -1,8 +1,10 @@
 # 「パンの値段を下げろ！」本番シナリオ設計書
 
-対象: economic-choices 第一作 / `scenario.json` 実装前の設計正本
-最終更新: 2026-09-02
+対象: economic-choices 第一作 / `scenario.json` と同期する設計正本
+最終更新: 2026-09-03
 準拠: [scenario-format.md](../scenario-format.md) `formatVersion: 1`
+
+シナリオversion: **1.1.0**。既存フォーマットとの互換性は保ったまま、choice・flag・scene・Endingを追加するため、patchではなくminor versionを更新する。
 
 このドキュメントは、`scenarios/bread-price/scenario.json` へ機械的に変換するための完成設計である。
 **台詞は本番稿**であり、プレースホルダーではない。実装時はこの文書を正本とし、差異が出たらこちらを先に直す。
@@ -45,11 +47,13 @@
 
 | 経路 | 公定価格 | 正規供給 | 非公式市場 | **foodAccess** | エンディング |
 | --- | --- | --- | --- | --- | --- |
-| 価格統制 → 維持 → **非公式市場を黙認** → 恒久化 | 160円 | 16 | 66 | **57** | 表の市場、裏の市場 |
-| 価格統制 → 維持 → **非公式市場を摘発** → 恒久化 | 160円 | 18 | 34 | **27** | 安いパン、空の棚 |
+| 価格統制 → 維持 → **非公式市場を黙認** → 恒久化 | 160円 | 16 | 68 | **57** | 表の市場、裏の市場 |
+| 価格統制 → 維持 → **届出・表示付きで容認** → 恒久化 | 160円 | 18 | 64 | **51** | 表の市場、裏の市場 |
+| 価格統制 → 維持 → **非公式市場を摘発** → 恒久化 | 160円 | 20 | 34 | **29** | 安いパン、空の棚 |
 
-**同じ価格、ほぼ同じ正規供給。それでも市民が実際に食べられる度合いは 2 倍以上違う。**
-価格の数字だけを見ていると、この差は見えない。これが本作の設計の芯である。
+**同じ価格、近い正規供給でも、市民が実際に食べられる度合いは大きく違う。**
+さらに、届出制は非公式市場を広げながら取引上の不確実性を下げる。
+価格と市場規模だけを見ていると、この差は見えない。これが本作の設計の芯である。
 
 ---
 
@@ -89,8 +93,8 @@
 品質保証の弱さ、販売者の素性の分かりにくさ、返品・契約保護の弱さ、衛生の確認しにくさ、
 詐欺的商品が混ざる可能性を表す。**犯罪度ではない。**
 `informalMarket` が大きいほど `marketRisk` も自動的に高い、という設計にはしない。
-本作では「非公式市場 66 / marketRisk 27」という**規模が大きく比較的秩序だった**状態も、
-「非公式市場 34 / marketRisk 15」という状態も、どちらも成立する。
+本作では「非公式市場 64 / marketRisk 22」という**規模が大きく比較的秩序だった**状態も、
+「非公式市場 68 / marketRisk 38」という高リスク状態も、どちらも成立する。
 
 **`policyChanges` — 大きな政策転換の回数。通常は非表示。**
 制度の予測可能性を測る内部指標。**一度の合理的な政策転換では不利益を出さない。**
@@ -119,6 +123,7 @@ UI は `goodDirection` を使って増減を「良い変化／悪い変化」に
 | `targetedSupportActive` | 困窮世帯への限定支援が現在有効 |
 | `rationingActive` | 購入量制限（配給制）が現在有効 |
 | `informalTolerated` | 非公式の食品取引を当面黙認している |
+| `informalRegistered` | 市が届出と表示により、食品とそれ以外の境界を制度として引いた |
 | `crackdownActive` | 非公式取引の摘発を実施した |
 | `permanentized` | 緊急措置を恒久制度化した |
 
@@ -139,8 +144,8 @@ UI は `goodDirection` を使って増減を「良い変化／悪い変化」に
 
 > **重要**: `illicitGoodsAppeared` は `informalMarket` の大きさとは独立に扱う。
 > 「非公式食品市場が育ったから必ず犯罪市場になる」とは描かない。
-> このフラグが立つのは **黙認を選び、市が線引きを明示しなかった場合のみ**であり、
-> 摘発ルートや価格緩和ルートでは立たない。
+> このフラグが立つのは **純粋な黙認を選び、市が線引きを明示しなかった場合のみ**である。
+> `informalRegistered=true`、摘発、価格緩和の経路では立たない。
 
 ---
 
@@ -212,11 +217,11 @@ UI は `goodDirection` を使って増減を「良い変化／悪い変化」に
 [非公式市場イベント] informal-intro │              │
                     ↓             │              │
               informal-decision   │              │
-          ┌─────────┬────────┬────┘              │
-       摘発       黙認     価格緩和                 │
-          ↓         ↓         ↓                  │
-  ...-crackdown-after / -tolerate-after / -relax-after
-          └─────────┴─────────┴──────────┬───────┘
+          ┌─────────┬─────────┬────────┬────┘      │
+       摘発       届出制      黙認     価格緩和       │
+          ↓          ↓         ↓         ↓        │
+  ...-crackdown-after / -register-after / -tolerate-after / -relax-after
+          └──────────┴─────────┴─────────┴──┬──────┘
                                           ↓
                                      m6-router  ← 表示行なし
               ┌────────┬────────┬────────┴────────┐
@@ -238,10 +243,10 @@ UI は `goodDirection` を使って増減を「良い変化／悪い変化」に
                             ↓
                       resolveEnding
                             ↓
-[ENDING] 7種 → [RESULT] → [ECONOMICS解説]
+[ENDING] 8種 → [RESULT] → [ECONOMICS解説]
 ```
 
-**シーン総数 34。** `d2-router` / `m6-router` と、`d3-nothing`の条件付きeffectを担う3シーンは
+**シーン総数 35。** `d2-router` / `m6-router` と、`d3-nothing`の条件付きeffectを担う3シーンは
 表示行を持たない分岐・結果専用シーン。
 
 ### 政策転換について
@@ -259,7 +264,7 @@ Decision 3では、価格上限から市場価格へ戻す、補助・配給を�
 市場価格と限定支援へ切り替える場合だけ `policyChanges` を +1 する。
 限定支援の恒久化・新規開始、情報公開、現状維持、現在の緊急措置の単純な恒久化では増やさない。
 期限切れを放置した`d3-nothing`も、プレイヤーが政策転換を決定していないため増やさない。
-非公式食品販売の限定的黙認は執行方針であり、政策体系の大きな転換には数えない。
+非公式食品販売への摘発・届出制・純粋な黙認は執行方針であり、政策体系の大きな転換には数えない。
 
 ---
 
@@ -285,22 +290,23 @@ Decision 3では、価格上限から市場価格へ戻す、補助・配給を�
 | 16 | `d2-results-controlled` | 10日後 | `back-lot.png` | narrator, misaki, yamada, fujii | 6 | branch |
 | 17 | `d2-results-open` | 10日後 | `market-street.png` | narrator, kuroda, yamada, misaki, takahashi, fujii | 6 | branch |
 | 18 | `informal-intro` | イベント | `back-lot.png` | narrator, misaki, kuroda, takahashi, fujii | 8 | goto `informal-decision` |
-| 19 | `informal-decision` | イベント判断 | `council-room.png` | fujii, takahashi | 2 | choices ×3 |
+| 19 | `informal-decision` | イベント判断 | `council-room.png` | fujii, takahashi | 2 | choices ×4 |
 | 20 | `informal-crackdown-after` | イベント結果 | `back-lot-empty.png` | narrator, takahashi, misaki | 5 | goto `m6-router` |
-| 21 | `informal-tolerate-after` | イベント結果 | `back-lot.png` | narrator, takahashi, misaki, fujii | 5 | goto `m6-router` |
-| 22 | `informal-relax-after` | イベント結果 | `bakery-yamada.png` | narrator, yamada, misaki, fujii | 5 | goto `m6-router` |
-| 23 | `m6-router` | 分岐専用 | — | **なし（行数 0）** | 0 | branch |
-| 24 | `m6-cap` | 6か月後 | `empty-shelf.png` | narrator, yamada, misaki, kuroda, fujii | 5 | goto `m6-council` |
-| 25 | `m6-subsidy` | 6か月後 | `bakery-yamada.png` | narrator, yamada, kuroda, fujii, takahashi | 5 | goto `m6-council` |
-| 26 | `m6-market` | 6か月後 | `market-street.png` | narrator, kuroda, misaki, yamada, fujii | 5 | goto `m6-council` |
-| 27 | `m6-common` | 6か月後 | `market-street.png` | narrator, misaki, yamada, takahashi, fujii | 6 | goto `m6-council` |
-| 28 | `m6-council` | 共通 | `council-room.png` | narrator, fujii, takahashi | 10 | goto `decision-3` |
-| 29 | `decision-3` | 判断③ | `mayors-office-night.png` | narrator, fujii, takahashi | 6 | choices ×8 |
-| 30 | `d3-nothing-expire-price` | 条件付きeffect | — | **なし（行数 0）** | 0 | goto `d3-results` |
-| 31 | `d3-nothing-expire-support` | 条件付きeffect | — | **なし（行数 0）** | 0 | goto `d3-results` |
-| 32 | `d3-nothing-no-expiry` | 条件付きeffect | — | **なし（行数 0）** | 0 | goto `d3-results` |
-| 33 | `d3-results` | 結果 | `council-room.png` | narrator, yamada, misaki, takahashi, fujii | 6 | goto `m9-epilogue` |
-| 34 | `m9-epilogue` | 3か月後 | `street-morning.png` | narrator, misaki, yamada, kuroda, takahashi, fujii | 9 | `resolveEnding` |
+| 21 | `informal-register-after` | イベント結果 | `back-lot.png` | narrator, takahashi, misaki, fujii | 5 | goto `m6-router` |
+| 22 | `informal-tolerate-after` | イベント結果 | `back-lot.png` | narrator, takahashi, misaki, fujii | 5 | goto `m6-router` |
+| 23 | `informal-relax-after` | イベント結果 | `bakery-yamada.png` | narrator, yamada, misaki, fujii | 5 | goto `m6-router` |
+| 24 | `m6-router` | 分岐専用 | — | **なし（行数 0）** | 0 | branch |
+| 25 | `m6-cap` | 6か月後 | `empty-shelf.png` | narrator, yamada, misaki, kuroda, fujii | 5 | goto `m6-council` |
+| 26 | `m6-subsidy` | 6か月後 | `bakery-yamada.png` | narrator, yamada, kuroda, fujii, takahashi | 5 | goto `m6-council` |
+| 27 | `m6-market` | 6か月後 | `market-street.png` | narrator, kuroda, misaki, yamada, fujii | 5 | goto `m6-council` |
+| 28 | `m6-common` | 6か月後 | `market-street.png` | narrator, misaki, yamada, takahashi, fujii | 6 | goto `m6-council` |
+| 29 | `m6-council` | 共通 | `council-room.png` | narrator, fujii, takahashi | 10 | goto `decision-3` |
+| 30 | `decision-3` | 判断③ | `mayors-office-night.png` | narrator, fujii, takahashi | 6 | choices ×8 |
+| 31 | `d3-nothing-expire-price` | 条件付きeffect | — | **なし（行数 0）** | 0 | goto `d3-results` |
+| 32 | `d3-nothing-expire-support` | 条件付きeffect | — | **なし（行数 0）** | 0 | goto `d3-results` |
+| 33 | `d3-nothing-no-expiry` | 条件付きeffect | — | **なし（行数 0）** | 0 | goto `d3-results` |
+| 34 | `d3-results` | 結果 | `council-room.png` | narrator, yamada, misaki, takahashi, fujii | 6 | goto `m9-epilogue` |
+| 35 | `m9-epilogue` | 3か月後 | `street-morning.png` | narrator, misaki, yamada, kuroda, takahashi, fujii | 9 | `resolveEnding` |
 
 > `d2-router` / `m6-router` と3つの`d3-nothing-*`は `lines: []` の専用シーン。
 > エンジンは表示行が 0 のシーンをそのまま次の遷移へ解決する（`engine/transition.ts` の `enterScene`）。
@@ -525,7 +531,7 @@ next: goto `w3-targeted`
 ### 9. `w3-cap` — 三週間後（価格規制ルート）
 
 背景 `empty-shelf.png`
-**onEnter**: `supply` −16 / `informalMarket` +18 / `foodAccess` **−14** / `marketRisk` +5 / `budget` −4 / `popularity` −6
+**onEnter**: `supply` −16 / `informalMarket` +18 / `foodAccess` **−14** / `marketRisk` +8 / `budget` −4 / `popularity` −6
 
 | line id | 話者 | 台詞 |
 | --- | --- | --- |
@@ -683,7 +689,7 @@ condition: `{ "param": "budget", "op": ">=", "value": 15 }` / ifUnmet: `disable`
 unmetText: 「政策余力が足りません（15 必要）」
 
 `budget` −15 / `popularity` +7 / `foodAccess` +4 / `informalMarket` +12 / `supply` −3 /
-`marketRisk` +2 / `policyChanges` **+1** / flag `rationingActive`=true, `everRationing`=true
+`marketRisk` +3 / `policyChanges` **+1** / flag `rationingActive`=true, `everRationing`=true
 
 next: goto `d2-router`
 
@@ -802,44 +808,65 @@ next: `type: "choices"` / prompt: **「非公式市場への方針を決めて�
 
 #### `informal-crackdown` 「徹底的に摘発する」
 
-> 一斉の指導と告発を行う。詐欺的な販売や出所不明の商品は減る。
-> そこで買っていた人の、今日の分も減る。
+> 一斉の指導と告発を行う。取引上の不確実性は大きく下がり、正規市場へ少し戻る。
+> ただし、そこで買っていた人の今日の分も減る。
 
 condition: なし（**無条件選択肢**）
 
 | effect | 値 | 意味 |
 | --- | --- | --- |
 | `informalMarket` | −22 | 取引は表から消える |
-| `foodAccess` | **−12** | **そこで食べていた人が食べられなくなる** |
-| `budget` | −12 | 執行コスト |
-| `marketRisk` | −6 | 詐欺・出所不明品は実際に減る |
-| `popularity` | −3 | 買っていた層の反発 |
-| `supply` | +2 | 一部は正規へ戻る |
-| flag | `crackdownActive`=true, `everCrackdown`=true | |
+| `foodAccess` | **−10** | **そこで食べていた人が食べられなくなる** |
+| `budget` | −16 | 一斉摘発の行政コスト |
+| `marketRisk` | −12 | 詐欺・出所不明品と取引保証の弱さを大きく減らす |
+| `popularity` | −1 | 人気投票ではなく取引安全性を目的にする |
+| `supply` | +4 | 一部は正規へ戻る |
+| flag | `crackdownActive`=true, `everCrackdown`=true, `illicitGoodsAppeared`=false | |
 
 > **単純な善行として描かない。** 摘発には本物の成果（`marketRisk` 低下）があり、
 > 本物の被害（`foodAccess` 低下）もある。両方を必ず台詞に出す。
 
 next: goto `informal-crackdown-after`
 
+#### `informal-register` 「届出と表示を条件に、食品の非公式販売を認める」
+
+> 売り手に届出と表示を求め、そのうえで食品の取引は認める。
+> 買える人は増え、誰が売っているかも分かる。境界線を引き、維持する仕事が市に残る。
+
+condition: `{ "param": "budget", "op": ">=", "value": 20 }` / ifUnmet: `disable`
+unmetText: **「行政コストを負担できません（20 必要）」**
+
+| effect | 値 | 意味 |
+| --- | --- | --- |
+| `informalMarket` | +8 | 届出済みの取引が続く |
+| `foodAccess` | **+12** | 仕事帰りにも買える場所を保つ |
+| `marketRisk` | −2 | 規模を保ちながら売り手と食品の確認可能性を上げる |
+| `budget` | −20 | 届出・表示確認を継続する行政コスト |
+| `supply` | +2 | 一部の取引が正規市場へ接続する |
+| `popularity` / `policyChanges` | 0 / 0 | 人気や大きな政策転換を目的にしない |
+| flag | `informalTolerated`=true, `everTolerated`=true, `informalRegistered`=true, `illicitGoodsAppeared`=false | |
+
+next: goto `informal-register-after`
+
 #### `informal-tolerate` 「食品の取引に限って、当面は黙認する」
 
-> 食品衛生の最低限だけ示し、摘発はしない。買える人は増える。
-> 「どこまで許すのか」を、これから毎週決めることになる。
+> 市は積極的な取締りを見送り、最低限の注意喚起に留める。
+> 買える人は最も増えるが、売り手の届出も取引の保証も求めない。
 
 condition: なし（**無条件選択肢**）
 
 | effect | 値 | 意味 |
 | --- | --- | --- |
-| `informalMarket` | +10 | 取引が定着する |
+| `informalMarket` | +12 | 取引が最も大きく広がる |
 | `foodAccess` | **+18** | **正規market の不足を実際に埋める** |
-| `marketRisk` | +6 | 保証のない取引が増える |
-| `popularity` | +2 | 買えるようになった層の支持 |
-| `budget` | −3 | 衛生指導の紙一枚分 |
+| `marketRisk` | +14 | 届出・表示・取引保証のない範囲が広がる |
+| `popularity` | +1 | 人気への効果は小さく留める |
+| `budget` | −4 | 最低限の注意喚起と現場対応 |
+| `policyChanges` | 0 | 大きな政策転換には数えない |
 | flag | `informalTolerated`=true, `everTolerated`=true, `illicitGoodsAppeared`=**true** | |
 
-> `marketRisk` は +6 に留める。**規模（+10）に比べて上がり方を小さくしてある。**
-> 「非公式市場が大きい＝危険」という自動的な結びつきを、数値の設計でも否定する。
+> 届出制との違いは、行政が食品とそれ以外の境界を制度として引くかどうかにある。
+> `illicitGoodsAppeared` は市場規模ではなく、この線引きを行わなかった履歴を表す。
 
 next: goto `informal-tolerate-after`
 
@@ -852,6 +879,9 @@ condition: `{ "flag": "priceCapActive" }` / ifUnmet: `hide`
 
 `price` **set 215** / `supply` +24 / `informalMarket` −20 / `foodAccess` +8 / `popularity` **−11** /
 `marketRisk` −5 / `policyChanges` **+1** / flag `priceCapActive`=**false**, `everReversed`=true
+
+このchoiceは表示上の4択には含まれるが、非公式市場への執行ではなく価格政策の撤回である。
+既存effectsを変更しない要件を優先し、執行3案に対するbudget・popularity不変条件の対象外とする。
 
 next: goto `informal-relax-after`
 
@@ -873,23 +903,39 @@ next: goto `m6-router`
 
 ---
 
-### 21. `informal-tolerate-after` — 黙認の決定後
+### 21. `informal-register-after` — 届出制の開始後
 
 背景 `back-lot.png` / onEnter なし
 
 | line id | 話者 | 台詞 |
 | --- | --- | --- |
-| `ita-01` | narrator | 市は、食品の非公式販売について、当面の指導を見送ると決めた。 |
-| `ita-02` | takahashi | 手洗い設備と表示だけ、紙一枚でお願いしました。断る人はいませんでした。 |
-| `ita-03` | misaki | 前より買いやすくなりました。値段は高いままです。 |
-| `ita-04` | takahashi | ただ、同じ場所で売られている食品以外の商品については、市は何も保証できません。 |
-| `ita-05` | fujii | 「どこまでを食品と呼ぶか」で、毎週会議をすることになりました。 |
+| `irg-01` | narrator | 届出制が始まった翌週、公民館の机には売り手の名前と食品の表示が並んだ。 |
+| `irg-02` | takahashi | 食品を売る人には届け出てもらいました。何を、誰が売っているかは確認できます。 |
+| `irg-03` | misaki | 販売は続いています。仕事の帰りにも買えるので、前より助かる人は増えました。 |
+| `irg-04` | fujii | 食べ物の話と、それ以外の話を分けて決めた。その境界を保つ確認作業は、市に残ります。 |
+| `irg-05` | takahashi | 非公式だから無秩序、とは限りません。ただ、表示を確かめ続けなければ、この制度は保てません。 |
 
 next: goto `m6-router`
 
 ---
 
-### 22. `informal-relax-after` — 上限価格の引き上げ後
+### 22. `informal-tolerate-after` — 純粋な黙認の決定後
+
+背景 `back-lot.png` / onEnter なし
+
+| line id | 話者 | 台詞 |
+| --- | --- | --- |
+| `ita-01` | narrator | 市は非公式販売への積極的な取締りを見送り、最低限の注意喚起に留めた。 |
+| `ita-02` | takahashi | 売り手の届け出も、商品の表示も義務にはしていません。現場へ注意書きを渡しただけです。 |
+| `ita-03` | misaki | 前より買いやすくなりました。値段は高いままです。 |
+| `ita-04` | takahashi | ただ、同じ場所で売られている食品以外の商品については、市は何も保証できません。 |
+| `ita-05` | fujii | 線を引かなかった分、取引は早く広がりました。市が確認できない範囲も、同じ速さで広がっています。 |
+
+next: goto `m6-router`
+
+---
+
+### 23. `informal-relax-after` — 上限価格の引き上げ後
 
 背景 `bakery-yamada.png` / onEnter なし
 
@@ -905,7 +951,7 @@ next: goto `m6-router`
 
 ---
 
-### 23. `m6-router` — 分岐専用（表示行なし）
+### 24. `m6-router` — 分岐専用（表示行なし）
 
 背景 なし / `lines: []` / onEnter なし
 
@@ -924,7 +970,7 @@ next:
 
 ---
 
-### 24. `m6-cap` — 六か月後（価格上限が続いている）
+### 25. `m6-cap` — 六か月後（価格上限が続いている）
 
 背景 `empty-shelf.png`
 **onEnter**: `supply` −8 / `informalMarket` +8 / `foodAccess` −3 / `marketRisk` +2 / `budget` −6 / `popularity` −3
@@ -941,7 +987,7 @@ next: goto `m6-council`
 
 ---
 
-### 25. `m6-subsidy` — 六か月後（補助金が続いている）
+### 26. `m6-subsidy` — 六か月後（補助金が続いている）
 
 背景 `bakery-yamada.png`
 **onEnter**: `budget` **−18** / `supply` +6 / `foodAccess` +4 / `popularity` −3 / `price` −5
@@ -958,7 +1004,7 @@ next: goto `m6-council`
 
 ---
 
-### 26. `m6-market` — 六か月後（市場が回っている）
+### 27. `m6-market` — 六か月後（市場が回っている）
 
 背景 `market-street.png`
 **onEnter**: `supply` +10 / `price` −20 / `foodAccess` +6 / `popularity` +2 / `budget` −4
@@ -975,7 +1021,7 @@ next: goto `m6-council`
 
 ---
 
-### 27. `m6-common` — 六か月後（そのほか）
+### 28. `m6-common` — 六か月後（そのほか）
 
 背景 `market-street.png`
 **onEnter**: `supply` +2 / `price` −5 / `foodAccess` +1 / `budget` −4 / `popularity` −2
@@ -993,7 +1039,7 @@ next: goto `m6-council`
 
 ---
 
-### 28. `m6-council` — 期限の話
+### 29. `m6-council` — 期限の話
 
 背景 `council-room.png` / onEnter なし
 
@@ -1017,7 +1063,7 @@ next: goto `decision-3`
 
 ---
 
-### 29. `decision-3` — 三度目の判断【判断③・出口または継続】
+### 30. `decision-3` — 三度目の判断【判断③・出口または継続】
 
 背景 `mayors-office-night.png` / onEnter なし
 
@@ -1125,7 +1171,9 @@ next: goto `d3-results`
 
 condition: `{ "not": { "any": [ { "flag": "priceCapActive" }, { "flag": "subsidyActive" }, { "flag": "rationingActive" } ] } }` / ifUnmet: `hide`
 
-`budget` −5 / `supply` +6 / `price` −10 / `foodAccess` +4 / `popularity` +1 / `marketRisk` −3
+`budget` −5 / `supply` +6 / `price` −10 / `foodAccess` +4 / `popularity` +1 / `marketRisk` −5
+
+`informalMarket` は動かさない。情報公開によって取引の規模ではなく、不確実性だけを下げる。
 
 > 「分散した知識」に対応する選択肢。**情報を配ることも政策である**という提示。
 
@@ -1156,7 +1204,7 @@ next: branch → `d3-nothing-*` → `d3-results`
 
 ---
 
-### 33. `d3-results` — 告示
+### 34. `d3-results` — 告示
 
 背景 `council-room.png` / onEnter なし
 
@@ -1176,7 +1224,7 @@ next: goto `m9-epilogue`
 
 ---
 
-### 34. `m9-epilogue` — 三か月後
+### 35. `m9-epilogue` — 三か月後
 
 背景 `street-morning.png` / onEnter なし（**最終判定の直前に数値を動かさない**）
 
@@ -1207,39 +1255,56 @@ next: `{ "type": "resolveEnding" }`
 | 2 | `policy-drift` | 政策迷走 | `bad` | `policyChanges >= 3` **かつ** `popularity <= 45` |
 | 3 | `two-markets` | 表の市場、裏の市場 | `normal` | `informalMarket >= 45` **かつ** `supply <= 60` |
 | 4 | `cheap-bread-empty-shelves` | 安いパン、空の棚 | `bad` | `priceCapActive` **かつ** `supply <= 50` |
-| 5 | `for-those-who-need` | 必要な人へ | `good` | `targetedSupportActive` **かつ** `foodAccess >= 65` |
-| 6 | `price-called-bread` | 高値が呼んだパン | `good` | `supply >= 85` かつ `foodAccess >= 65` かつ `not priceCapActive` かつ `not rationingActive` かつ `everDeregulate` |
-| 7 | `mixed-ledger` | 混ざった帳簿 | `normal` | **条件なし（フォールバック）** |
+| 5 | `order-without-bread` | 秩序は戻った、棚は戻らない | `normal` | `everCrackdown` かつ `marketRisk <= 12` かつ `foodAccess <= 50` |
+| 6 | `for-those-who-need` | 必要な人へ | `good` | `targetedSupportActive` **かつ** `foodAccess >= 65` |
+| 7 | `price-called-bread` | 高値が呼んだパン | `good` | `supply >= 85` かつ `foodAccess >= 65` かつ `not priceCapActive` かつ `not rationingActive` かつ `everDeregulate` |
+| 8 | `mixed-ledger` | 混ざった帳簿 | `normal` | **条件なし（フォールバック）** |
 
-### 到達検証（19経路をシミュレーションした結果の抜粋）
+### 到達検証（20代表経路をシミュレーションした結果の抜粋）
 
 | 経路 | pop | budget | supply | price | informal | **food** | risk | 転換 | → エンディング |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A統制→維持→**黙認**→恒久化 | 58 | 57 | 16 | 160 | 66 | **57** | 27 | 0 | 表の市場、裏の市場 |
-| A統制→維持→**摘発**→恒久化 | 53 | 48 | 18 | 160 | 34 | **27** | 15 | 0 | 安いパン、空の棚 |
-| A統制→配給→黙認→恒久化 | 69 | 42 | 15 | 160 | 78 | **62** | 29 | 1 | 表の市場、裏の市場 |
-| A統制→配給→価格緩和→補助・購入制限終了 | 43 | 68 | 59 | 230 | 24 | 57 | 11 | **3** | 政策迷走 |
-| A統制→緩和→情報公開 | 47 | 82 | 68 | 195 | 13 | 60 | 8 | 1 | 混ざった帳簿 |
+| A統制→維持→**黙認**→恒久化 | 57 | 56 | 16 | 160 | 68 | **57** | 38 | 0 | 表の市場、裏の市場 |
+| A統制→維持→**届出制**→恒久化 | 56 | 40 | 18 | 160 | 64 | **51** | 22 | 0 | 表の市場、裏の市場 |
+| A統制→維持→**摘発**→恒久化 | 55 | 44 | 20 | 160 | 34 | **29** | 12 | 0 | 安いパン、空の棚 |
+| A統制→限定支援→**摘発**→市場価格＋限定支援 | 55 | 29 | 40 | 180 | 16 | **48** | 7 | 1 | 秩序は戻った、棚は戻らない |
+| A統制→配給→黙認→恒久化 | 68 | 41 | 15 | 160 | 80 | **62** | 41 | 1 | 表の市場、裏の市場 |
+| A統制→配給→価格緩和→補助・購入制限終了 | 43 | 68 | 59 | 230 | 24 | 57 | 15 | **3** | 政策迷走 |
+| A統制→緩和→情報公開 | 47 | 82 | 68 | 195 | 13 | 60 | 9 | 1 | 混ざった帳簿 |
 | B補助→補助増額→恒久化 | 64 | **0** | 96 | 175 | 8 | 79 | 12 | 0 | 市が払います |
 | B補助→維持→補助終了 | 40 | 27 | 92 | 215 | 0 | 72 | 7 | 1 | 混ざった帳簿 |
-| C緩和→維持→情報公開 | **39** | 88 | 106 | 165 | 2 | **78** | 12 | 0 | 高値が呼んだパン |
+| C緩和→維持→情報公開 | **39** | 88 | 106 | 165 | 2 | **78** | 10 | 0 | 高値が呼んだパン |
 | C緩和→限定支援→限定恒久 | 47 | 58 | 102 | 175 | 2 | **89** | 14 | 0 | 必要な人へ |
-| C緩和→配給→期限切れ | 37 | 76 | 93 | 194 | 24 | 72 | 17 | 1 | 高値が呼んだパン |
+| C緩和→配給→期限切れ | 37 | 76 | 93 | 194 | 24 | 72 | 18 | 1 | 高値が呼んだパン |
 | D限定→維持→限定恒久 | 45 | 55 | 69 | 225 | 2 | 73 | 9 | 0 | 必要な人へ |
 | D限定→価格統制→価格上限解除 | 50 | 55 | 59 | 205 | 19 | 65 | 9 | 2 | 必要な人へ |
 
-全98経路の機械列挙結果は、`the-city-pays` 12 / `policy-drift` 1 / `two-markets` 14 /
-`cheap-bread-empty-shelves` 4 / `for-those-who-need` 25 / `price-called-bread` 7 /
-`mixed-ledger` 35。`d3-nothing`経由28経路は順に3 / 0 / 4 / 0 / 5 / 3 / 13。
-全7 endingへ到達でき、条件付きlineにdead codeはない。
+全経路の機械列挙結果は **114経路**。Ending別は `the-city-pays` 13 / `policy-drift` 1 /
+`two-markets` 26 / `cheap-bread-empty-shelves` 4 / `order-without-bread` 12 /
+`for-those-who-need` 26 / `price-called-bread` 7 / `mixed-ledger` 25。
+全8 Endingへ到達でき、条件付きlineにdead codeはない。
 
-**全 7 エンディングが到達可能。** そして、
+非公式市場イベント後に完走する経路と最終レンジは次のとおり。分布はバランス確認用であり、テストの固定値にはしない。
+
+| choice | 経路数 | foodAccess | marketRisk | informalMarket |
+| --- | ---: | ---: | ---: | ---: |
+| `informal-crackdown` | 16 | 29–48 | 5–15 | 10–46 |
+| `informal-register` | 16 | 51–70 | 15–25 | 40–76 |
+| `informal-tolerate` | 16 | 57–76 | 31–41 | 44–80 |
+| `informal-relax-price` | 13 | 49–66 | 10–20 | 12–40 |
+
+全114経路の最終レンジは `foodAccess` 29–89 / `marketRisk` 5–41 / `informalMarket` 0–80。
+最終状態の `informalMarket` と `marketRisk` のPearson相関係数は **0.808**。
+摘発16経路のうち `mixed-ledger` は0経路で、比率は **0%**。
+`marketRisk` の最大値−最小値（36）と摘発経路のEnding比率はレポート値に留め、hard assertionにはしない。
+
+**全 8 エンディングが到達可能。** そして、
 
 - **完全勝利は存在しない。** 表中で最高の `foodAccess` 89 を出す経路は支持率 47。
   支持率最高の 69 を出す経路は正規供給 15。`budget` 88 を残す経路は支持率 39。
 - **同じ「価格統制」から、正反対の結末に分かれる。**（1行目と2行目）
-- **`informalMarket` が高く `marketRisk` が中程度**の状態（66/27）が成立する。
-  規模の大きさと危険性は連動しない。
+- **`informalMarket` が増えて `marketRisk` が下がる**届出制が成立する。
+  規模と不確実性は同じ方向へしか動かない指標ではない。
 
 ### 各エンディングの本文
 
@@ -1285,7 +1350,8 @@ summary: 個々の判断は誤りではなかった。変わり続けること�
 | `tm-04` | misaki | でも、うちの子は今週も朝ごはんを食べました。 | — |
 | `tm-05` | yamada | 表の店を続けているのは、意地みたいなものです。 | — |
 | `tm-06` | takahashi | 同じ場所で、食品以外のものも動き始めています。そちらは、市が何も保証できません。 | `{ "flag": "illicitGoodsAppeared" }` |
-| `tm-07` | takahashi | 売っている人の顔は、だいたい分かるようになりました。それが良いことなのかは、まだ分かりません。 | `{ "param": "marketRisk", "op": "<", "value": 35 }` |
+| `tm-07-ordered` | takahashi | 売り手の顔と常連のつながりは見えています。悪い商品を売れば次から相手にされない。繰り返す取引と評判が、保証の代わりになっています。 | `marketRisk < 28` |
+| `tm-07-risky` | misaki | 品質は、その場では確かめきれません。買った場所も言いたくないです。明日そこまで無くなるのが怖いので。 | `marketRisk >= 28` |
 | `tm-08` | narrator | 市は、この市場を作らなかった。ただ、消すこともできなかった。 | — |
 | `tm-09` | narrator | 市場を禁じることと、取引そのものを消すことは、同じだろうか。 | — |
 
@@ -1300,12 +1366,33 @@ summary: 正規市場が細り、実際の取引は別の場所へ移った。�
 | `ces-03` | misaki | 安いんです。ずっと、安いままなんです。 | — |
 | `ces-04` | yamada | 週に二日だけ焼いています。それ以上焼くと、赤字の日が増えるので。 | — |
 | `ces-05` | misaki | 少し前まで、裏で買えました。今はそれもありません。 | `{ "flag": "everCrackdown" }` |
+| `ces-05-quiet` | narrator | 裏通りも静かになった。静かなだけで、棚は空のままだ。 | `everCrackdown` かつ `marketRisk <= 12` |
 | `ces-06` | narrator | 一部の市民は、まだどこかで手に入れている。多くは、そうではない。 | `{ "param": "informalMarket", "op": ">=", "value": 20 }` |
 | `ces-07` | narrator | 価格は下がった。パンは減った。この二つは、別々の出来事ではなかった。 | — |
 
 summary: 合法な価格は最後まで低く保たれた。ただし、その価格で買える機会そのものが減っていった。
 
-#### 5. `for-those-who-need` 「必要な人へ」 rank: `good`
+#### 5. `order-without-bread` 「秩序は戻った、棚は戻らない」 rank: `normal`
+
+condition: `everCrackdown=true` かつ `marketRisk <= 12` かつ `foodAccess <= 50`。
+配列上は `cheap-bread-empty-shelves` の後、`for-those-who-need` の前に置く。
+
+| line id | 話者 | 台詞 |
+| --- | --- | --- |
+| `owb-01` | narrator | 非公式販売の折りたたみ机は、通りから消えた。 |
+| `owb-02` | takahashi | 偽の支給券と出所を説明できない商品は、目に見えて減りました。 |
+| `owb-03` | narrator | 取引上の不確実性は大きく下がった。誰から何を買うのか分からない取引も減った。 |
+| `owb-04` | misaki | でも、買う場所そのものも減りました。正規のお店の棚は、まだ朝で空になります。 |
+| `owb-05` | yamada | 店へ戻ってきた分はあります。足りない分まで戻ったわけではありません。 |
+| `owb-06` | fujii | 法律を守らせることと、商品を手に入るようにすることは、同じ仕事ではありませんでした。 |
+| `owb-07` | narrator | 秩序は得た。しかし供給は戻らなかった。 |
+
+summary: 取引上の不確実性は下がった。しかし食料を買える場所も減り、正規の供給は不足を埋めなかった。
+
+摘発を失敗とも正解とも断定しない。取引安全性を優先した正当な政策選択が、
+`foodAccess` を犠牲にしうるという帰結を描く。
+
+#### 6. `for-those-who-need` 「必要な人へ」 rank: `good`
 
 | line id | 話者 | 台詞 | condition |
 | --- | --- | --- | --- |
@@ -1319,7 +1406,7 @@ summary: 合法な価格は最後まで低く保たれた。ただし、その�
 
 summary: 価格を市場に任せ、生活の保障は行政が引き受けた。線引きの負担と事務費は、毎年ここに残る。
 
-#### 6. `price-called-bread` 「高値が呼んだパン」 rank: `good`
+#### 7. `price-called-bread` 「高値が呼んだパン」 rank: `good`
 
 conditionには`everDeregulate=true`を含め、市外参入・流通緩和を一度も経験していない経路を除外する。
 
@@ -1335,7 +1422,7 @@ conditionには`everDeregulate=true`を含め、市外参入・流通緩和を�
 
 summary: 価格の上昇が市外から供給を呼び戻し、棚は埋まった。その数か月の負担と、退出した店は戻らない。
 
-#### 7. `mixed-ledger` 「混ざった帳簿」 rank: `normal` / **条件なし**
+#### 8. `mixed-ledger` 「混ざった帳簿」 rank: `normal` / **条件なし**
 
 | line id | 話者 | 台詞 | condition |
 | --- | --- | --- | --- |
@@ -1367,7 +1454,8 @@ summary: 複数の政策の長所と短所が打ち消し合った。破綻は�
 
 Result 画面で `price` と `foodAccess` が並ぶことに意味がある。
 
-- 「価格 160 円 / foodAccess 27」→ **安いが、食べられていない**
+- 「価格 160 円 / foodAccess 29」→ **安いが、食べられていない**
+- 「価格 160 円 / foodAccess 51」→ **届出制で取引を残し、行政コストを払っている**
 - 「価格 160 円 / foodAccess 57」→ **安く、正規では買えず、それでも食べられている**
 - 「価格 235 円 / foodAccess 77」→ **高いが、食べられている**
 
@@ -1385,7 +1473,7 @@ Result 画面で `price` と `foodAccess` が並ぶことに意味がある。
 **各エンディングの `lines` の末尾に、そのルートに関係する解説カードを 4 枚だけ `analyst` の台詞として追加する。**
 `EndingView` の `narrative` にそのまま並ぶため、UI 変更は不要。
 
-全 12 枚は以下に全文を書く。将来 Result 画面に解説パネルを作る場合は、ここから全文を流用する。
+全 14 枚は以下に全文を書く。将来 Result 画面に解説パネルを作る場合は、ここから全文を流用する。
 
 ### カード全文
 
@@ -1439,12 +1527,11 @@ Result 画面で `price` と `foodAccess` が並ぶことに意味がある。
 > 買いたい人と売りたい人が残っていれば、取引は別の場所へ移ります。
 > 公民館の駐車場に人が集まったのは、そこにしか市場が残っていなかったからです。
 
-**E11 非公式市場のもう一つの側面**
-> 非公式市場は、正規市場が届かなくなった食料を人々へ届けることがあります。
-> 同時に、そこでの取引には返品も保証も届出もありません。
-> そして同じ流通経路には、食品以外の、規制の対象になる商品も入り込むことがあります。
-> **食料が非公式に流れることと、犯罪市場ができることは、同じではありません。**
-> ただし、経路が同じになると、区別する仕事は行政の側に残ります。
+**E11 非公式市場の秩序と保証**
+> 非公式市場は犯罪市場と同義ではなく、正規市場からこぼれた需要と供給を再接続することがあります。
+> 顔の見える地域では、繰り返す取引、評判、共同体からの排除が、一定の秩序を作ることもあります。
+> 一方で、通常の契約・返品・品質保証は弱くなりがちです。
+> 届出や表示は、市の費用と引き換えに、市場の規模を保ちながら取引上の不確実性だけを下げることがあります。
 
 **E12 「値段」と「手に入るか」は別の数字**
 > このゲームには、価格と `foodAccess` という二つの数字がありました。
@@ -1456,21 +1543,27 @@ Result 画面で `price` と `foodAccess` が並ぶことに意味がある。
 > ただし、山田さんが設備の見積もりを断ったのは、政策の中身のせいではありませんでした。
 > 三か月後が分からないこと自体が、投資と契約をためらわせます。
 
+**E14 取引の安全と食料アクセス**（`order-without-bread` 専用）
+> 摘発は、詐欺的な販売や品質を確かめにくい取引を減らし、取引上の不確実性を下げます。
+> 同時に、取引の場そのものを閉じれば、そこで食料を得ていた人の経路も消えます。
+> 安全性と入手しやすさは別の指標で、一方だけを改善する政策にも正当な理由と明確な代償があります。
+
 ### エンディング別の解説カード割り当て（各4枚）
 
 | エンディング | 解説カード |
 | --- | --- |
 | `the-city-pays` | E05 補助金 / E08 機会費用 / E02 需要と供給 / E12 値段と入手 |
 | `policy-drift` | **E13 予測可能性** / E03 価格シグナル / E08 機会費用 / E12 値段と入手 |
-| `two-markets` | E04 価格上限 / **E10 非公式市場** / **E11 もう一つの側面** / E12 値段と入手 |
+| `two-markets` | E04 価格上限 / **E10 非公式市場** / **E11 秩序と保証** / E12 値段と入手 |
 | `cheap-bread-empty-shelves` | E01 希少性 / E04 価格上限 / E10 非公式市場 / E12 値段と入手 |
+| `order-without-bread` | E10 非公式市場 / E11 秩序と保証 / **E14 取引安全とアクセス** / E12 値段と入手 |
 | `for-those-who-need` | E07 限定支援 / E03 価格シグナル / E08 機会費用 / E12 値段と入手 |
 | `price-called-bread` | E03 価格シグナル / E06 参入障壁 / E01 希少性 / E12 値段と入手 |
 | `mixed-ledger` | E02 需要と供給 / E08 機会費用 / E09 分散した知識 / E12 値段と入手 |
 
 **E12 はすべてのエンディングに入れる。** これが本作の問いそのものだからである。
-E10は`two-markets`と`cheap-bread-empty-shelves`に定義するが、
-`visited informal-intro`のときだけ表示し、非公式市場イベント未経験者には見せない。
+E10は`two-markets`と`cheap-bread-empty-shelves`では `visited informal-intro` のときだけ表示し、
+非公式市場イベント未経験者には見せない。`order-without-bread`は定義上必ず同イベントを経るため無条件で表示する。
 
 ---
 
@@ -1478,21 +1571,17 @@ E10は`two-markets`と`cheap-bread-empty-shelves`に定義するが、
 
 ### 17.1 現行 `scenario.json` からの差分
 
-現在の `scenarios/bread-price/scenario.json` は**エンジン検証用の骨組み**であり、本設計で全面的に差し替える。
+`scenarios/bread-price/scenario.json` が実装正本であり、この文書を同時に同期する。
+H-8再設計ではフォーマットを変えず、シナリオデータだけを次のように拡張した。
 
-| 項目 | 現行 | 本設計 |
+| 項目 | 1.0.1 | 1.1.0 |
 | --- | --- | --- |
-| パラメータ | `blackMarket` | **`informalMarket` に置換** |
-| パラメータ | — | **`foodAccess` / `marketRisk` / `policyChanges` を追加** |
-| `budget` | −200〜500 / 初期 100 | **0〜100 / 初期 100** |
-| `supply` | 0〜200 / 初期 80 | **0〜120 / 初期 60** |
-| `price` | 初期 320 | **初期 240** |
-| `price` の goodDirection | `down` | **`neutral`**（§2 の理由） |
-| 登場人物 | 3人 | **7人**（`analyst` 含む） |
-| シーン | 11 | **34** |
-| エンディング | 5 | **7** |
-| `meta.estimatedMinutes` | 5 | **12** |
-| `meta.version` | 0.1.0 | **1.0.1** |
+| 非公式市場イベント | 摘発 / 黙認 / 価格緩和 | **摘発 / 届出制 / 純粋な黙認 / 価格緩和** |
+| フラグ | — | **`informalRegistered`** |
+| シーン | 34 | **35**（`informal-register-after`を追加） |
+| エンディング | 7 | **8**（`order-without-bread`を追加） |
+| `two-markets` | risk低のみ | **`marketRisk < 28` / `>= 28` の相互排他的本文** |
+| `meta.version` | 1.0.1 | **1.1.0** |
 
 ### 17.2 エンジンに手を入れずに済ませるための約束
 
@@ -1511,7 +1600,7 @@ E10は`two-markets`と`cheap-bread-empty-shelves`に定義するが、
 
 4. **`endings` の最後（`mixed-ledger`）に `condition` を付けない。** 検証エラーになる。
 
-5. **フラグは全 17 個を `initialState.flags` に `false` で宣言する。** 未宣言フラグの使用は検証エラー。
+5. **フラグは全 19 個を `initialState.flags` に `false` で宣言する。** 未宣言フラグの使用は検証エラー。
 
 6. **`ifUnmet` の使い分け**
    - `disable` + `unmetText`: 財政が理由のもの（「その手はあるが、いま金がない」を見せる）
@@ -1561,9 +1650,10 @@ E10は`two-markets`と`cheap-bread-empty-shelves`に定義するが、
 | `foodAccess` の初期値と全増減 | 初期 55 | **最重要。** 「安いが買えない」と「高いが買える」の差が体感できるか |
 | 非公式市場イベントの発生閾値 | `informalMarket >= 35` | 統制ルートで確実に、緩和ルートでは滅多に起きないか |
 | `informal-tolerate` の `foodAccess` +18 | +18 | 大きすぎると黙認が万能に、小さすぎると本作の主張が消える |
-| `informal-crackdown` の `foodAccess` −12 | −12 | 摘発が「単なる悪手」になっていないか（`marketRisk` −6 と釣り合うか） |
+| `informal-register` の行政コスト | `budget` −20 | access改善とrisk低下を同時に得る代償として十分か |
+| `informal-crackdown` の `foodAccess` −10 | −10 | 摘発が「単なる悪手」になっていないか（`marketRisk` −12 と釣り合うか） |
 | 補助金ルートの財政消耗 | −35 / −16 / −28 / −18 | 出口を選べば生き残り、拡大し続けると破綻する、になっているか |
-| 1周の所要時間 | **実測見積 8〜12 分** | 表示行数は最大 105 行（イベントあり・エンディング本文と解説込み）。短ければ prologue と 6か月後シーンを増やす |
+| 1周の所要時間 | **実測見積 8〜12 分** | 表示行数は条件分岐で変動するため固定せず、実プレイで確認する |
 
 ### 優先度：中
 
@@ -1574,7 +1664,7 @@ E10は`two-markets`と`cheap-bread-empty-shelves`に定義するが、
 | `policy-drift` の閾値 | `policyChanges >= 3` かつ `popularity <= 45` |
 | 価格統制の `supply` 減少幅 | 直後 −8 / 3週間後 −16 / 6か月後 −8 |
 | `decision-2` の選択肢数 | 6（条件により実際の表示は 3〜5） |
-| エンディングの `rank` 配分 | good 2 / normal 3 / bad 2 |
+| エンディングの `rank` 配分 | good 2 / normal 4 / bad 2 |
 
 ### 優先度：低（本文が固まってから）
 
@@ -1586,7 +1676,7 @@ E10は`two-markets`と`cheap-bread-empty-shelves`に定義するが、
 ### 調整してはいけないもの
 
 **「特定の政策が常に最適になる」方向へは調整しない。**
-19 経路のシミュレーションで、`foodAccess` 最高値の経路が支持率で劣り、
+20代表経路と全114経路のシミュレーションで、`foodAccess` 最高値の経路が支持率で劣り、
 支持率最高の経路が正規供給で劣る、という関係を維持すること。
 どれか一つの政策が全指標で勝つ状態になったら、それはバランス調整の失敗である。
 
@@ -1594,42 +1684,57 @@ E10は`two-markets`と`cheap-bread-empty-shelves`に定義するが、
 
 ## 19. 設計セルフチェック結果
 
-本設計書に対して機械的な検証を実行した結果（2026-09-02 時点）。
+本設計書に対して機械的な検証を実行した結果（2026-09-03 時点）。
 
 | 検査項目 | 結果 |
 | --- | --- |
-| Scene ID の重複 | **なし**（31 シーン、すべて一意） |
-| Scene 一覧表と本文見出しの一致 | **一致**（31 / 31） |
-| line ID の重複 | **なし**（本編222行 + Economics解説28行、すべて一意） |
+| Scene ID の重複 | **なし**（35 シーン、すべて一意） |
+| Scene 一覧表とscenarioの一致 | **一致**（35 / 35。空の条件付きeffect sceneを含む） |
+| line ID の重複 | **なし**（非analyst 236行 + Economics解説32行、すべて一意） |
 | 未定義シーンへの遷移 | **なし** |
 | どこからも参照されないシーン | **なし**（`prologue-street` が開始点） |
-| `{{param.x}}` の参照先 | すべて定義済みパラメータ（21 行が該当、⚠ 印と完全一致） |
-| 使用フラグの宣言漏れ | **なし**（17 個すべて §3 に宣言） |
-| エンディング数と最後のフォールバック | 7 種、最後の `mixed-ledger` は条件なし ✅ |
-| 全エンディングの到達可能性 | **7/7 到達確認**（19 経路シミュレーション、§14） |
+| `{{param.x}}` の参照先 | すべて定義済みパラメータ（24 行） |
+| 使用フラグの宣言漏れ | **なし**（19 個すべて §3 に宣言） |
+| エンディング数と最後のフォールバック | 8 種、最後の `mixed-ledger` は条件なし ✅ |
+| 全エンディングの到達可能性 | **8/8 到達確認**（全114経路、§14） |
 | 無条件選択肢の有無 | 4 つの `choices` すべてに 1 つ以上あり |
-| 1 周の表示行数 | 最大 105 行 → 読み 5 秒/行 + 判断 4 回で **約 10〜12 分** |
+
+### H-8意味的不変条件
+
+| ID | 検証内容 | 結果 |
+| --- | --- | --- |
+| H8-1 | 摘発直後は全到達状態で`marketRisk`が低下 | ✅ |
+| H8-2 | 届出制・黙認直後は`foodAccess`が上昇 | ✅ |
+| H8-3 | 届出制は`informalMarket`増加・`marketRisk`低下 | ✅ |
+| H8-4 | `marketRisk`をEnding条件1件以上・conditional line 2件以上で参照 | ✅ |
+| H8-7 | `illicitGoodsAppeared=true`なら未登録の黙認経路 | ✅ |
+| H8-8 | 非公式市場を直接扱う執行3案すべてにbudgetコスト | ✅ |
+| H8-9 | 全8 Endingが到達可能 | ✅ |
+| H8-10 | 執行3案のpopularity変化は絶対値3以下 | ✅ |
+
+H8-5（`marketRisk`レンジ幅）とH8-6（摘発経路の`mixed-ledger`比率）は分布調整値なので、
+算出はするがhard assertionにしない。`informal-relax-price`は既存effects維持を優先する例外である。
 
 ### 話者別の行数バランス
 
 | 話者 | 行数 | 備考 |
 | --- | --- | --- |
-| narrator | 62 | 地の文 |
-| misaki | 40 | 最多。市民視点が本作の軸のため意図的 |
-| fujii | 39 | 数値報告を担当するため多い |
-| yamada | 30 | |
-| takahashi | 25 | |
-| kuroda | 14 | **最少。限定支援ルートで登場が薄くなる**（§18 の調整項目） |
-| analyst | 0 | **本編には登場しない**（解説カードのみ） |
+| narrator | 72 | 地の文 |
+| misaki | 43 | 市民視点が本作の軸のため多い |
+| fujii | 45 | 数値報告と制度上の線引きを担当 |
+| yamada | 31 | |
+| takahashi | 30 | 届出・確認の行政実務を担当 |
+| kuroda | 15 | **最少。限定支援ルートで登場が薄くなる**（§18 の調整項目） |
+| analyst | 32 | **本編には登場せず、Ending解説カードだけに登場** |
 
 ### 主張の中立性チェック
 
 - どの初期政策（A〜D）からも、`good` ランクのエンディングに到達できる経路がある。
-- `foodAccess` 最高値の経路（93）は支持率 43。支持率最高の経路（69）は正規供給 15。
+- `foodAccess` 最高値は89。支持率が高い経路でも正規供給が細い場合がある。
   **全指標で勝つ政策は存在しない。**
-- 価格統制ルートは、非公式市場の扱い次第で `foodAccess` 27 にも 57 にもなる。
+- 価格統制ルートは、非公式市場の扱い次第で `foodAccess` 29にも57にもなる。
   **政策そのものではなく、その後の判断が結末を分ける。**
-- 摘発（`informal-crackdown`）には実際の成果（`marketRisk` −6、偽支給券の摘発）がある。
+- 摘発（`informal-crackdown`）には実際の成果（`marketRisk` −12、偽支給券の摘発）がある。
   単なる悪手として設計していない。
-- 非公式市場の規模（+10）に対して `marketRisk`（+6）の上がり方を小さくしてある。
-  **規模と危険性は連動しない。**
+- 届出制では非公式市場を+8しながら`marketRisk`を−2する。
+  **規模と不確実性は同じ方向にしか動かない指標ではない。**

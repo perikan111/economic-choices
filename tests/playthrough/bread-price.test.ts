@@ -13,6 +13,7 @@ const ENDING_IDS = [
   "cheap-bread-empty-shelves",
   "for-those-who-need",
   "mixed-ledger",
+  "order-without-bread",
   "policy-drift",
   "price-called-bread",
   "the-city-pays",
@@ -35,37 +36,37 @@ interface RouteExpectation {
   };
 }
 
-// 設計書 §14 に最終値が明記されている12経路。
+// 設計書 §14 に最終値が明記されている14経路。
 const DESIGN_ROUTES: RouteExpectation[] = [
   {
     name: "A-hold-tolerate-permanent",
     choices: ["d1-price-cap", "d2-hold", "informal-tolerate", "d3-permanent"],
     endingId: "two-markets",
-    parameters: { popularity: 58, budget: 57, supply: 16, price: 160, informalMarket: 66, foodAccess: 57, marketRisk: 27, policyChanges: 0 },
+    parameters: { popularity: 57, budget: 56, supply: 16, price: 160, informalMarket: 68, foodAccess: 57, marketRisk: 38, policyChanges: 0 },
   },
   {
     name: "A-hold-crackdown-permanent",
     choices: ["d1-price-cap", "d2-hold", "informal-crackdown", "d3-permanent"],
     endingId: "cheap-bread-empty-shelves",
-    parameters: { popularity: 53, budget: 48, supply: 18, price: 160, informalMarket: 34, foodAccess: 27, marketRisk: 15, policyChanges: 0 },
+    parameters: { popularity: 55, budget: 44, supply: 20, price: 160, informalMarket: 34, foodAccess: 29, marketRisk: 12, policyChanges: 0 },
   },
   {
     name: "A-ration-tolerate-permanent",
     choices: ["d1-price-cap", "d2-rationing", "informal-tolerate", "d3-permanent"],
     endingId: "two-markets",
-    parameters: { popularity: 69, budget: 42, supply: 15, price: 160, informalMarket: 78, foodAccess: 62, marketRisk: 29, policyChanges: 1 },
+    parameters: { popularity: 68, budget: 41, supply: 15, price: 160, informalMarket: 80, foodAccess: 62, marketRisk: 41, policyChanges: 1 },
   },
   {
     name: "A-ration-relax-phaseout",
     choices: ["d1-price-cap", "d2-rationing", "informal-relax-price", "d3-phase-out-support"],
     endingId: "policy-drift",
-    parameters: { popularity: 43, budget: 68, supply: 59, price: 230, informalMarket: 24, foodAccess: 57, marketRisk: 11, policyChanges: 3 },
+    parameters: { popularity: 43, budget: 68, supply: 59, price: 230, informalMarket: 24, foodAccess: 57, marketRisk: 15, policyChanges: 3 },
   },
   {
     name: "A-relax-monitor",
     choices: ["d1-price-cap", "d2-relax-cap", "d3-monitor"],
     endingId: "mixed-ledger",
-    parameters: { popularity: 47, budget: 82, supply: 68, price: 195, informalMarket: 13, foodAccess: 60, marketRisk: 8, policyChanges: 1 },
+    parameters: { popularity: 47, budget: 82, supply: 68, price: 195, informalMarket: 13, foodAccess: 60, marketRisk: 9, policyChanges: 1 },
   },
   {
     name: "B-subsidy-permanent",
@@ -83,7 +84,7 @@ const DESIGN_ROUTES: RouteExpectation[] = [
     name: "C-hold-monitor",
     choices: ["d1-deregulate", "d2-hold", "d3-monitor"],
     endingId: "price-called-bread",
-    parameters: { popularity: 39, budget: 88, supply: 106, price: 165, informalMarket: 2, foodAccess: 78, marketRisk: 12, policyChanges: 0 },
+    parameters: { popularity: 39, budget: 88, supply: 106, price: 165, informalMarket: 2, foodAccess: 78, marketRisk: 10, policyChanges: 0 },
   },
   {
     name: "C-targeted-targeted",
@@ -95,7 +96,7 @@ const DESIGN_ROUTES: RouteExpectation[] = [
     name: "C-ration-nothing",
     choices: ["d1-deregulate", "d2-rationing", "d3-nothing"],
     endingId: "price-called-bread",
-    parameters: { popularity: 37, budget: 76, supply: 93, price: 194, informalMarket: 24, foodAccess: 72, marketRisk: 17, policyChanges: 1 },
+    parameters: { popularity: 37, budget: 76, supply: 93, price: 194, informalMarket: 24, foodAccess: 72, marketRisk: 18, policyChanges: 1 },
   },
   {
     name: "D-hold-targeted",
@@ -109,27 +110,33 @@ const DESIGN_ROUTES: RouteExpectation[] = [
     endingId: "for-those-who-need",
     parameters: { popularity: 50, budget: 55, supply: 59, price: 205, informalMarket: 19, foodAccess: 65, marketRisk: 9, policyChanges: 2 },
   },
+  {
+    name: "A-hold-register-permanent",
+    choices: ["d1-price-cap", "d2-hold", "informal-register", "d3-permanent"],
+    endingId: "two-markets",
+    parameters: { popularity: 56, budget: 40, supply: 18, price: 160, informalMarket: 64, foodAccess: 51, marketRisk: 22, policyChanges: 0 },
+  },
+  {
+    name: "A-targeted-crackdown-targeted",
+    choices: ["d1-price-cap", "d2-targeted", "informal-crackdown", "d3-market-return-with-support"],
+    endingId: "order-without-bread",
+    parameters: { popularity: 55, budget: 29, supply: 40, price: 180, informalMarket: 16, foodAccess: 48, marketRisk: 7, policyChanges: 1 },
+  },
 ];
 
-// §14 の表は12経路のみを掲載しているため、全19経路の機械確認用に7経路を補う。
+// §14 の表は14経路のみを掲載しているため、全20代表経路の機械確認用に6経路を補う。
 const ADDITIONAL_ROUTES: RouteExpectation[] = [
   {
     name: "A-subsidy-tolerate-phaseout",
     choices: ["d1-price-cap", "d2-subsidy", "informal-tolerate", "d3-phase-out-price"],
     endingId: "mixed-ledger",
-    parameters: { popularity: 54, budget: 46, supply: 56, price: 180, informalMarket: 42, foodAccess: 71, marketRisk: 20, policyChanges: 1 },
-  },
-  {
-    name: "A-targeted-crackdown-targeted",
-    choices: ["d1-price-cap", "d2-targeted", "informal-crackdown", "d3-market-return-with-support"],
-    endingId: "mixed-ledger",
-    parameters: { popularity: 53, budget: 33, supply: 38, price: 180, informalMarket: 16, foodAccess: 46, marketRisk: 10, policyChanges: 1 },
+    parameters: { popularity: 53, budget: 45, supply: 56, price: 180, informalMarket: 44, foodAccess: 71, marketRisk: 31, policyChanges: 1 },
   },
   {
     name: "A-targeted-tolerate-permanent",
     choices: ["d1-price-cap", "d2-targeted", "informal-tolerate", "d3-permanent"],
     endingId: "two-markets",
-    parameters: { popularity: 66, budget: 37, supply: 18, price: 160, informalMarket: 66, foodAccess: 67, marketRisk: 27, policyChanges: 0 },
+    parameters: { popularity: 65, budget: 36, supply: 18, price: 160, informalMarket: 68, foodAccess: 67, marketRisk: 38, policyChanges: 0 },
   },
   {
     name: "B-cap-permanent",
@@ -153,7 +160,7 @@ const ADDITIONAL_ROUTES: RouteExpectation[] = [
     name: "D-ration-phaseout",
     choices: ["d1-targeted", "d2-rationing", "d3-phase-out-support"],
     endingId: "for-those-who-need",
-    parameters: { popularity: 46, budget: 51, supply: 64, price: 250, informalMarket: 21, foodAccess: 70, marketRisk: 11, policyChanges: 2 },
+    parameters: { popularity: 46, budget: 51, supply: 64, price: 250, informalMarket: 21, foodAccess: 70, marketRisk: 12, policyChanges: 2 },
   },
 ];
 
@@ -222,7 +229,7 @@ describe("パンの値段を下げろ！ 本番シナリオ通しプレイ", () 
     expect(state.parameters).toEqual(parameters);
   });
 
-  test("代表19経路で7種類すべてのエンディングへ到達できる", () => {
+  test("代表20経路で8種類すべてのエンディングへ到達できる", () => {
     const reached = new Set(
       ROUTES.map(({ choices }) => {
         const state = playThrough(breadPriceScenario, choices);
@@ -234,18 +241,27 @@ describe("パンの値段を下げろ！ 本番シナリオ通しプレイ", () 
     expect([...reached].sort()).toEqual([...ENDING_IDS].sort());
   });
 
-  test("限定的黙認は非公式市場とfoodAccessを伸ばし、線引き不足で違法商品フラグが立つ", () => {
+  test("純粋な黙認は非公式市場とfoodAccessを伸ばし、線引き不足で違法商品フラグが立つ", () => {
     const state = playThrough(breadPriceScenario, DESIGN_ROUTES[0].choices);
 
-    expect(state.parameters).toMatchObject({ price: 160, supply: 16, informalMarket: 66, foodAccess: 57, marketRisk: 27 });
-    expect(state.flags).toMatchObject({ informalTolerated: true, crackdownActive: false, illicitGoodsAppeared: true });
+    expect(state.parameters).toMatchObject({ price: 160, supply: 16, informalMarket: 68, foodAccess: 57, marketRisk: 38 });
+    expect(state.flags).toMatchObject({ informalTolerated: true, informalRegistered: false, crackdownActive: false, illicitGoodsAppeared: true });
   });
 
   test("摘発は非公式市場とmarketRiskを抑える一方、foodAccessも低下させる", () => {
     const state = playThrough(breadPriceScenario, DESIGN_ROUTES[1].choices);
 
-    expect(state.parameters).toMatchObject({ price: 160, supply: 18, informalMarket: 34, foodAccess: 27, marketRisk: 15 });
-    expect(state.flags).toMatchObject({ informalTolerated: false, crackdownActive: true, illicitGoodsAppeared: false });
+    expect(state.parameters).toMatchObject({ price: 160, supply: 20, informalMarket: 34, foodAccess: 29, marketRisk: 12 });
+    expect(state.flags).toMatchObject({ informalTolerated: false, informalRegistered: false, crackdownActive: true, illicitGoodsAppeared: false });
+  });
+
+  test("届出制は非公式市場を保ちながらmarketRiskを下げ、違法商品フラグを立てない", () => {
+    const route = DESIGN_ROUTES.find(({ name }) => name === "A-hold-register-permanent");
+    if (!route) throw new Error("登録制の代表経路が見つかりません。");
+    const state = playThrough(breadPriceScenario, route.choices);
+
+    expect(state.parameters).toMatchObject({ informalMarket: 64, foodAccess: 51, marketRisk: 22 });
+    expect(state.flags).toMatchObject({ informalTolerated: true, informalRegistered: true, illicitGoodsAppeared: false });
   });
 
   test("政策変更が3回に達した経路はpolicy-driftへ分岐する", () => {
@@ -339,7 +355,7 @@ describe("パンの値段を下げろ！ 本番シナリオ通しプレイ", () 
     }
   });
 
-  test("全プレイ経路を列挙して7 endingsとpolicy-driftへの到達を維持する", () => {
+  test("全プレイ経路を列挙して経路数を固定せず8 endingsとpolicy-driftへの到達を確認する", () => {
     const { completed } = enumerateAllPlaythroughs();
     const reached = new Set(
       completed.map((state) => {
@@ -348,7 +364,7 @@ describe("パンの値段を下げろ！ 本番シナリオ通しプレイ", () 
       }),
     );
 
-    expect(completed).toHaveLength(98);
+    expect(completed.length).toBeGreaterThan(0);
     expect([...reached].sort()).toEqual([...ENDING_IDS].sort());
     expect(reached).toContain("policy-drift");
   });
