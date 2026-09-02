@@ -3,396 +3,3207 @@
   "meta": {
     "id": "bread-price",
     "title": "パンの値段を下げろ！",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "locale": "ja-JP",
     "author": "economic-choices",
     "summary": "小麦不足でパン価格が高騰した都市。市長として、価格・供給・財政の均衡を探る短編です。",
-    "estimatedMinutes": 5,
-    "tags": ["price-control", "subsidy", "shortage"]
+    "estimatedMinutes": 12,
+    "tags": [
+      "price-control",
+      "subsidy",
+      "shortage"
+    ]
   },
   "characters": [
-    { "id": "narrator", "name": "", "color": "#9aa3b5" },
-    { "id": "aide", "name": "財政補佐官 リーゼ", "color": "#efb366" },
-    { "id": "citizen", "name": "パン屋の店主", "color": "#78d6b0" }
+    {
+      "id": "narrator",
+      "name": "",
+      "color": "#9aa3b5"
+    },
+    {
+      "id": "misaki",
+      "name": "佐藤 美咲",
+      "color": "#7fb2e5"
+    },
+    {
+      "id": "yamada",
+      "name": "山田 浩一",
+      "color": "#d9a05b"
+    },
+    {
+      "id": "kuroda",
+      "name": "黒田 誠",
+      "color": "#9b8ec4"
+    },
+    {
+      "id": "takahashi",
+      "name": "高橋 玲奈",
+      "color": "#7ec9a5"
+    },
+    {
+      "id": "fujii",
+      "name": "藤井 慎一",
+      "color": "#e08a7a"
+    },
+    {
+      "id": "analyst",
+      "name": "解説",
+      "color": "#b9c0cc"
+    }
   ],
   "parameters": [
-    { "id": "popularity", "label": "支持率", "min": 0, "max": 100, "integer": true, "display": { "visible": true, "order": 1, "unit": "%", "goodDirection": "up" } },
-    { "id": "budget", "label": "市財政", "min": -200, "max": 500, "integer": true, "display": { "visible": true, "order": 2, "unit": "億", "goodDirection": "up" } },
-    { "id": "supply", "label": "パン供給量", "min": 0, "max": 200, "integer": true, "display": { "visible": true, "order": 3, "goodDirection": "up" } },
-    { "id": "price", "label": "パン価格", "min": 0, "max": 2000, "integer": true, "display": { "visible": true, "order": 4, "unit": "円", "goodDirection": "down" } },
-    { "id": "blackMarket", "label": "闇市場規模", "min": 0, "max": 100, "integer": true, "display": { "visible": true, "order": 5, "goodDirection": "down" } }
+    {
+      "id": "popularity",
+      "label": "支持率",
+      "min": 0,
+      "max": 100,
+      "integer": true,
+      "display": {
+        "visible": true,
+        "order": 1,
+        "unit": "%",
+        "goodDirection": "up"
+      }
+    },
+    {
+      "id": "budget",
+      "label": "政策余力",
+      "min": 0,
+      "max": 100,
+      "integer": true,
+      "display": {
+        "visible": true,
+        "order": 2,
+        "goodDirection": "up"
+      }
+    },
+    {
+      "id": "supply",
+      "label": "正規市場の供給",
+      "min": 0,
+      "max": 120,
+      "integer": true,
+      "display": {
+        "visible": true,
+        "order": 3,
+        "goodDirection": "up"
+      }
+    },
+    {
+      "id": "price",
+      "label": "正規店頭価格",
+      "min": 0,
+      "max": 600,
+      "integer": true,
+      "display": {
+        "visible": true,
+        "order": 4,
+        "unit": "円",
+        "goodDirection": "neutral"
+      }
+    },
+    {
+      "id": "informalMarket",
+      "label": "非公式市場の規模",
+      "min": 0,
+      "max": 100,
+      "integer": true,
+      "display": {
+        "visible": true,
+        "order": 5,
+        "goodDirection": "neutral"
+      }
+    },
+    {
+      "id": "foodAccess",
+      "label": "食料入手のしやすさ",
+      "min": 0,
+      "max": 100,
+      "integer": true,
+      "display": {
+        "visible": true,
+        "order": 6,
+        "goodDirection": "up"
+      }
+    },
+    {
+      "id": "marketRisk",
+      "label": "取引上の不確実性",
+      "min": 0,
+      "max": 100,
+      "integer": true,
+      "display": {
+        "visible": true,
+        "order": 7,
+        "goodDirection": "down"
+      }
+    },
+    {
+      "id": "policyChanges",
+      "label": "政策転換回数",
+      "min": 0,
+      "max": 10,
+      "integer": true,
+      "display": {
+        "visible": false,
+        "order": 8,
+        "unit": "回",
+        "goodDirection": "neutral"
+      }
+    }
   ],
   "initialState": {
-    "startScene": "intro",
+    "startScene": "prologue-street",
     "params": {
       "popularity": 50,
       "budget": 100,
-      "supply": 80,
-      "price": 320,
-      "blackMarket": 5
+      "supply": 60,
+      "price": 240,
+      "informalMarket": 5,
+      "foodAccess": 55,
+      "marketRisk": 10,
+      "policyChanges": 0
     },
     "flags": {
-      "priceControl": false,
-      "subsidy": false,
+      "priceCapActive": false,
+      "subsidyActive": false,
       "deregulated": false,
-      "rationing": false,
-      "targetedSupport": false,
-      "crackdown": false,
-      "waitedSecond": false,
-      "expandedRationing": false
+      "targetedSupportActive": false,
+      "rationingActive": false,
+      "informalTolerated": false,
+      "crackdownActive": false,
+      "permanentized": false,
+      "everPriceCap": false,
+      "everSubsidy": false,
+      "everDeregulate": false,
+      "everTargetedSupport": false,
+      "everRationing": false,
+      "everCrackdown": false,
+      "everTolerated": false,
+      "everReversed": false,
+      "illicitGoodsAppeared": false
     }
   },
   "scenes": [
     {
-      "id": "intro",
-      "background": "city-hall-morning.png",
+      "id": "prologue-street",
+      "background": "street-morning.png",
       "lines": [
-        { "id": "intro-1", "speaker": "narrator", "text": "小麦の不作から三週間。都市のパンは、平時のほぼ二倍になった。" },
-        { "id": "intro-2", "speaker": "citizen", "text": "市長！ パンが高すぎます。このままでは朝食を買えません！" },
-        { "id": "intro-3", "speaker": "aide", "text": "現在の価格は {{param.price}} 円、供給量は {{param.supply}}。最初の一手が今後を決めます。" }
+        {
+          "id": "ps-01",
+          "speaker": "narrator",
+          "text": "十二万人が暮らすこの市の朝は、商店街のシャッターが上がる音から始まる。"
+        },
+        {
+          "id": "ps-02",
+          "speaker": "narrator",
+          "text": "三か月前まで、食パン一斤は百三十円だった。"
+        },
+        {
+          "id": "ps-03",
+          "speaker": "misaki",
+          "text": "……二百四十円。先週より、また十円上がってる。"
+        },
+        {
+          "id": "ps-04",
+          "speaker": "misaki",
+          "text": "上の子が「おかわり」って言うのを、聞こえなかったふりをしました。"
+        },
+        {
+          "id": "ps-05",
+          "speaker": "narrator",
+          "text": "列に並んでいるのは、あなたに投票した人たちだ。"
+        },
+        {
+          "id": "ps-06",
+          "speaker": "misaki",
+          "text": "市長さん。難しい話は、私には分かりません。"
+        },
+        {
+          "id": "ps-07",
+          "speaker": "misaki",
+          "text": "ただ、明日の朝、子どもに何を食べさせればいいのか教えてください。"
+        },
+        {
+          "id": "ps-08",
+          "speaker": "narrator",
+          "text": "市長就任から、四か月目のことだった。"
+        }
       ],
-      "next": { "type": "goto", "scene": "first-decision" }
+      "next": {
+        "type": "goto",
+        "scene": "prologue-bakery"
+      }
     },
     {
-      "id": "first-decision",
+      "id": "prologue-bakery",
+      "background": "bakery-yamada.png",
+      "lines": [
+        {
+          "id": "pb-01",
+          "speaker": "narrator",
+          "text": "商店街の角で、山田ベーカリーは三代続いている。"
+        },
+        {
+          "id": "pb-02",
+          "speaker": "yamada",
+          "text": "小麦が一・八倍、電気が一・四倍。運送屋にも先月、値上げを頼まれました。"
+        },
+        {
+          "id": "pb-03",
+          "speaker": "yamada",
+          "text": "二百四十円で売って、ようやく去年と同じくらいです。"
+        },
+        {
+          "id": "pb-04",
+          "speaker": "yamada",
+          "text": "儲けたくて上げてるわけじゃないんです。明日も窯に火を入れたいだけで。"
+        },
+        {
+          "id": "pb-05",
+          "speaker": "misaki",
+          "text": "……分かってます。山田さんが悪いなんて、思ってません。"
+        },
+        {
+          "id": "pb-06",
+          "speaker": "misaki",
+          "text": "でも、分かっていても、財布の中身は増えないんです。"
+        },
+        {
+          "id": "pb-07",
+          "speaker": "narrator",
+          "text": "二人とも正しかった。そして、二人とも困っていた。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "prologue-office"
+      }
+    },
+    {
+      "id": "prologue-office",
       "background": "mayors-office.png",
       "lines": [
-        { "id": "first-1", "speaker": "aide", "text": "値段だけを下げるのか、供給を支えるのか。それとも市場へ荷を呼び込むのか。" }
+        {
+          "id": "po-01",
+          "speaker": "narrator",
+          "text": "市長室の机には、三つの書類が並んでいる。どれも「至急」と押してある。"
+        },
+        {
+          "id": "po-02",
+          "speaker": "fujii",
+          "text": "市の政策余力は {{param.budget}}。今年度、自由に動かせる分です。"
+        },
+        {
+          "id": "po-03",
+          "speaker": "fujii",
+          "text": "先に申し上げます。何をするにも、この数字から引かれます。"
+        },
+        {
+          "id": "po-04",
+          "speaker": "takahashi",
+          "text": "就学援助と生活相談の窓口が、先月から混んでいます。"
+        },
+        {
+          "id": "po-05",
+          "speaker": "takahashi",
+          "text": "全員が同じように困っているわけではありません。困り方に差があります。"
+        },
+        {
+          "id": "po-06",
+          "speaker": "kuroda",
+          "text": "市外の卸です。呼ばれたので来ました。"
+        },
+        {
+          "id": "po-07",
+          "speaker": "kuroda",
+          "text": "言っておきますが、私はこの街のために運ぶわけじゃない。採算が合えば運びます。"
+        },
+        {
+          "id": "po-08",
+          "speaker": "fujii",
+          "text": "支持率は {{param.popularity}}。三か月後の議会までに、何かは決めないと。"
+        },
+        {
+          "id": "po-09",
+          "speaker": "narrator",
+          "text": "誰も、正解を持っていなかった。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "decision-1"
+      }
+    },
+    {
+      "id": "decision-1",
+      "background": "mayors-office.png",
+      "lines": [
+        {
+          "id": "d1-01",
+          "speaker": "fujii",
+          "text": "四つ、案があります。"
+        },
+        {
+          "id": "d1-02",
+          "speaker": "fujii",
+          "text": "どれも筋は通っています。通らないのは、代償のほうです。"
+        }
       ],
       "next": {
         "type": "choices",
-        "prompt": "最初の政策を選んでください",
+        "prompt": "最初の対応を決めてください",
         "choices": [
           {
-            "id": "price-cap",
-            "text": "価格を規制する",
-            "description": "上限価格を条例で定める。すぐ安くなる一方、店側は仕入れを減らす。",
+            "id": "d1-price-cap",
+            "text": "パンの価格に上限を設ける",
+            "description": "一斤百六十円を上限とする条例。明日から、誰でも安く買える。その値段で焼き続けられるかどうかは、店の側の事情になる。",
             "effects": [
-              { "param": "price", "op": "mul", "value": 0.6 },
-              { "param": "popularity", "op": "add", "value": 12 },
-              { "param": "supply", "op": "add", "value": -25 },
-              { "flag": "priceControl", "value": true }
+              {
+                "param": "price",
+                "op": "set",
+                "value": 160
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 14
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": -8
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 4
+              },
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": 5
+              },
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -5
+              },
+              {
+                "flag": "priceCapActive",
+                "value": true
+              },
+              {
+                "flag": "everPriceCap",
+                "value": true
+              }
             ],
-            "next": { "type": "goto", "scene": "after-price-cap" }
+            "next": {
+              "type": "goto",
+              "scene": "d1-cap"
+            }
           },
           {
-            "id": "subsidy",
-            "text": "補助金を出す",
-            "description": "パン屋の仕入れを支える。供給は増えるが、市の金庫は軽くなる。",
-            "condition": { "param": "budget", "op": ">=", "value": 45 },
+            "id": "d1-subsidy",
+            "text": "パン屋へ補助金を出す",
+            "description": "仕入れ値の一部を市が肩代わりする。店は焼き続けられる。財政からは、毎月、確実に出ていく。",
+            "condition": {
+              "param": "budget",
+              "op": ">=",
+              "value": 35
+            },
             "ifUnmet": "disable",
-            "unmetText": "財政が不足しています（45億必要）",
+            "unmetText": "政策余力が足りません（35 必要）",
             "effects": [
-              { "param": "budget", "op": "add", "value": -45 },
-              { "param": "supply", "op": "add", "value": 25 },
-              { "param": "price", "op": "add", "value": -75 },
-              { "param": "popularity", "op": "add", "value": 6 },
-              { "flag": "subsidy", "value": true }
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -35
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 12
+              },
+              {
+                "param": "price",
+                "op": "add",
+                "value": -30
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 8
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 8
+              },
+              {
+                "flag": "subsidyActive",
+                "value": true
+              },
+              {
+                "flag": "everSubsidy",
+                "value": true
+              }
             ],
-            "next": { "type": "goto", "scene": "after-subsidy" }
+            "next": {
+              "type": "goto",
+              "scene": "d1-subsidy"
+            }
           },
           {
-            "id": "deregulate",
-            "text": "輸入・流通規制を緩和する",
-            "description": "他都市からの搬入を認める。供給は増えるが、既存業者の反発を招く。",
+            "id": "d1-deregulate",
+            "text": "流通・販売・参入の規制を緩和する",
+            "description": "市外業者の搬入と臨時販売所を認める。荷は増える。地元の店と商店会は反発する。効果が出るまで少し時間がかかる。",
             "effects": [
-              { "param": "supply", "op": "add", "value": 30 },
-              { "param": "price", "op": "add", "value": -40 },
-              { "param": "popularity", "op": "add", "value": -5 },
-              { "flag": "deregulated", "value": true }
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 6
+              },
+              {
+                "param": "price",
+                "op": "add",
+                "value": -5
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": -6
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 2
+              },
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -3
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": 2
+              },
+              {
+                "flag": "deregulated",
+                "value": true
+              },
+              {
+                "flag": "everDeregulate",
+                "value": true
+              }
             ],
-            "next": { "type": "goto", "scene": "after-deregulate" }
+            "next": {
+              "type": "goto",
+              "scene": "d1-deregulate"
+            }
+          },
+          {
+            "id": "d1-targeted",
+            "text": "低所得世帯を限定して支援する",
+            "description": "対象世帯へ食料費を直接支給する。価格には触れない。「誰が対象か」を決める仕事が、このあとずっと残る。",
+            "condition": {
+              "param": "budget",
+              "op": ">=",
+              "value": 18
+            },
+            "ifUnmet": "disable",
+            "unmetText": "政策余力が足りません（18 必要）",
+            "effects": [
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -18
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 3
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 9
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 2
+              },
+              {
+                "flag": "targetedSupportActive",
+                "value": true
+              },
+              {
+                "flag": "everTargetedSupport",
+                "value": true
+              }
+            ],
+            "next": {
+              "type": "goto",
+              "scene": "d1-targeted"
+            }
           }
         ]
       }
     },
     {
-      "id": "after-price-cap",
-      "background": "empty-bakery.png",
-      "onEnter": [
-        { "param": "blackMarket", "op": "add", "value": 25 }
-      ],
+      "id": "d1-cap",
+      "background": "bakery-cheap.png",
       "lines": [
-        { "id": "cap-1", "speaker": "narrator", "text": "翌朝、値札は安くなった。そして昼前には棚が空になった。" },
-        { "id": "cap-2", "speaker": "citizen", "text": "決められた値段では焼くほど赤字です。裏では別の値段がついています。" }
+        {
+          "id": "c1-01",
+          "speaker": "narrator",
+          "text": "条例は三日で通った。値札は一晩で書き換わった。"
+        },
+        {
+          "id": "c1-02",
+          "speaker": "misaki",
+          "text": "百六十円。……本当に、百六十円でした。"
+        },
+        {
+          "id": "c1-03",
+          "speaker": "misaki",
+          "text": "久しぶりに、レジで小銭を数えなくていい買い物をしました。"
+        },
+        {
+          "id": "c1-04",
+          "speaker": "yamada",
+          "text": "今日の分は焼きました。明日の分の小麦を、まだ買っていません。"
+        },
+        {
+          "id": "c1-05",
+          "speaker": "fujii",
+          "text": "支持率が {{param.popularity}} まで上がりました。歓迎されています、今は。"
+        }
       ],
-      "next": { "type": "goto", "scene": "second-decision" }
+      "next": {
+        "type": "goto",
+        "scene": "w3-cap"
+      }
     },
     {
-      "id": "after-subsidy",
-      "background": "busy-bakery.png",
+      "id": "d1-subsidy",
+      "background": "bakery-yamada.png",
       "lines": [
-        { "id": "subsidy-1", "speaker": "narrator", "text": "パン屋の窯に火が戻り、店頭価格も下がった。" },
-        { "id": "subsidy-2", "speaker": "aide", "text": "供給は {{param.supply}} まで戻りました。ただし財政は残り {{param.budget}} 億です。" }
+        {
+          "id": "s1-01",
+          "speaker": "narrator",
+          "text": "市は、小麦の仕入れ値の一部を肩代わりすると発表した。"
+        },
+        {
+          "id": "s1-02",
+          "speaker": "yamada",
+          "text": "助かります。来月の仕入れの心配を、しなくて済みます。"
+        },
+        {
+          "id": "s1-03",
+          "speaker": "narrator",
+          "text": "店頭価格は二百十円まで下がり、棚には昨日より多くのパンが並んだ。"
+        },
+        {
+          "id": "s1-04",
+          "speaker": "fujii",
+          "text": "残りの余力は {{param.budget}}。申し上げたとおり、確実に減りました。"
+        },
+        {
+          "id": "s1-05",
+          "speaker": "fujii",
+          "text": "それと、これは毎月です。一度きりの支出ではありません。"
+        }
       ],
-      "next": { "type": "goto", "scene": "second-decision" }
+      "next": {
+        "type": "goto",
+        "scene": "w3-subsidy"
+      }
     },
     {
-      "id": "after-deregulate",
+      "id": "d1-deregulate",
       "background": "city-gate.png",
       "lines": [
-        { "id": "deregulate-1", "speaker": "narrator", "text": "市門を通る荷車は増えた。価格の下落は、まだ緩やかだった。" },
-        { "id": "deregulate-2", "speaker": "aide", "text": "供給は改善していますが、地元業者から抗議文が届いています。" }
+        {
+          "id": "g1-01",
+          "speaker": "narrator",
+          "text": "市外業者の搬入許可と、臨時販売所の届出制が、その週のうちに施行された。"
+        },
+        {
+          "id": "g1-02",
+          "speaker": "kuroda",
+          "text": "手続きが減ったので、来週から週二便に増やします。採算が合うので。"
+        },
+        {
+          "id": "g1-03",
+          "speaker": "yamada",
+          "text": "……駅前に、うちより安い臨時の店が出ました。"
+        },
+        {
+          "id": "g1-04",
+          "speaker": "yamada",
+          "text": "恨んではいません。ただ、うちには三代分の設備の借金があるので。"
+        },
+        {
+          "id": "g1-05",
+          "speaker": "fujii",
+          "text": "商店会から抗議文が届いています。支持率は {{param.popularity}} です。"
+        }
       ],
-      "next": { "type": "goto", "scene": "second-decision" }
+      "next": {
+        "type": "goto",
+        "scene": "w3-deregulate"
+      }
     },
     {
-      "id": "second-decision",
+      "id": "d1-targeted",
+      "background": "welfare-desk.png",
+      "lines": [
+        {
+          "id": "t1-01",
+          "speaker": "narrator",
+          "text": "対象世帯への食料費の直接支給が決まった。価格には手をつけなかった。"
+        },
+        {
+          "id": "t1-02",
+          "speaker": "takahashi",
+          "text": "千二百世帯に通知を出しました。申請してくれたのは、まだ七割です。"
+        },
+        {
+          "id": "t1-03",
+          "speaker": "misaki",
+          "text": "うちは……対象でした。正直、助かりました。"
+        },
+        {
+          "id": "t1-04",
+          "speaker": "misaki",
+          "text": "隣の家は、少しだけ収入が多くて外れたそうです。気まずくて、まだ話していません。"
+        },
+        {
+          "id": "t1-05",
+          "speaker": "fujii",
+          "text": "余力は {{param.budget}} まで下がりました。価格は二百四十円のままです。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "w3-targeted"
+      }
+    },
+    {
+      "id": "w3-cap",
+      "background": "empty-shelf.png",
+      "onEnter": [
+        {
+          "param": "supply",
+          "op": "add",
+          "value": -16
+        },
+        {
+          "param": "informalMarket",
+          "op": "add",
+          "value": 18
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": -14
+        },
+        {
+          "param": "marketRisk",
+          "op": "add",
+          "value": 5
+        },
+        {
+          "param": "budget",
+          "op": "add",
+          "value": -4
+        },
+        {
+          "param": "popularity",
+          "op": "add",
+          "value": -6
+        }
+      ],
+      "lines": [
+        {
+          "id": "w3c-01",
+          "speaker": "narrator",
+          "text": "三週間後。値札は変わらず百六十円だった。"
+        },
+        {
+          "id": "w3c-02",
+          "speaker": "narrator",
+          "text": "ただし、その値札の下に、パンは載っていなかった。"
+        },
+        {
+          "id": "w3c-03",
+          "speaker": "misaki",
+          "text": "朝七時に並んで、買えたのは二回だけです。"
+        },
+        {
+          "id": "w3c-04",
+          "speaker": "misaki",
+          "text": "安いんです。安いんですけど、無いんです。"
+        },
+        {
+          "id": "w3c-05",
+          "speaker": "yamada",
+          "text": "百六十円だと、焼くほど赤字になります。だから焼く数を減らしました。"
+        },
+        {
+          "id": "w3c-06",
+          "speaker": "yamada",
+          "text": "昨日、知らない人に声をかけられました。「うちに卸さないか」と。"
+        },
+        {
+          "id": "w3c-07",
+          "speaker": "fujii",
+          "text": "正規の供給は {{param.supply}}。届け出のない取引の話が、こちらにも入っています。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "w3-council"
+      }
+    },
+    {
+      "id": "w3-subsidy",
+      "background": "bakery-yamada.png",
+      "onEnter": [
+        {
+          "param": "budget",
+          "op": "add",
+          "value": -16
+        },
+        {
+          "param": "supply",
+          "op": "add",
+          "value": 6
+        },
+        {
+          "param": "price",
+          "op": "add",
+          "value": -5
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": 3
+        },
+        {
+          "param": "popularity",
+          "op": "add",
+          "value": -2
+        }
+      ],
+      "lines": [
+        {
+          "id": "w3s-01",
+          "speaker": "narrator",
+          "text": "三週間後。窯の火は消えていなかった。"
+        },
+        {
+          "id": "w3s-02",
+          "speaker": "yamada",
+          "text": "おかげさまで、いつもどおり焼けています。従業員も戻しました。"
+        },
+        {
+          "id": "w3s-03",
+          "speaker": "kuroda",
+          "text": "補助が出ると聞いて、うちも卸値を少し上げさせてもらいました。"
+        },
+        {
+          "id": "w3s-04",
+          "speaker": "kuroda",
+          "text": "悪く思わないでください。市が払うと決まった以上、そこに合わせるのが商売です。"
+        },
+        {
+          "id": "w3s-05",
+          "speaker": "misaki",
+          "text": "二百五円。……高いままですけど、買えるだけましです。"
+        },
+        {
+          "id": "w3s-06",
+          "speaker": "fujii",
+          "text": "補助の実績が積み上がっています。余力は {{param.budget}}。"
+        },
+        {
+          "id": "w3s-07",
+          "speaker": "fujii",
+          "text": "来年度の道路と学校の修繕を、どこかで削る話になります。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "w3-council"
+      }
+    },
+    {
+      "id": "w3-deregulate",
+      "background": "city-gate.png",
+      "onEnter": [
+        {
+          "param": "supply",
+          "op": "add",
+          "value": 22
+        },
+        {
+          "param": "price",
+          "op": "add",
+          "value": -35
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": 10
+        },
+        {
+          "param": "popularity",
+          "op": "add",
+          "value": -4
+        },
+        {
+          "param": "marketRisk",
+          "op": "add",
+          "value": 3
+        }
+      ],
+      "lines": [
+        {
+          "id": "w3g-01",
+          "speaker": "narrator",
+          "text": "三週間後。市の入口の交通量が、目に見えて増えていた。"
+        },
+        {
+          "id": "w3g-02",
+          "speaker": "kuroda",
+          "text": "週二便が四便になりました。他社も入ってきています。"
+        },
+        {
+          "id": "w3g-03",
+          "speaker": "narrator",
+          "text": "店頭価格は二百円前後まで下がり、棚は埋まった。"
+        },
+        {
+          "id": "w3g-04",
+          "speaker": "misaki",
+          "text": "買えるようになりました。……ただ、どこの小麦か書いていない袋もあって。"
+        },
+        {
+          "id": "w3g-05",
+          "speaker": "yamada",
+          "text": "先週、同じ商店街の一軒が店を閉めました。四十年やっていた店です。"
+        },
+        {
+          "id": "w3g-06",
+          "speaker": "yamada",
+          "text": "うちはまだ大丈夫です。「まだ」ですが。"
+        },
+        {
+          "id": "w3g-07",
+          "speaker": "fujii",
+          "text": "支持率は {{param.popularity}}。商店会は、もう次の選挙の話をしています。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "w3-council"
+      }
+    },
+    {
+      "id": "w3-targeted",
+      "background": "welfare-desk.png",
+      "onEnter": [
+        {
+          "param": "budget",
+          "op": "add",
+          "value": -8
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": 2
+        },
+        {
+          "param": "popularity",
+          "op": "add",
+          "value": -3
+        },
+        {
+          "param": "supply",
+          "op": "add",
+          "value": 3
+        },
+        {
+          "param": "price",
+          "op": "add",
+          "value": -5
+        }
+      ],
+      "lines": [
+        {
+          "id": "w3t-01",
+          "speaker": "narrator",
+          "text": "三週間後。店頭価格は二百三十五円。ほとんど動いていない。"
+        },
+        {
+          "id": "w3t-02",
+          "speaker": "takahashi",
+          "text": "支給は届いています。対象世帯の欠食の相談は、はっきり減りました。"
+        },
+        {
+          "id": "w3t-03",
+          "speaker": "takahashi",
+          "text": "問題は、対象の外側です。基準を一万円超えただけの世帯から、毎日電話が来ます。"
+        },
+        {
+          "id": "w3t-04",
+          "speaker": "misaki",
+          "text": "助かっている人がいるのは知っています。でも、うちの隣は助かっていません。"
+        },
+        {
+          "id": "w3t-05",
+          "speaker": "narrator",
+          "text": "「必要な人へ」という言葉は、「必要でない人」を決める作業でもあった。"
+        },
+        {
+          "id": "w3t-06",
+          "speaker": "fujii",
+          "text": "審査と支給の事務費が、想定より膨らんでいます。余力は {{param.budget}}。"
+        },
+        {
+          "id": "w3t-07",
+          "speaker": "yamada",
+          "text": "値段は下がっていませんが、お客さんは戻ってきました。それだけでもありがたい。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "w3-council"
+      }
+    },
+    {
+      "id": "w3-council",
       "background": "council-room.png",
       "lines": [
-        { "id": "second-1", "speaker": "aide", "text": "一週間が経ちました。次は、届いたパンを誰にどう渡すか決める必要があります。" }
+        {
+          "id": "wc-01",
+          "speaker": "narrator",
+          "text": "三週間目の庁議。書類の束は、最初より厚くなっている。"
+        },
+        {
+          "id": "wc-02",
+          "speaker": "fujii",
+          "text": "現状です。価格 {{param.price}} 円、正規の供給 {{param.supply}}、余力 {{param.budget}}。"
+        },
+        {
+          "id": "wc-03",
+          "speaker": "takahashi",
+          "text": "それと、市民が実際に食べ物を手に入れられている度合い。今は {{param.foodAccess}} 程度と見ています。"
+        },
+        {
+          "id": "wc-04",
+          "speaker": "takahashi",
+          "text": "値段と、買えるかどうかは、別の数字です。ここを一緒にすると判断を誤ります。"
+        },
+        {
+          "id": "wc-05",
+          "speaker": "fujii",
+          "text": "次の一手を決めましょう。前回と違う方向でも構いません。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "decision-2"
+      }
+    },
+    {
+      "id": "decision-2",
+      "background": "council-room.png",
+      "lines": [
+        {
+          "id": "d2-01",
+          "speaker": "fujii",
+          "text": "方向を変えるなら、変える理由を説明できるようにしてください。"
+        },
+        {
+          "id": "d2-02",
+          "speaker": "fujii",
+          "text": "制度が三か月ごとに変わる街では、誰も来年の計画を立てられません。"
+        },
+        {
+          "id": "d2-03",
+          "speaker": "takahashi",
+          "text": "それでも、間違いを認めないよりはましです。"
+        }
       ],
       "next": {
         "type": "choices",
-        "prompt": "二つ目の政策を選んでください",
+        "prompt": "二つ目の判断をしてください",
         "choices": [
           {
-            "id": "crackdown",
-            "text": "闇市場を取り締まる",
-            "description": "非公式な売買を止める。闇市場は縮むが、表裏を合わせた供給も減る。",
-            "condition": { "param": "blackMarket", "op": ">=", "value": 20 },
+            "id": "d2-price-cap",
+            "text": "価格に上限を設ける",
+            "description": "一斤百六十五円を上限とする。すぐに効く。効いたあとのことは、まだ分からない。",
+            "condition": {
+              "not": {
+                "flag": "priceCapActive"
+              }
+            },
             "ifUnmet": "hide",
             "effects": [
-              { "param": "blackMarket", "op": "add", "value": -20 },
-              { "param": "supply", "op": "add", "value": -10 },
-              { "param": "popularity", "op": "add", "value": -8 },
-              { "flag": "crackdown", "value": true }
+              {
+                "param": "price",
+                "op": "set",
+                "value": 165
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 12
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": -14
+              },
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": 10
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": -2
+              },
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -5
+              },
+              {
+                "param": "policyChanges",
+                "op": "add",
+                "value": 1
+              },
+              {
+                "flag": "priceCapActive",
+                "value": true
+              },
+              {
+                "flag": "everPriceCap",
+                "value": true
+              }
             ],
-            "next": { "type": "goto", "scene": "second-results" }
+            "next": {
+              "type": "goto",
+              "scene": "d2-router"
+            }
           },
           {
-            "id": "targeted-support",
-            "text": "低所得世帯だけを支援する",
-            "description": "支援を必要な世帯へ絞る。効果は小さいが副作用も抑えられる。",
-            "condition": { "param": "budget", "op": ">=", "value": 20 },
+            "id": "d2-relax-cap",
+            "text": "上限価格を引き上げる",
+            "description": "上限を二百十五円へ。棚は戻りやすくなる。安くすると約束した市長が、値上げを決めることになる。",
+            "condition": {
+              "flag": "priceCapActive"
+            },
+            "ifUnmet": "hide",
+            "effects": [
+              {
+                "param": "price",
+                "op": "set",
+                "value": 215
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 20
+              },
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": -12
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 8
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": -10
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": -4
+              },
+              {
+                "param": "policyChanges",
+                "op": "add",
+                "value": 1
+              },
+              {
+                "flag": "priceCapActive",
+                "value": false
+              },
+              {
+                "flag": "everReversed",
+                "value": true
+              }
+            ],
+            "next": {
+              "type": "goto",
+              "scene": "d2-router"
+            }
+          },
+          {
+            "id": "d2-subsidy",
+            "text": "パン屋への補助を出す・増やす",
+            "description": "仕入れを支え、店を営業させ続ける。毎月出ていく。",
+            "condition": {
+              "param": "budget",
+              "op": ">=",
+              "value": 30
+            },
             "ifUnmet": "disable",
-            "unmetText": "財政が不足しています（20億必要）",
+            "unmetText": "政策余力が足りません（30 必要）",
             "effects": [
-              { "param": "budget", "op": "add", "value": -20 },
-              { "param": "popularity", "op": "add", "value": 5 },
-              { "flag": "targetedSupport", "value": true }
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -28
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 12
+              },
+              {
+                "param": "price",
+                "op": "add",
+                "value": -20
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 6
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 7
+              },
+              {
+                "flag": "subsidyActive",
+                "value": true
+              },
+              {
+                "flag": "everSubsidy",
+                "value": true
+              }
             ],
-            "next": { "type": "goto", "scene": "second-results" }
+            "next": {
+              "type": "goto",
+              "scene": "d2-router"
+            }
           },
           {
-            "id": "rationing",
-            "text": "配給制を導入する",
-            "description": "一人あたりの購入量を制限する。公平感は生まれるが、運用費と抜け道も増える。",
+            "id": "d2-targeted",
+            "text": "困窮世帯への限定支援を始める・広げる",
+            "description": "価格ではなく、人に配る。線引きの事務は増える。",
+            "condition": {
+              "param": "budget",
+              "op": ">=",
+              "value": 20
+            },
+            "ifUnmet": "disable",
+            "unmetText": "政策余力が足りません（20 必要）",
             "effects": [
-              { "param": "budget", "op": "add", "value": -35 },
-              { "param": "popularity", "op": "add", "value": 8 },
-              { "param": "blackMarket", "op": "add", "value": 15 },
-              { "flag": "rationing", "value": true }
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -20
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 9
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 4
+              },
+              {
+                "flag": "targetedSupportActive",
+                "value": true
+              },
+              {
+                "flag": "everTargetedSupport",
+                "value": true
+              }
             ],
-            "next": { "type": "goto", "scene": "second-results" }
+            "next": {
+              "type": "goto",
+              "scene": "d2-router"
+            }
           },
           {
-            "id": "wait-second",
-            "text": "もう一週間、様子を見る",
-            "description": "財政は温存できるが、待たされる市民の不満は増える。",
+            "id": "d2-rationing",
+            "text": "一人あたりの購入量を制限する",
+            "description": "並んだ人に行き渡らせる。整理券の管理と、その転売が始まる。",
+            "condition": {
+              "param": "budget",
+              "op": ">=",
+              "value": 15
+            },
+            "ifUnmet": "disable",
+            "unmetText": "政策余力が足りません（15 必要）",
             "effects": [
-              { "param": "popularity", "op": "add", "value": -4 },
-              { "flag": "waitedSecond", "value": true }
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -15
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 7
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 4
+              },
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": 12
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": -3
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": 2
+              },
+              {
+                "param": "policyChanges",
+                "op": "add",
+                "value": 1
+              },
+              {
+                "flag": "rationingActive",
+                "value": true
+              },
+              {
+                "flag": "everRationing",
+                "value": true
+              }
             ],
-            "next": { "type": "goto", "scene": "second-results" }
+            "next": {
+              "type": "goto",
+              "scene": "d2-router"
+            }
+          },
+          {
+            "id": "d2-hold",
+            "text": "現行の方針を維持する",
+            "description": "新しい代償は増やさない。今の代償は、そのまま続く。",
+            "effects": [
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": -4
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": -1
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": -2
+              }
+            ],
+            "next": {
+              "type": "goto",
+              "scene": "d2-router"
+            }
           }
         ]
       }
     },
     {
-      "id": "second-results",
-      "background": "market-week-two.png",
+      "id": "d2-router",
+      "lines": [],
+      "next": {
+        "type": "branch",
+        "branches": [
+          {
+            "when": {
+              "any": [
+                {
+                  "flag": "priceCapActive"
+                },
+                {
+                  "flag": "rationingActive"
+                }
+              ]
+            },
+            "then": {
+              "type": "goto",
+              "scene": "d2-results-controlled"
+            }
+          }
+        ],
+        "else": {
+          "type": "goto",
+          "scene": "d2-results-open"
+        }
+      }
+    },
+    {
+      "id": "d2-results-controlled",
+      "background": "back-lot.png",
+      "onEnter": [
+        {
+          "param": "informalMarket",
+          "op": "add",
+          "value": 14
+        },
+        {
+          "param": "supply",
+          "op": "add",
+          "value": -6
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": -2
+        },
+        {
+          "param": "marketRisk",
+          "op": "add",
+          "value": 2
+        }
+      ],
       "lines": [
-        { "id": "second-result-ration", "speaker": "citizen", "text": "列は整いました。でも配給券を買い取る人が現れています。", "condition": { "flag": "rationing" } },
-        { "id": "second-result-target", "speaker": "citizen", "text": "必要な家には券が届きました。全員が安く買えるわけではありませんが。", "condition": { "flag": "targetedSupport" } },
-        { "id": "second-result-crack", "speaker": "citizen", "text": "裏通りは静かになりました。そのぶん、手に入るパンも減りました。", "condition": { "flag": "crackdown" } },
-        { "id": "second-result-wait", "speaker": "narrator", "text": "市庁舎が待つあいだにも、市民の一週間は過ぎていった。", "condition": { "flag": "waitedSecond" } }
+        {
+          "id": "rc-01",
+          "speaker": "narrator",
+          "text": "決定から十日。窓口の電話は減り、路地の人通りが増えた。"
+        },
+        {
+          "id": "rc-02",
+          "speaker": "misaki",
+          "text": "商店街の裏に、車で来る人がいるんです。パン、あります。二百九十円で。"
+        },
+        {
+          "id": "rc-03",
+          "speaker": "misaki",
+          "text": "高いです。高いですけど、あるんです。"
+        },
+        {
+          "id": "rc-04",
+          "speaker": "misaki",
+          "text": "昨日は買いました。安くて無いより、高くてあるほうが、今日は助かるので。",
+          "condition": {
+            "param": "informalMarket",
+            "op": ">=",
+            "value": 30
+          }
+        },
+        {
+          "id": "rc-05",
+          "speaker": "yamada",
+          "text": "うちの整理券を、駅前で買い取っている人がいます。",
+          "condition": {
+            "flag": "rationingActive"
+          }
+        },
+        {
+          "id": "rc-06",
+          "speaker": "fujii",
+          "text": "正規の供給は {{param.supply}}。非公式の取引規模は {{param.informalMarket}} と見ています。"
+        }
       ],
       "next": {
         "type": "branch",
         "branches": [
-          { "when": { "flag": "priceControl", "value": true }, "then": { "type": "goto", "scene": "shortage-deepens" } }
+          {
+            "when": {
+              "param": "informalMarket",
+              "op": ">=",
+              "value": 35
+            },
+            "then": {
+              "type": "goto",
+              "scene": "informal-intro"
+            }
+          }
         ],
-        "else": { "type": "goto", "scene": "market-shifts" }
+        "else": {
+          "type": "goto",
+          "scene": "m6-router"
+        }
       }
     },
     {
-      "id": "shortage-deepens",
-      "background": "back-alley.png",
+      "id": "d2-results-open",
+      "background": "market-street.png",
       "onEnter": [
-        { "param": "supply", "op": "add", "value": -10 },
-        { "param": "blackMarket", "op": "add", "value": 10 }
+        {
+          "param": "informalMarket",
+          "op": "add",
+          "value": -3
+        },
+        {
+          "param": "supply",
+          "op": "add",
+          "value": 4
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": 2
+        },
+        {
+          "param": "price",
+          "op": "add",
+          "value": -5
+        }
       ],
       "lines": [
-        { "id": "shortage-1", "speaker": "narrator", "text": "安い公定価格の横で、裏通りの相場だけが育っていった。" },
-        { "id": "shortage-2", "speaker": "aide", "text": "表の供給は {{param.supply}}、闇市場規模は {{param.blackMarket}}。数字のずれが広がっています。" }
+        {
+          "id": "ro-01",
+          "speaker": "narrator",
+          "text": "決定から十日。市場は、静かに動き続けていた。"
+        },
+        {
+          "id": "ro-02",
+          "speaker": "kuroda",
+          "text": "値段が付いていれば、荷は動きます。付かなければ止まります。単純な話です。"
+        },
+        {
+          "id": "ro-03",
+          "speaker": "yamada",
+          "text": "お客さんの顔ぶれが、少し戻りました。"
+        },
+        {
+          "id": "ro-04",
+          "speaker": "misaki",
+          "text": "前より買えます。前より高いですけど。",
+          "condition": {
+            "param": "price",
+            "op": ">=",
+            "value": 210
+          }
+        },
+        {
+          "id": "ro-05",
+          "speaker": "takahashi",
+          "text": "支給の対象世帯からは、苦情がほとんど来なくなりました。",
+          "condition": {
+            "flag": "targetedSupportActive"
+          }
+        },
+        {
+          "id": "ro-06",
+          "speaker": "fujii",
+          "text": "正規の供給は {{param.supply}}、価格は {{param.price}} 円です。"
+        }
       ],
-      "next": { "type": "goto", "scene": "third-decision" }
+      "next": {
+        "type": "branch",
+        "branches": [
+          {
+            "when": {
+              "param": "informalMarket",
+              "op": ">=",
+              "value": 35
+            },
+            "then": {
+              "type": "goto",
+              "scene": "informal-intro"
+            }
+          }
+        ],
+        "else": {
+          "type": "goto",
+          "scene": "m6-router"
+        }
+      }
     },
     {
-      "id": "market-shifts",
-      "background": "market-recovering.png",
-      "onEnter": [
-        { "param": "supply", "op": "add", "value": 5 },
-        { "param": "price", "op": "add", "value": -10 }
-      ],
+      "id": "informal-intro",
+      "background": "back-lot.png",
       "lines": [
-        { "id": "market-1", "speaker": "narrator", "text": "新しい荷が市場へ届き、価格は少しずつ動いた。" },
-        { "id": "market-2", "speaker": "aide", "text": "価格は {{param.price}} 円、供給は {{param.supply}}。最後の判断です。" }
+        {
+          "id": "ii-01",
+          "speaker": "narrator",
+          "text": "四週目。市内三か所で、届け出のない販売が常態化していた。"
+        },
+        {
+          "id": "ii-02",
+          "speaker": "narrator",
+          "text": "平日の夕方、公民館の駐車場。折りたたみ机の上に、パンが並ぶ。"
+        },
+        {
+          "id": "ii-03",
+          "speaker": "misaki",
+          "text": "私、そこで買っています。隠しません。"
+        },
+        {
+          "id": "ii-04",
+          "speaker": "misaki",
+          "text": "正規のお店は、安いけれど朝で終わります。私は仕事があります。"
+        },
+        {
+          "id": "ii-05",
+          "speaker": "kuroda",
+          "text": "私の荷も、一部はそちらへ流れています。買う人がいるので。"
+        },
+        {
+          "id": "ii-06",
+          "speaker": "takahashi",
+          "text": "食品衛生の担当が困っています。誰が売っているのか、把握できていません。"
+        },
+        {
+          "id": "ii-07",
+          "speaker": "takahashi",
+          "text": "それと、同じ場所で食品以外のものも売られ始めています。出所の説明がつかない物です。"
+        },
+        {
+          "id": "ii-08",
+          "speaker": "fujii",
+          "text": "食べ物の話と、それ以外の話を、同じ紙に書かないでください。分けて決めましょう。"
+        }
       ],
-      "next": { "type": "goto", "scene": "third-decision" }
+      "next": {
+        "type": "goto",
+        "scene": "informal-decision"
+      }
     },
     {
-      "id": "third-decision",
-      "background": "mayors-office-night.png",
+      "id": "informal-decision",
+      "background": "council-room.png",
       "lines": [
-        { "id": "third-1", "speaker": "aide", "text": "危機対策を仕上げます。どの代償を引き受けますか。" }
+        {
+          "id": "id-01",
+          "speaker": "fujii",
+          "text": "非公式の取引を、市としてどう扱いますか。"
+        },
+        {
+          "id": "id-02",
+          "speaker": "takahashi",
+          "text": "どれを選んでも、誰かの今日の食事に影響します。"
+        }
       ],
       "next": {
         "type": "choices",
-        "prompt": "最後の政策を選んでください",
+        "prompt": "非公式市場への方針を決めてください",
         "choices": [
           {
-            "id": "stabilize-imports",
-            "text": "輸送費を限定支援する",
-            "description": "追加の荷を確保しつつ、支出に上限を設ける。",
-            "condition": { "param": "budget", "op": ">=", "value": 25 },
-            "ifUnmet": "disable",
-            "unmetText": "財政が不足しています（25億必要）",
+            "id": "informal-crackdown",
+            "text": "徹底的に摘発する",
+            "description": "一斉の指導と告発を行う。詐欺的な販売や出所不明の商品は減る。そこで買っていた人の、今日の分も減る。",
             "effects": [
-              { "param": "budget", "op": "add", "value": -25 },
-              { "param": "supply", "op": "add", "value": 10 },
-              { "param": "price", "op": "add", "value": -15 },
-              { "param": "popularity", "op": "add", "value": 1 }
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": -22
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": -12
+              },
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -12
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": -6
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": -3
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 2
+              },
+              {
+                "flag": "crackdownActive",
+                "value": true
+              },
+              {
+                "flag": "everCrackdown",
+                "value": true
+              }
             ],
-            "next": { "type": "goto", "scene": "finale" }
+            "next": {
+              "type": "goto",
+              "scene": "informal-crackdown-after"
+            }
           },
           {
-            "id": "emergency-subsidy",
-            "text": "大規模な緊急補助金を出す",
-            "description": "供給と価格を一気に改善する。来年度の予算まで使い込む危険がある。",
-            "condition": { "param": "budget", "op": ">=", "value": 20 },
-            "ifUnmet": "disable",
-            "unmetText": "実施のための信用余力がありません",
+            "id": "informal-tolerate",
+            "text": "食品の取引に限って、当面は黙認する",
+            "description": "食品衛生の最低限だけ示し、摘発はしない。買える人は増える。「どこまで許すのか」を、これから毎週決めることになる。",
             "effects": [
-              { "param": "budget", "op": "add", "value": -60 },
-              { "param": "supply", "op": "add", "value": 20 },
-              { "param": "price", "op": "add", "value": -40 },
-              { "param": "popularity", "op": "add", "value": 6 }
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": 10
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 18
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": 6
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 2
+              },
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -3
+              },
+              {
+                "param": "policyChanges",
+                "op": "add",
+                "value": 1
+              },
+              {
+                "flag": "informalTolerated",
+                "value": true
+              },
+              {
+                "flag": "everTolerated",
+                "value": true
+              },
+              {
+                "flag": "illicitGoodsAppeared",
+                "value": true
+              }
             ],
-            "next": { "type": "goto", "scene": "finale" }
+            "next": {
+              "type": "goto",
+              "scene": "informal-tolerate-after"
+            }
           },
           {
-            "id": "expand-rationing",
-            "text": "配給網を全市へ広げる",
-            "description": "公平な配分を優先する。運用費と非公式取引がさらに増える。",
-            "effects": [
-              { "param": "budget", "op": "add", "value": -25 },
-              { "param": "supply", "op": "add", "value": -5 },
-              { "param": "blackMarket", "op": "add", "value": 35 },
-              { "param": "popularity", "op": "add", "value": 8 },
-              { "flag": "expandedRationing", "value": true }
-            ],
-            "next": { "type": "goto", "scene": "finale" }
-          },
-          {
-            "id": "withdraw-price-cap",
-            "text": "価格規制を撤回する",
-            "description": "表の供給を戻す代わりに、値上がりと政治的な反発を受け入れる。",
-            "condition": { "flag": "priceControl", "value": true },
+            "id": "informal-relax-price",
+            "text": "価格規制を緩めて、正規の市場へ戻す",
+            "description": "上限を引き上げ、店が売れるようにする。裏へ回る理由そのものが減る。安くすると約束した市長が、値上げを決めることになる。",
+            "condition": {
+              "flag": "priceCapActive"
+            },
             "ifUnmet": "hide",
             "effects": [
-              { "param": "price", "op": "add", "value": 45 },
-              { "param": "supply", "op": "add", "value": 25 },
-              { "param": "blackMarket", "op": "add", "value": -15 },
-              { "param": "popularity", "op": "add", "value": -8 },
-              { "flag": "priceControl", "value": false }
+              {
+                "param": "price",
+                "op": "set",
+                "value": 215
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 24
+              },
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": -20
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 8
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": -11
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": -5
+              },
+              {
+                "param": "policyChanges",
+                "op": "add",
+                "value": 1
+              },
+              {
+                "flag": "priceCapActive",
+                "value": false
+              },
+              {
+                "flag": "everReversed",
+                "value": true
+              }
             ],
-            "next": { "type": "goto", "scene": "finale" }
-          },
-          {
-            "id": "observe",
-            "text": "追加策は行わない",
-            "description": "財政を温存する。状況が自然に整うか、悪化するかを受け入れる。",
-            "effects": [
-              { "param": "popularity", "op": "add", "value": -2 }
-            ],
-            "next": { "type": "goto", "scene": "finale" }
+            "next": {
+              "type": "goto",
+              "scene": "informal-relax-after"
+            }
           }
         ]
       }
     },
     {
-      "id": "finale",
-      "background": "city-dawn.png",
+      "id": "informal-crackdown-after",
+      "background": "back-lot-empty.png",
       "lines": [
-        { "id": "finale-1", "speaker": "narrator", "text": "一か月が過ぎた。都市は、あなたが選んだ均衡の上で朝を迎える。" },
-        { "id": "finale-2", "speaker": "aide", "text": "棚の不足は数字以上に深刻です。", "condition": { "visited": "shortage-deepens" } },
-        { "id": "finale-3", "speaker": "aide", "text": "あとは結果を受け止めましょう。", "condition": { "not": { "visited": "shortage-deepens" } } }
+        {
+          "id": "ica-01",
+          "speaker": "narrator",
+          "text": "一斉指導の翌週、公民館の駐車場は空になった。"
+        },
+        {
+          "id": "ica-02",
+          "speaker": "takahashi",
+          "text": "出所不明の商品と、偽の支給券が数件見つかりました。そこは成果です。"
+        },
+        {
+          "id": "ica-03",
+          "speaker": "misaki",
+          "text": "……買えなくなりました。正規のお店には、やっぱり朝しかありません。"
+        },
+        {
+          "id": "ica-04",
+          "speaker": "misaki",
+          "text": "悪いことをしていた自覚は、正直ありません。ただ、無くなりました。"
+        },
+        {
+          "id": "ica-05",
+          "speaker": "narrator",
+          "text": "取引は消えた。需要は消えなかった。"
+        }
       ],
-      "next": { "type": "resolveEnding" }
+      "next": {
+        "type": "goto",
+        "scene": "m6-router"
+      }
+    },
+    {
+      "id": "informal-tolerate-after",
+      "background": "back-lot.png",
+      "lines": [
+        {
+          "id": "ita-01",
+          "speaker": "narrator",
+          "text": "市は、食品の非公式販売について、当面の指導を見送ると決めた。"
+        },
+        {
+          "id": "ita-02",
+          "speaker": "takahashi",
+          "text": "手洗い設備と表示だけ、紙一枚でお願いしました。断る人はいませんでした。"
+        },
+        {
+          "id": "ita-03",
+          "speaker": "misaki",
+          "text": "前より買いやすくなりました。値段は高いままです。"
+        },
+        {
+          "id": "ita-04",
+          "speaker": "takahashi",
+          "text": "ただ、同じ場所で売られている食品以外の商品については、市は何も保証できません。"
+        },
+        {
+          "id": "ita-05",
+          "speaker": "fujii",
+          "text": "「どこまでを食品と呼ぶか」で、毎週会議をすることになりました。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "m6-router"
+      }
+    },
+    {
+      "id": "informal-relax-after",
+      "background": "bakery-yamada.png",
+      "lines": [
+        {
+          "id": "ira-01",
+          "speaker": "narrator",
+          "text": "上限価格は二百十五円へ引き上げられた。市長の会見は、十二分で終わった。"
+        },
+        {
+          "id": "ira-02",
+          "speaker": "yamada",
+          "text": "焼けます。二百十五円なら、焼けます。"
+        },
+        {
+          "id": "ira-03",
+          "speaker": "misaki",
+          "text": "値上げですよね、これ。……分かっています。分かっていますけど。"
+        },
+        {
+          "id": "ira-04",
+          "speaker": "narrator",
+          "text": "公民館の駐車場から、車は少しずつ減っていった。"
+        },
+        {
+          "id": "ira-05",
+          "speaker": "fujii",
+          "text": "支持率は {{param.popularity}}。説明を求める陳情が、四十七件来ています。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "m6-router"
+      }
+    },
+    {
+      "id": "m6-router",
+      "lines": [],
+      "next": {
+        "type": "branch",
+        "branches": [
+          {
+            "when": {
+              "flag": "priceCapActive"
+            },
+            "then": {
+              "type": "goto",
+              "scene": "m6-cap"
+            }
+          },
+          {
+            "when": {
+              "flag": "subsidyActive"
+            },
+            "then": {
+              "type": "goto",
+              "scene": "m6-subsidy"
+            }
+          },
+          {
+            "when": {
+              "flag": "deregulated"
+            },
+            "then": {
+              "type": "goto",
+              "scene": "m6-market"
+            }
+          }
+        ],
+        "else": {
+          "type": "goto",
+          "scene": "m6-common"
+        }
+      }
+    },
+    {
+      "id": "m6-cap",
+      "background": "empty-shelf.png",
+      "onEnter": [
+        {
+          "param": "supply",
+          "op": "add",
+          "value": -8
+        },
+        {
+          "param": "informalMarket",
+          "op": "add",
+          "value": 8
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": -3
+        },
+        {
+          "param": "marketRisk",
+          "op": "add",
+          "value": 2
+        },
+        {
+          "param": "budget",
+          "op": "add",
+          "value": -6
+        },
+        {
+          "param": "popularity",
+          "op": "add",
+          "value": -3
+        }
+      ],
+      "lines": [
+        {
+          "id": "m6c-01",
+          "speaker": "narrator",
+          "text": "六か月後。条例は生きている。値札も百六十円のままだ。"
+        },
+        {
+          "id": "m6c-02",
+          "speaker": "yamada",
+          "text": "週三日にしました。焼く日を減らせば、赤字の日も減るので。"
+        },
+        {
+          "id": "m6c-03",
+          "speaker": "misaki",
+          "text": "正規のお店で買えたのは、今月に入って一度です。"
+        },
+        {
+          "id": "m6c-04",
+          "speaker": "kuroda",
+          "text": "この街への正規の便は、来月から半分にします。採算が合わないので。"
+        },
+        {
+          "id": "m6c-05",
+          "speaker": "fujii",
+          "text": "正規の供給 {{param.supply}}、非公式の規模 {{param.informalMarket}}。差が開いています。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "m6-council"
+      }
+    },
+    {
+      "id": "m6-subsidy",
+      "background": "bakery-yamada.png",
+      "onEnter": [
+        {
+          "param": "budget",
+          "op": "add",
+          "value": -18
+        },
+        {
+          "param": "supply",
+          "op": "add",
+          "value": 6
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": 4
+        },
+        {
+          "param": "popularity",
+          "op": "add",
+          "value": -3
+        },
+        {
+          "param": "price",
+          "op": "add",
+          "value": -5
+        }
+      ],
+      "lines": [
+        {
+          "id": "m6s-01",
+          "speaker": "narrator",
+          "text": "六か月後。店は開いている。市の口座からは、毎月同じ額が出ていく。"
+        },
+        {
+          "id": "m6s-02",
+          "speaker": "yamada",
+          "text": "助かっています。ただ、補助がいつまでかを聞かれると、答えられません。"
+        },
+        {
+          "id": "m6s-03",
+          "speaker": "kuroda",
+          "text": "補助を見込んだ卸値になっています。市が止めれば、そこも戻ります。"
+        },
+        {
+          "id": "m6s-04",
+          "speaker": "fujii",
+          "text": "余力は {{param.budget}}。学校の屋上防水を、来年度に送りました。"
+        },
+        {
+          "id": "m6s-05",
+          "speaker": "takahashi",
+          "text": "補助は全員に届きます。困っていない家にも、同じだけ届いています。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "m6-council"
+      }
+    },
+    {
+      "id": "m6-market",
+      "background": "market-street.png",
+      "onEnter": [
+        {
+          "param": "supply",
+          "op": "add",
+          "value": 10
+        },
+        {
+          "param": "price",
+          "op": "add",
+          "value": -20
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": 6
+        },
+        {
+          "param": "popularity",
+          "op": "add",
+          "value": 2
+        },
+        {
+          "param": "budget",
+          "op": "add",
+          "value": -4
+        }
+      ],
+      "lines": [
+        {
+          "id": "m6m-01",
+          "speaker": "narrator",
+          "text": "六か月後。市外からの搬入は日常になった。価格は {{param.price}} 円まで落ち着いている。"
+        },
+        {
+          "id": "m6m-02",
+          "speaker": "kuroda",
+          "text": "もう特別なことはしていません。普通の商売です。"
+        },
+        {
+          "id": "m6m-03",
+          "speaker": "misaki",
+          "text": "買えます。値段も、去年ほどではないけれど戻ってきました。"
+        },
+        {
+          "id": "m6m-04",
+          "speaker": "yamada",
+          "text": "うちは残りました。商店街で二軒、残りませんでした。"
+        },
+        {
+          "id": "m6m-05",
+          "speaker": "fujii",
+          "text": "支持率は {{param.popularity}}。危機が終わると、誰も理由を覚えていません。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "m6-council"
+      }
+    },
+    {
+      "id": "m6-common",
+      "background": "market-street.png",
+      "onEnter": [
+        {
+          "param": "supply",
+          "op": "add",
+          "value": 2
+        },
+        {
+          "param": "price",
+          "op": "add",
+          "value": -5
+        },
+        {
+          "param": "foodAccess",
+          "op": "add",
+          "value": 1
+        },
+        {
+          "param": "budget",
+          "op": "add",
+          "value": -4
+        },
+        {
+          "param": "popularity",
+          "op": "add",
+          "value": -2
+        }
+      ],
+      "lines": [
+        {
+          "id": "m6n-01",
+          "speaker": "narrator",
+          "text": "六か月後。劇的なことは、何も起きなかった。"
+        },
+        {
+          "id": "m6n-02",
+          "speaker": "misaki",
+          "text": "慣れました。……慣れたくは、なかったんですけど。"
+        },
+        {
+          "id": "m6n-03",
+          "speaker": "yamada",
+          "text": "続いています。良くも悪くも、続いています。"
+        },
+        {
+          "id": "m6n-04",
+          "speaker": "takahashi",
+          "text": "窓口の相談件数は、危機前の一・四倍で止まっています。"
+        },
+        {
+          "id": "m6n-05",
+          "speaker": "fujii",
+          "text": "価格 {{param.price}} 円、供給 {{param.supply}}、余力 {{param.budget}}。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "m6-council"
+      }
+    },
+    {
+      "id": "m6-council",
+      "background": "council-room.png",
+      "lines": [
+        {
+          "id": "mc-01",
+          "speaker": "narrator",
+          "text": "緊急対応として始めたものには、たいてい期限が書いてある。"
+        },
+        {
+          "id": "mc-02",
+          "speaker": "fujii",
+          "text": "条例と補助の期限が、三か月後に来ます。"
+        },
+        {
+          "id": "mc-03",
+          "speaker": "fujii",
+          "text": "延ばすなら議会の議決が要ります。止めるなら、止める説明が要ります。"
+        },
+        {
+          "id": "mc-04",
+          "speaker": "takahashi",
+          "text": "決めない、という選択もあります。期限が来れば、勝手に終わります。"
+        },
+        {
+          "id": "mc-05",
+          "speaker": "fujii",
+          "text": "それも決定です。ただ、誰も説明しなかった決定になります。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "decision-3"
+      }
+    },
+    {
+      "id": "decision-3",
+      "background": "mayors-office-night.png",
+      "lines": [
+        {
+          "id": "d3-01",
+          "speaker": "narrator",
+          "text": "三度目の判断は、始めることではなく、終わらせることについてだった。"
+        },
+        {
+          "id": "d3-02",
+          "speaker": "fujii",
+          "text": "緊急措置を、どうしますか。"
+        },
+        {
+          "id": "d3-03",
+          "speaker": "takahashi",
+          "text": "今の暮らしが、この措置の上に載っている人がいます。そこだけは忘れないでください。"
+        }
+      ],
+      "next": {
+        "type": "choices",
+        "prompt": "緊急措置の出口を決めてください",
+        "choices": [
+          {
+            "id": "d3-permanent",
+            "text": "緊急措置を恒久制度にする",
+            "description": "期限を外し、制度として続ける。市民は計画を立てられる。市も、同じ額を毎年払い続ける。",
+            "condition": {
+              "any": [
+                {
+                  "flag": "priceCapActive"
+                },
+                {
+                  "flag": "subsidyActive"
+                },
+                {
+                  "flag": "rationingActive"
+                }
+              ]
+            },
+            "ifUnmet": "hide",
+            "effects": [
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -25
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 5
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": -4
+              },
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": 6
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": 2
+              },
+              {
+                "flag": "permanentized",
+                "value": true
+              }
+            ],
+            "next": {
+              "type": "goto",
+              "scene": "d3-results"
+            }
+          },
+          {
+            "id": "d3-phase-out",
+            "text": "三か月かけて段階的に終了する",
+            "description": "価格と供給を市場へ戻す。棚は戻る。負担も戻る。",
+            "condition": {
+              "any": [
+                {
+                  "flag": "priceCapActive"
+                },
+                {
+                  "flag": "subsidyActive"
+                },
+                {
+                  "flag": "rationingActive"
+                }
+              ]
+            },
+            "ifUnmet": "hide",
+            "effects": [
+              {
+                "param": "price",
+                "op": "add",
+                "value": 40
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 22
+              },
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": -18
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 6
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": -9
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": -5
+              },
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -8
+              },
+              {
+                "param": "policyChanges",
+                "op": "add",
+                "value": 1
+              },
+              {
+                "flag": "priceCapActive",
+                "value": false
+              },
+              {
+                "flag": "subsidyActive",
+                "value": false
+              },
+              {
+                "flag": "rationingActive",
+                "value": false
+              },
+              {
+                "flag": "everReversed",
+                "value": true
+              }
+            ],
+            "next": {
+              "type": "goto",
+              "scene": "d3-results"
+            }
+          },
+          {
+            "id": "d3-targeted-permanent",
+            "text": "価格は市場に戻し、困窮世帯支援を恒久化する",
+            "description": "価格には触れず、必要な世帯だけを支える。「誰が必要か」を決める仕事が、毎年ここに残る。",
+            "condition": {
+              "param": "budget",
+              "op": ">=",
+              "value": 20
+            },
+            "ifUnmet": "disable",
+            "unmetText": "政策余力が足りません（20 必要）",
+            "effects": [
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -20
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 14
+              },
+              {
+                "param": "price",
+                "op": "add",
+                "value": 20
+              },
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": -12
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 9
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": -3
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": -3
+              },
+              {
+                "param": "policyChanges",
+                "op": "add",
+                "value": 1
+              },
+              {
+                "flag": "targetedSupportActive",
+                "value": true
+              },
+              {
+                "flag": "everTargetedSupport",
+                "value": true
+              },
+              {
+                "flag": "priceCapActive",
+                "value": false
+              },
+              {
+                "flag": "rationingActive",
+                "value": false
+              }
+            ],
+            "next": {
+              "type": "goto",
+              "scene": "d3-results"
+            }
+          },
+          {
+            "id": "d3-monitor",
+            "text": "介入は行わず、価格と在庫の公表を続ける",
+            "description": "市がやるのは、数字を毎日出すことだけ。安上がりで、劇的でもない。",
+            "condition": {
+              "not": {
+                "any": [
+                  {
+                    "flag": "priceCapActive"
+                  },
+                  {
+                    "flag": "subsidyActive"
+                  },
+                  {
+                    "flag": "rationingActive"
+                  }
+                ]
+              }
+            },
+            "ifUnmet": "hide",
+            "effects": [
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -5
+              },
+              {
+                "param": "supply",
+                "op": "add",
+                "value": 6
+              },
+              {
+                "param": "price",
+                "op": "add",
+                "value": -10
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": 4
+              },
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": 1
+              },
+              {
+                "param": "marketRisk",
+                "op": "add",
+                "value": -3
+              }
+            ],
+            "next": {
+              "type": "goto",
+              "scene": "d3-results"
+            }
+          },
+          {
+            "id": "d3-nothing",
+            "text": "決めない。期限まで、このままにする",
+            "description": "今日は何も変わらない。期限の日に、説明のないまま変わる。",
+            "effects": [
+              {
+                "param": "popularity",
+                "op": "add",
+                "value": -5
+              },
+              {
+                "param": "foodAccess",
+                "op": "add",
+                "value": -2
+              },
+              {
+                "param": "informalMarket",
+                "op": "add",
+                "value": 4
+              },
+              {
+                "param": "budget",
+                "op": "add",
+                "value": -3
+              }
+            ],
+            "next": {
+              "type": "goto",
+              "scene": "d3-results"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "d3-results",
+      "background": "council-room.png",
+      "lines": [
+        {
+          "id": "dr-01",
+          "speaker": "narrator",
+          "text": "決定は三日後に告示された。"
+        },
+        {
+          "id": "dr-02",
+          "speaker": "yamada",
+          "text": "続くと分かれば、設備の更新もできます。……続くなら。",
+          "condition": {
+            "flag": "permanentized"
+          }
+        },
+        {
+          "id": "dr-03",
+          "speaker": "misaki",
+          "text": "終わるんですね。……分かりました。準備します。",
+          "condition": {
+            "flag": "everReversed"
+          }
+        },
+        {
+          "id": "dr-04",
+          "speaker": "takahashi",
+          "text": "対象世帯の名簿を、毎年更新する仕事が増えました。",
+          "condition": {
+            "flag": "targetedSupportActive"
+          }
+        },
+        {
+          "id": "dr-05",
+          "speaker": "misaki",
+          "text": "何も変わらないと聞きました。それが答えなんですね。",
+          "condition": {
+            "not": {
+              "any": [
+                {
+                  "flag": "permanentized"
+                },
+                {
+                  "flag": "everReversed"
+                },
+                {
+                  "flag": "targetedSupportActive"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "dr-06",
+          "speaker": "fujii",
+          "text": "三か月後、また同じ机で報告します。"
+        }
+      ],
+      "next": {
+        "type": "goto",
+        "scene": "m9-epilogue"
+      }
+    },
+    {
+      "id": "m9-epilogue",
+      "background": "street-morning.png",
+      "lines": [
+        {
+          "id": "ep-01",
+          "speaker": "narrator",
+          "text": "それから三か月。市の朝は、以前と同じ音で始まる。"
+        },
+        {
+          "id": "ep-02",
+          "speaker": "narrator",
+          "text": "商店街のシャッターが上がる。上がらないシャッターも、二枚ある。"
+        },
+        {
+          "id": "ep-03",
+          "speaker": "misaki",
+          "text": "今日は買えました。",
+          "condition": {
+            "param": "foodAccess",
+            "op": ">=",
+            "value": 60
+          }
+        },
+        {
+          "id": "ep-04",
+          "speaker": "misaki",
+          "text": "今日も、買えませんでした。",
+          "condition": {
+            "param": "foodAccess",
+            "op": "<",
+            "value": 45
+          }
+        },
+        {
+          "id": "ep-05",
+          "speaker": "yamada",
+          "text": "窯には火を入れています。何年か先のことは、まだ考えられません。"
+        },
+        {
+          "id": "ep-06",
+          "speaker": "kuroda",
+          "text": "私は次の街へ行きます。ここはもう、普通の相場に戻ったので。",
+          "condition": {
+            "param": "supply",
+            "op": ">=",
+            "value": 85
+          }
+        },
+        {
+          "id": "ep-07",
+          "speaker": "takahashi",
+          "text": "窓口は、まだ開いています。"
+        },
+        {
+          "id": "ep-08",
+          "speaker": "fujii",
+          "text": "記録は残します。次にこの机に座る人のために。"
+        }
+      ],
+      "next": {
+        "type": "resolveEnding"
+      }
     }
   ],
   "endings": [
     {
-      "id": "fiscal-crisis",
-      "title": "支払えない約束",
-      "rank": "bad",
-      "condition": { "param": "budget", "op": "<", "value": 0 },
+      "id": "the-city-pays",
+      "title": "市が払います",
+      "rank": "normal",
+      "condition": {
+        "param": "budget",
+        "op": "<=",
+        "value": 15
+      },
       "lines": [
-        { "id": "fiscal-1", "speaker": "narrator", "text": "パンは増えた。しかし市は、来年度に支払う金まで使い切っていた。" }
+        {
+          "id": "tcp-01",
+          "speaker": "narrator",
+          "text": "パンはあった。値段も、危機の前ほどではないが落ち着いた。"
+        },
+        {
+          "id": "tcp-02",
+          "speaker": "narrator",
+          "text": "市の口座には、ほとんど何も残っていなかった。"
+        },
+        {
+          "id": "tcp-03",
+          "speaker": "fujii",
+          "text": "来年度の予算編成を始めました。削る欄から埋めています。"
+        },
+        {
+          "id": "tcp-04",
+          "speaker": "fujii",
+          "text": "学校の防水、橋の点検、図書館の開館日。どれも、今日は困りません。"
+        },
+        {
+          "id": "tcp-05",
+          "speaker": "yamada",
+          "text": "補助が切れたら、その日から二百四十円に戻します。戻すしかありません。",
+          "condition": {
+            "flag": "everSubsidy"
+          }
+        },
+        {
+          "id": "tcp-06",
+          "speaker": "narrator",
+          "text": "市は、危機を買い取った。支払いは、これから何年もかけて行われる。"
+        },
+        {
+          "id": "the-city-pays-e05",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：補助金】\n補助金は、値段を下げながら供給も保てる、数少ない方法です。\nただし、支払いは消えたのではなく、市の会計へ移っただけです。\nそして、補助が出ると分かった相手は、その分だけ値をつけ直すことがあります。"
+        },
+        {
+          "id": "the-city-pays-e08",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：機会費用】\n藤井さんは、どの政策にも賛成も反対もしませんでした。\n彼が数えていたのは、その政策のために「やらなかったこと」です。\n予算に使い道を書くことは、同時に、別の使い道を消すことでもあります。"
+        },
+        {
+          "id": "the-city-pays-e02",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：需要と供給】\n値段が上がると、買う量は少し減り、売りたい量は増えます。\nこの二つが釣り合うところに、店頭の値段は落ち着こうとします。\n釣り合う前の値段で止めると、片側だけが動きます。"
+        },
+        {
+          "id": "the-city-pays-e12",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：「値段」と「手に入るか」は別の数字】\nこのゲームには、価格と foodAccess という二つの数字がありました。\n公定価格が最も低かった結末で、市民が最も食べられていたわけではありません。\n合法な価格、実際に払われた価格、実際に手に入ったかどうか。この三つは、いつも同じではありません。"
+        }
       ],
-      "summary": "短期の安心と引き換えに財政が破綻した。次の危機へ備える余力は残っていない。"
+      "summary": "供給と生活は守られた。その費用は、まだ来ていない年度から前借りされている。"
     },
     {
-      "id": "shortage-collapse",
-      "title": "空の棚",
+      "id": "policy-drift",
+      "title": "政策迷走",
       "rank": "bad",
       "condition": {
         "all": [
-          { "param": "supply", "op": "<", "value": 50 },
-          { "param": "blackMarket", "op": ">=", "value": 40 }
+          {
+            "param": "policyChanges",
+            "op": ">=",
+            "value": 3
+          },
+          {
+            "param": "popularity",
+            "op": "<=",
+            "value": 45
+          }
         ]
       },
       "lines": [
-        { "id": "shortage-ending-1", "speaker": "narrator", "text": "値札の数字は小さい。だが、その値段で買えるパンはどこにもなかった。" }
+        {
+          "id": "pd-01",
+          "speaker": "narrator",
+          "text": "一年のあいだに、市の方針は三度変わった。"
+        },
+        {
+          "id": "pd-02",
+          "speaker": "yamada",
+          "text": "設備の見積もりを二回取って、二回とも断りました。三か月後が分からないので。"
+        },
+        {
+          "id": "pd-03",
+          "speaker": "kuroda",
+          "text": "この街は、今は避けています。契約が読めない街には、荷を置きにくいので。"
+        },
+        {
+          "id": "pd-04",
+          "speaker": "misaki",
+          "text": "どれが今の制度なのか、正直、もう分かりません。"
+        },
+        {
+          "id": "pd-05",
+          "speaker": "narrator",
+          "text": "どの一手も、それ自体は筋が通っていた。"
+        },
+        {
+          "id": "pd-06",
+          "speaker": "narrator",
+          "text": "ただ、次に何が来るか分からないこと自体が、新しいコストになっていた。"
+        },
+        {
+          "id": "policy-drift-e13",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：制度の予測可能性】\n政策を変えること自体は、失敗ではありません。効かないと分かったら変えるべきです。\nただし、山田さんが設備の見積もりを断ったのは、政策の中身のせいではありませんでした。\n三か月後が分からないこと自体が、投資と契約をためらわせます。"
+        },
+        {
+          "id": "policy-drift-e03",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：価格シグナル】\n黒田さんは、この街を助けるために荷を運んだのではありません。\n「この街は高い」という情報が、運ぶ価値があると伝えたから運びました。\n値段は、支払いの額であると同時に、遠くの人へ届く合図でもあります。"
+        },
+        {
+          "id": "policy-drift-e08",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：機会費用】\n藤井さんは、どの政策にも賛成も反対もしませんでした。\n彼が数えていたのは、その政策のために「やらなかったこと」です。\n予算に使い道を書くことは、同時に、別の使い道を消すことでもあります。"
+        },
+        {
+          "id": "policy-drift-e12",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：「値段」と「手に入るか」は別の数字】\nこのゲームには、価格と foodAccess という二つの数字がありました。\n公定価格が最も低かった結末で、市民が最も食べられていたわけではありません。\n合法な価格、実際に払われた価格、実際に手に入ったかどうか。この三つは、いつも同じではありません。"
+        }
       ],
-      "summary": "公定価格は下がったが供給が崩れ、取引は裏通りへ移った。"
+      "summary": "個々の判断は誤りではなかった。変わり続けること自体が、市民と業者の計画を壊した。"
     },
     {
-      "id": "black-market-city",
-      "title": "裏通りの相場",
-      "rank": "bad",
-      "condition": { "param": "blackMarket", "op": ">=", "value": 50 },
+      "id": "two-markets",
+      "title": "表の市場、裏の市場",
+      "rank": "normal",
+      "condition": {
+        "all": [
+          {
+            "param": "informalMarket",
+            "op": ">=",
+            "value": 45
+          },
+          {
+            "param": "supply",
+            "op": "<=",
+            "value": 60
+          }
+        ]
+      },
       "lines": [
-        { "id": "black-market-1", "speaker": "narrator", "text": "表の制度が公平を約束するほど、裏の値段が都市の本当の相場になった。" }
+        {
+          "id": "tm-01",
+          "speaker": "narrator",
+          "text": "商店街の値札は百六十円のままだ。棚は、たいてい空だ。"
+        },
+        {
+          "id": "tm-02",
+          "speaker": "narrator",
+          "text": "公民館の駐車場では、同じパンが二百九十円で売られている。そちらには、ある。"
+        },
+        {
+          "id": "tm-03",
+          "speaker": "misaki",
+          "text": "高いです。おかしいとも思います。"
+        },
+        {
+          "id": "tm-04",
+          "speaker": "misaki",
+          "text": "でも、うちの子は今週も朝ごはんを食べました。"
+        },
+        {
+          "id": "tm-05",
+          "speaker": "yamada",
+          "text": "表の店を続けているのは、意地みたいなものです。"
+        },
+        {
+          "id": "tm-06",
+          "speaker": "takahashi",
+          "text": "同じ場所で、食品以外のものも動き始めています。そちらは、市が何も保証できません。",
+          "condition": {
+            "flag": "illicitGoodsAppeared"
+          }
+        },
+        {
+          "id": "tm-07",
+          "speaker": "takahashi",
+          "text": "売っている人の顔は、だいたい分かるようになりました。それが良いことなのかは、まだ分かりません。",
+          "condition": {
+            "param": "marketRisk",
+            "op": "<",
+            "value": 35
+          }
+        },
+        {
+          "id": "tm-08",
+          "speaker": "narrator",
+          "text": "市は、この市場を作らなかった。ただ、消すこともできなかった。"
+        },
+        {
+          "id": "tm-09",
+          "speaker": "narrator",
+          "text": "市場を禁じることと、取引そのものを消すことは、同じだろうか。"
+        },
+        {
+          "id": "two-markets-e04",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：価格上限】\n上限を決めると、その値段で買えた人は確かに得をします。\n同時に、その値段では売りたくない人が売るのをやめます。\nだから「安く買えるようになる」ことと「買えるようになる」ことは、同じではありません。"
+        },
+        {
+          "id": "two-markets-e10",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：非公式市場】\n取引を禁じても、需要と供給そのものは消えません。\n買いたい人と売りたい人が残っていれば、取引は別の場所へ移ります。\n公民館の駐車場に人が集まったのは、そこにしか市場が残っていなかったからです。"
+        },
+        {
+          "id": "two-markets-e11",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：非公式市場のもう一つの側面】\n非公式市場は、正規市場が届かなくなった食料を人々へ届けることがあります。\n同時に、そこでの取引には返品も保証も届出もありません。\nそして同じ流通経路には、食品以外の、規制の対象になる商品も入り込むことがあります。\n食料が非公式に流れることと、犯罪市場ができることは、同じではありません。\nただし、経路が同じになると、区別する仕事は行政の側に残ります。"
+        },
+        {
+          "id": "two-markets-e12",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：「値段」と「手に入るか」は別の数字】\nこのゲームには、価格と foodAccess という二つの数字がありました。\n公定価格が最も低かった結末で、市民が最も食べられていたわけではありません。\n合法な価格、実際に払われた価格、実際に手に入ったかどうか。この三つは、いつも同じではありません。"
+        }
       ],
-      "summary": "供給は保たれたが、複雑な配分制度が大きな非公式市場を生んだ。"
+      "summary": "公定価格は低いまま、実際の取引は別の場所へ移った。多くの市民はそこで食料を確保しているが、そこに市の保証はない。"
     },
     {
-      "id": "soft-landing",
-      "title": "静かな朝",
+      "id": "cheap-bread-empty-shelves",
+      "title": "安いパン、空の棚",
+      "rank": "bad",
+      "condition": {
+        "all": [
+          {
+            "flag": "priceCapActive"
+          },
+          {
+            "param": "supply",
+            "op": "<=",
+            "value": 50
+          }
+        ]
+      },
+      "lines": [
+        {
+          "id": "ces-01",
+          "speaker": "narrator",
+          "text": "条例は守られた。価格は百六十円のままだ。"
+        },
+        {
+          "id": "ces-02",
+          "speaker": "narrator",
+          "text": "その値段で買えたと答えた市民は、月に一度か二度だと言う。"
+        },
+        {
+          "id": "ces-03",
+          "speaker": "misaki",
+          "text": "安いんです。ずっと、安いままなんです。"
+        },
+        {
+          "id": "ces-04",
+          "speaker": "yamada",
+          "text": "週に二日だけ焼いています。それ以上焼くと、赤字の日が増えるので。"
+        },
+        {
+          "id": "ces-05",
+          "speaker": "misaki",
+          "text": "少し前まで、裏で買えました。今はそれもありません。",
+          "condition": {
+            "flag": "everCrackdown"
+          }
+        },
+        {
+          "id": "ces-06",
+          "speaker": "narrator",
+          "text": "一部の市民は、まだどこかで手に入れている。多くは、そうではない。",
+          "condition": {
+            "param": "informalMarket",
+            "op": ">=",
+            "value": 20
+          }
+        },
+        {
+          "id": "ces-07",
+          "speaker": "narrator",
+          "text": "価格は下がった。パンは減った。この二つは、別々の出来事ではなかった。"
+        },
+        {
+          "id": "cheap-bread-empty-shelves-e01",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：希少性】\n小麦が減っても、パンを食べたい人の数は減りませんでした。\n足りないものを、誰がどれだけ持つかを決める方法は、必ず何かしら必要になります。\n値段で決めるか、行列で決めるか、行政が決めるか。方法が違うだけで、選ばれなかった人は必ず出ます。"
+        },
+        {
+          "id": "cheap-bread-empty-shelves-e04",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：価格上限】\n上限を決めると、その値段で買えた人は確かに得をします。\n同時に、その値段では売りたくない人が売るのをやめます。\nだから「安く買えるようになる」ことと「買えるようになる」ことは、同じではありません。"
+        },
+        {
+          "id": "cheap-bread-empty-shelves-e10",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：非公式市場】\n取引を禁じても、需要と供給そのものは消えません。\n買いたい人と売りたい人が残っていれば、取引は別の場所へ移ります。\n公民館の駐車場に人が集まったのは、そこにしか市場が残っていなかったからです。"
+        },
+        {
+          "id": "cheap-bread-empty-shelves-e12",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：「値段」と「手に入るか」は別の数字】\nこのゲームには、価格と foodAccess という二つの数字がありました。\n公定価格が最も低かった結末で、市民が最も食べられていたわけではありません。\n合法な価格、実際に払われた価格、実際に手に入ったかどうか。この三つは、いつも同じではありません。"
+        }
+      ],
+      "summary": "合法な価格は最後まで低く保たれた。ただし、その価格で買える機会そのものが減っていった。"
+    },
+    {
+      "id": "for-those-who-need",
+      "title": "必要な人へ",
       "rank": "good",
       "condition": {
         "all": [
-          { "param": "price", "op": "<=", "value": 250 },
-          { "param": "supply", "op": ">=", "value": 90 },
-          { "param": "popularity", "op": ">=", "value": 55 }
+          {
+            "flag": "targetedSupportActive"
+          },
+          {
+            "param": "foodAccess",
+            "op": ">=",
+            "value": 65
+          }
         ]
       },
       "lines": [
-        { "id": "soft-landing-1", "speaker": "narrator", "text": "行列は消えた。誰も市長を称えなかった。それが、うまくいった証拠だった。" }
+        {
+          "id": "ftn-01",
+          "speaker": "narrator",
+          "text": "店頭価格は市場のままだ。安くはない。"
+        },
+        {
+          "id": "ftn-02",
+          "speaker": "narrator",
+          "text": "棚には、たいていパンがある。"
+        },
+        {
+          "id": "ftn-03",
+          "speaker": "misaki",
+          "text": "うちは支給を受けています。それで、なんとかなっています。"
+        },
+        {
+          "id": "ftn-04",
+          "speaker": "takahashi",
+          "text": "対象は千四百世帯。毎年、名簿を作り直します。"
+        },
+        {
+          "id": "ftn-05",
+          "speaker": "takahashi",
+          "text": "基準の一円外側にいる人からは、今年も電話が来ます。私はまだ、答えを持っていません。"
+        },
+        {
+          "id": "ftn-06",
+          "speaker": "yamada",
+          "text": "値段を決めるのはうちです。払えない人を支えるのは市です。……分かりやすくは、なりました。"
+        },
+        {
+          "id": "ftn-07",
+          "speaker": "narrator",
+          "text": "誰も歓声を上げなかった。窓口だけが、これからも開き続ける。"
+        },
+        {
+          "id": "for-those-who-need-e07",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：限定支援】\n全員の値段を下げる代わりに、困っている人にお金を渡す方法です。\n値段の合図を壊さずに済むので、供給は減りにくくなります。\n代わりに「誰が困っているか」を誰かが決めなければならず、その線の外側には必ず人がいます。"
+        },
+        {
+          "id": "for-those-who-need-e03",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：価格シグナル】\n黒田さんは、この街を助けるために荷を運んだのではありません。\n「この街は高い」という情報が、運ぶ価値があると伝えたから運びました。\n値段は、支払いの額であると同時に、遠くの人へ届く合図でもあります。"
+        },
+        {
+          "id": "for-those-who-need-e08",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：機会費用】\n藤井さんは、どの政策にも賛成も反対もしませんでした。\n彼が数えていたのは、その政策のために「やらなかったこと」です。\n予算に使い道を書くことは、同時に、別の使い道を消すことでもあります。"
+        },
+        {
+          "id": "for-those-who-need-e12",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：「値段」と「手に入るか」は別の数字】\nこのゲームには、価格と foodAccess という二つの数字がありました。\n公定価格が最も低かった結末で、市民が最も食べられていたわけではありません。\n合法な価格、実際に払われた価格、実際に手に入ったかどうか。この三つは、いつも同じではありません。"
+        }
       ],
-      "summary": "供給を守りながら価格を戻した。ただし財政の余裕と一部業者の利益は静かに失われた。"
+      "summary": "価格を市場に任せ、生活の保障は行政が引き受けた。線引きの負担と事務費は、毎年ここに残る。"
     },
     {
-      "id": "muddle-through",
-      "title": "とりあえずの均衡",
+      "id": "price-called-bread",
+      "title": "高値が呼んだパン",
+      "rank": "good",
+      "condition": {
+        "all": [
+          {
+            "param": "supply",
+            "op": ">=",
+            "value": 85
+          },
+          {
+            "param": "foodAccess",
+            "op": ">=",
+            "value": 65
+          },
+          {
+            "not": {
+              "flag": "priceCapActive"
+            }
+          },
+          {
+            "not": {
+              "flag": "rationingActive"
+            }
+          }
+        ]
+      },
+      "lines": [
+        {
+          "id": "pcb-01",
+          "speaker": "narrator",
+          "text": "危機の三か月目、パンは二百四十円だった。"
+        },
+        {
+          "id": "pcb-02",
+          "speaker": "narrator",
+          "text": "一年後、棚は埋まり、価格は {{param.price}} 円まで戻っている。"
+        },
+        {
+          "id": "pcb-03",
+          "speaker": "kuroda",
+          "text": "高かったから運びました。それだけです。感謝はいりません。"
+        },
+        {
+          "id": "pcb-04",
+          "speaker": "misaki",
+          "text": "高い時期は、本当にきつかったです。あれを「調整」と呼ぶ人とは、まだ話せません。"
+        },
+        {
+          "id": "pcb-05",
+          "speaker": "yamada",
+          "text": "商店街で二軒、閉まりました。四十年と、六十年の店です。"
+        },
+        {
+          "id": "pcb-06",
+          "speaker": "yamada",
+          "text": "残ったのが、うちが正しかったからだとは思っていません。"
+        },
+        {
+          "id": "pcb-07",
+          "speaker": "narrator",
+          "text": "値段は、荷を呼んだ。呼ばれるまでの数か月は、誰かが耐えていた。"
+        },
+        {
+          "id": "price-called-bread-e03",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：価格シグナル】\n黒田さんは、この街を助けるために荷を運んだのではありません。\n「この街は高い」という情報が、運ぶ価値があると伝えたから運びました。\n値段は、支払いの額であると同時に、遠くの人へ届く合図でもあります。"
+        },
+        {
+          "id": "price-called-bread-e06",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：参入障壁】\n市外の業者が入りにくい仕組みは、地元の店を守ります。\n同じ仕組みが、足りないときに荷が入ってくるのも遅らせます。\n守ることと閉じることは、平時には区別できても、危機には同じ形をしています。"
+        },
+        {
+          "id": "price-called-bread-e01",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：希少性】\n小麦が減っても、パンを食べたい人の数は減りませんでした。\n足りないものを、誰がどれだけ持つかを決める方法は、必ず何かしら必要になります。\n値段で決めるか、行列で決めるか、行政が決めるか。方法が違うだけで、選ばれなかった人は必ず出ます。"
+        },
+        {
+          "id": "price-called-bread-e12",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：「値段」と「手に入るか」は別の数字】\nこのゲームには、価格と foodAccess という二つの数字がありました。\n公定価格が最も低かった結末で、市民が最も食べられていたわけではありません。\n合法な価格、実際に払われた価格、実際に手に入ったかどうか。この三つは、いつも同じではありません。"
+        }
+      ],
+      "summary": "価格の上昇が市外から供給を呼び戻し、棚は埋まった。その数か月の負担と、退出した店は戻らない。"
+    },
+    {
+      "id": "mixed-ledger",
+      "title": "混ざった帳簿",
       "rank": "normal",
       "lines": [
-        { "id": "normal-1", "speaker": "narrator", "text": "劇的な解決はなかった。それでも明日も店は開き、市は次の判断を待つ。" }
+        {
+          "id": "ml-01",
+          "speaker": "narrator",
+          "text": "一年が過ぎた。都市は、はっきりした答えを出さなかった。"
+        },
+        {
+          "id": "ml-02",
+          "speaker": "narrator",
+          "text": "いくつかの政策は効いた。いくつかは、効く前に終わった。"
+        },
+        {
+          "id": "ml-03",
+          "speaker": "misaki",
+          "text": "去年よりましです。おととしよりは、ずっと悪いです。"
+        },
+        {
+          "id": "ml-04",
+          "speaker": "yamada",
+          "text": "続いています。それ以上のことは、言えません。"
+        },
+        {
+          "id": "ml-05",
+          "speaker": "fujii",
+          "text": "記録には、こう書きます。「複数の措置を併用し、決定的な悪化は避けた」。"
+        },
+        {
+          "id": "ml-06",
+          "speaker": "fujii",
+          "text": "決定的な改善も、避けました。"
+        },
+        {
+          "id": "ml-07",
+          "speaker": "narrator",
+          "text": "帳簿には、赤も黒も並んでいる。"
+        },
+        {
+          "id": "mixed-ledger-e02",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：需要と供給】\n値段が上がると、買う量は少し減り、売りたい量は増えます。\nこの二つが釣り合うところに、店頭の値段は落ち着こうとします。\n釣り合う前の値段で止めると、片側だけが動きます。"
+        },
+        {
+          "id": "mixed-ledger-e08",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：機会費用】\n藤井さんは、どの政策にも賛成も反対もしませんでした。\n彼が数えていたのは、その政策のために「やらなかったこと」です。\n予算に使い道を書くことは、同時に、別の使い道を消すことでもあります。"
+        },
+        {
+          "id": "mixed-ledger-e09",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：分散した知識】\n市長室には、市内の在庫も、各家庭の事情も、全部は集まりません。\n山田さんは自分の窯のことを知り、美咲さんは自分の台所のことを知っています。\n中央で正しく決めるのが難しいのは、意欲や能力の問題ではなく、情報がそもそも散らばっているからです。"
+        },
+        {
+          "id": "mixed-ledger-e12",
+          "speaker": "analyst",
+          "text": "【ECONOMICS：「値段」と「手に入るか」は別の数字】\nこのゲームには、価格と foodAccess という二つの数字がありました。\n公定価格が最も低かった結末で、市民が最も食べられていたわけではありません。\n合法な価格、実際に払われた価格、実際に手に入ったかどうか。この三つは、いつも同じではありません。"
+        }
       ],
-      "summary": "都市は持ちこたえたが、価格か支持、あるいは未解決の不満を残した。"
+      "summary": "複数の政策の長所と短所が打ち消し合った。破綻はしなかったが、どの問題も解決していない。"
     }
   ]
 }
