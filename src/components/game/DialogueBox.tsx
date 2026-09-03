@@ -10,7 +10,7 @@ export function DialogueBox({ speaker, text }: DialogueBoxProps) {
     <section className="dialogue-box" aria-live="polite">
       {speaker?.name && (
         <p className="speaker-name" style={{ color: speaker.color }}>
-          {speaker.name}
+          {speaker.role ? `${speaker.role}｜${speaker.name}` : speaker.name}
         </p>
       )}
       <p className={speaker?.name ? "dialogue-text" : "dialogue-text narration"}>{text}</p>

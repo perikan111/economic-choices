@@ -26,7 +26,6 @@ body {
 button, a { font: inherit; }
 button { color: inherit; }
 
-.title-screen,
 .loading-screen {
   min-height: 100svh;
   display: grid;
@@ -37,13 +36,25 @@ button { color: inherit; }
     linear-gradient(145deg, #0b1019, #101827 58%, #151d2e);
 }
 
-.title-card {
-  width: min(720px, 100%);
-  padding: clamp(28px, 6vw, 64px);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  background: rgba(21, 29, 46, 0.92);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+.series-home {
+  min-height: 100svh;
+  padding: clamp(32px, 6vw, 76px) clamp(18px, 5vw, 48px);
+  background:
+    radial-gradient(circle at 16% 8%, rgba(239, 179, 102, 0.13), transparent 28%),
+    radial-gradient(circle at 84% 42%, rgba(82, 116, 165, 0.12), transparent 34%),
+    linear-gradient(145deg, #0b1019, #101827 58%, #151d2e);
+}
+
+.series-hero,
+.scenario-section,
+.prototype-note {
+  width: min(1180px, 100%);
+  margin-inline: auto;
+}
+
+.series-hero {
+  padding-bottom: clamp(34px, 6vw, 62px);
+  border-bottom: 1px solid var(--border);
 }
 
 .eyebrow,
@@ -56,18 +67,100 @@ button { color: inherit; }
   text-transform: uppercase;
 }
 
-.title-card h1 {
+.series-hero h1 {
   margin: 0;
-  font-size: clamp(2.25rem, 8vw, 4.6rem);
-  line-height: 1.12;
-  letter-spacing: -0.04em;
+  max-width: 980px;
+  font-size: clamp(2.7rem, 8vw, 6.8rem);
+  line-height: 0.96;
+  letter-spacing: -0.055em;
 }
 
-.title-summary { margin: 28px 0 0; color: #d9deea; font-size: 1.08rem; }
-.title-role { color: var(--muted); }
-.title-note { margin: 24px 0 0; color: var(--muted); font-size: 0.84rem; }
+.series-introduction {
+  max-width: 760px;
+  margin: 28px 0 0;
+  color: #d9deea;
+  font-size: clamp(1rem, 2vw, 1.18rem);
+}
 
-.title-actions { display: flex; gap: 12px; margin-top: 32px; }
+.scenario-section { padding-top: clamp(34px, 5vw, 54px); }
+.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
+.section-heading .eyebrow { margin: 0; }
+.section-heading h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.65rem); }
+
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.scenario-card {
+  min-width: 0;
+  min-height: 430px;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(22px, 3vw, 30px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(21, 29, 46, 0.9);
+  box-shadow: 0 16px 46px rgba(0, 0, 0, 0.22);
+}
+
+.scenario-card-playable { border-color: #665035; }
+.scenario-card-planned { opacity: 0.66; box-shadow: none; }
+
+.scenario-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.scenario-card-heading p {
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.scenario-status {
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.scenario-status-playable { border-color: #74603f; background: #2b2115; color: #f3d5a8; }
+
+.scenario-card h3 {
+  margin: 22px 0 0;
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+  line-height: 1.35;
+}
+
+.scenario-summary { margin: 20px 0 0; color: #e0e4ed; }
+.scenario-description { margin: 10px 0 0; color: var(--muted); font-size: 0.9rem; }
+.scenario-card-footer { margin-top: auto; padding-top: 26px; }
+.scenario-duration { margin: 0 0 12px; color: var(--muted); font-size: 0.78rem; }
+.scenario-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.scenario-actions .primary-button,
+.scenario-actions .secondary-button { width: 100%; }
+.scenario-planned-note { margin: auto 0 0; padding-top: 26px; color: var(--muted); font-size: 0.78rem; }
+
+.prototype-note {
+  margin-top: clamp(28px, 5vw, 48px);
+  padding: 20px 0 4px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.prototype-note .eyebrow { margin-bottom: 7px; }
+.prototype-note > p:last-child { margin: 0; }
+
 .link-button { display: inline-flex; justify-content: center; text-decoration: none; }
 
 .primary-button,
@@ -225,6 +318,13 @@ button { color: inherit; }
 .debug-panel pre { overflow-x: auto; white-space: pre-wrap; }
 
 @media (max-width: 720px) {
+  .series-home { padding-block: 30px; }
+  .series-hero h1 { font-size: clamp(2.55rem, 15vw, 4.1rem); }
+  .series-introduction br,
+  .prototype-note br { display: none; }
+  .section-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .scenario-card { min-height: 0; }
+  .scenario-actions { grid-template-columns: 1fr; }
   .game-shell { padding: 14px; }
   .game-header { align-items: flex-start; flex-direction: column; }
   .save-controls { justify-content: flex-start; }
@@ -236,7 +336,10 @@ button { color: inherit; }
   .advance-row span { text-align: center; }
   .primary-button { width: 100%; }
   .result-grid { grid-template-columns: 1fr; }
-  .title-actions { flex-direction: column; }
+}
+
+@media (max-width: 940px) {
+  .scenario-grid { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

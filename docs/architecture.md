@@ -143,7 +143,7 @@ economic-choices/
 │   │       └── assetResolver.ts      論理パス → URL
 │   │
 │   └── content/
-│       └── scenarios.ts           シナリオの静的 import と登録
+│       └── scenarios.ts           シナリオの静的 import・登録とシリーズ catalog metadata
 │
 ├── tests/
 │   ├── engine/                    game-core の単体テスト
@@ -352,7 +352,7 @@ Effect は配列順に1件ずつ適用する。各パラメータ効果は演算
 export interface GameView {
   phase: 'line' | 'choice' | 'ending';
   background?: string;
-  speaker: { id: string; name: string; color?: string } | null;
+  speaker: { id: string; name: string; role?: string; color?: string } | null;
   text: string;                 // {{param.x}} 補間済み
   canAdvance: boolean;
   prompt?: string;
@@ -386,6 +386,8 @@ export interface ChoiceView {
 
 - **ゲームのルール判断を一切しない。** 条件判定、パラメータ計算、分岐、エンディング決定は
   すべて game-core が済ませた `GameView` を描画するだけ。
+- `characters[].role` は表示専用 metadata として `SpeakerView` へ射影し、存在する場合だけ人物名と併記する。
+  `GameState` やセーブデータには保持しない。
 - シナリオ ID やパラメータ ID をコンポーネントにハードコードしない
   （`params.map()` で回す。`popularity` という文字列が `components/` に現れたら赤信号）。
 
@@ -412,7 +414,7 @@ reducer の中身は `advance(scenario, state)` を呼ぶだけ。**ロジック
 
 ### ページ構成
 
-- `/` … タイトル（はじめから / つづきから / このゲームについて）
+- `/` … シリーズホーム（scenario catalog / はじめから / つづきから）
 - `/play` … ゲーム本体（クライアントコンポーネント）
 - `output: 'export'`（静的エクスポート）で動く範囲に留める。Server Actions / Route Handlers / ISR は使わない
   → Tauri へそのまま持っていける（§10）

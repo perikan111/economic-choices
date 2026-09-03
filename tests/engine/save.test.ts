@@ -1,9 +1,30 @@
 import { describe, expect, test } from "vitest";
-import { choose, createInitialState, fromSaveData, getView, toSaveData } from "@/game-core";
+import {
+  choose,
+  createInitialState,
+  fromSaveData,
+  getView,
+  toSaveData,
+  type Scenario,
+} from "@/game-core";
 import { engineScenario } from "../fixtures/engineScenario";
 import { reachNextChoice } from "../helpers";
 
 describe("save format", () => {
+  test("character roleはGameStateとセーブ内容へ影響しない", () => {
+    const scenarioWithRole: Scenario = {
+      ...engineScenario,
+      characters: engineScenario.characters.map((character) => ({ ...character, role: "案内役" })),
+    };
+    const stateWithoutRole = createInitialState(engineScenario);
+    const stateWithRole = createInitialState(scenarioWithRole);
+    const meta = { savedAt: "2026-09-01T00:00:00.000Z" };
+
+    expect(stateWithRole).toEqual(stateWithoutRole);
+    expect(toSaveData(stateWithRole, meta)).toEqual(toSaveData(stateWithoutRole, meta));
+    expect(JSON.stringify(toSaveData(stateWithRole, meta))).not.toContain('"role"');
+  });
+
   test("GameStateをJSON保存して完全に復元できる", () => {
     const atChoice = reachNextChoice(engineScenario, createInitialState(engineScenario));
     const state = choose(engineScenario, atChoice, "skip");

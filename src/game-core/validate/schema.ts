@@ -195,6 +195,7 @@ export function validateStructure(raw: unknown, errors: string[]): raw is Scenar
     else {
       requiredString(character, "id", path, errors);
       requiredString(character, "name", path, errors);
+      optionalString(character, "role", path, errors);
       optionalString(character, "color", path, errors);
     }
   });

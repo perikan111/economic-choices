@@ -75,6 +75,22 @@ describe("scenario validation", () => {
     expect(breadPriceScenario.endings.every((ending) => ending.lines.some((line) => line.speaker === "analyst"))).toBe(true);
   });
 
+  test("主要charactersに表示用roleが設定されている", () => {
+    const roles = Object.fromEntries(
+      breadPriceScenario.characters.map(({ id, role }) => [id, role]),
+    );
+
+    expect(roles).toEqual({
+      narrator: undefined,
+      misaki: "市民代表",
+      yamada: "パン屋",
+      kuroda: "食品卸",
+      takahashi: "市・福祉担当",
+      fujii: "市・財政担当",
+      analyst: "ECONOMICS",
+    });
+  });
+
   test("14種類のEconomics解説を設計どおり各endingへ4枚ずつ割り当てる", () => {
     const assignments = Object.fromEntries(
       breadPriceScenario.endings.map((ending) => [

@@ -81,7 +81,8 @@
   { "id": "mayor", "name": "あなた", "color": "#3b6ea5" },
   {
     "id": "aide",
-    "name": "財政補佐官 リーゼ",
+    "name": "リーゼ",
+    "role": "財政補佐官",
     "color": "#a5603b",
     "portrait": "aide/base.png",
     "expressions": { "normal": "aide/normal.png", "worried": "aide/worried.png" },
@@ -90,6 +91,8 @@
 ]
 ```
 
+- `role` は任意。UI 上で人物名と併記する短い役割・肩書き（例: `財政補佐官｜リーゼ`）。
+  `portrait` や `voice` と同じ表示用 metadata であり、条件・効果・ゲーム状態には影響しない。
 - `portrait` / `expressions` は**論理パス**。URL への変換はプラットフォーム層の責務（[architecture.md](./architecture.md) §6）。
 - `voice` は将来の一括音声生成用。MVP では読み飛ばして構わない（存在しても無視できる）。
 - `id: "narrator"` は慣習として地の文に使う。エンジン上の特別扱いはしない（`name` が空なら名前欄を出さない、という UI 側の判断だけ）。

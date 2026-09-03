@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "パンの値段を下げろ！ | economic choices",
-  description: "経済政策のトレードオフを選択で体験する短編ゲーム",
+  title: "ECONOMIC CHOICES",
+  description: "政策を選び、その先に起きることを体験する短編シミュレーション",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

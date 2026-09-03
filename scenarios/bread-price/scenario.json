@@ -23,31 +23,37 @@
     {
       "id": "misaki",
       "name": "佐藤 美咲",
+      "role": "市民代表",
       "color": "#7fb2e5"
     },
     {
       "id": "yamada",
       "name": "山田 浩一",
+      "role": "パン屋",
       "color": "#d9a05b"
     },
     {
       "id": "kuroda",
       "name": "黒田 誠",
+      "role": "食品卸",
       "color": "#9b8ec4"
     },
     {
       "id": "takahashi",
       "name": "高橋 玲奈",
+      "role": "市・福祉担当",
       "color": "#7ec9a5"
     },
     {
       "id": "fujii",
       "name": "藤井 慎一",
+      "role": "市・財政担当",
       "color": "#e08a7a"
     },
     {
       "id": "analyst",
       "name": "解説",
+      "role": "ECONOMICS",
       "color": "#b9c0cc"
     }
   ],

@@ -70,6 +70,7 @@ export interface ParameterDef {
 export interface CharacterDef {
   id: string;
   name: string;
+  role?: string;
   color?: string;
   portrait?: string;
   expressions?: Record<string, string>;

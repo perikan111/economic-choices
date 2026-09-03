@@ -1,6 +1,7 @@
 export interface SpeakerView {
   id: string;
   name: string;
+  role?: string;
   color?: string;
 }
 

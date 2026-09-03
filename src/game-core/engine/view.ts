@@ -10,7 +10,12 @@ function speakerFor(scenario: Scenario, line: Line | undefined): SpeakerView | n
   if (!line) return null;
   const character = scenario.characters.find((candidate) => candidate.id === line.speaker);
   if (!character) throw new EngineError(`話者 "${line.speaker}" が存在しません。`);
-  return { id: character.id, name: character.name, color: character.color };
+  return {
+    id: character.id,
+    name: character.name,
+    role: character.role,
+    color: character.color,
+  };
 }
 
 export function getView(scenario: Scenario, state: GameState): GameView {

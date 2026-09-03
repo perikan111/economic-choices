@@ -116,7 +116,7 @@ export function GameScreen() {
     <main className="game-shell">
       <header className="game-header">
         <div>
-          <Link className="back-link" href="/">← タイトルへ</Link>
+          <Link className="back-link" href="/">← シナリオ選択へ</Link>
           <h1>{scenario.meta.title}</h1>
         </div>
         <nav className="save-controls" aria-label="セーブ操作">

@@ -25,7 +25,7 @@ function nestedBranch(scenario: Scenario): Extract<Next, { type: "branch" }> {
 }
 
 describe("scenario integrity validator", () => {
-  test("engine fixtureは有効", () => {
+  test("roleのないengine fixtureも有効", () => {
     expect(validateScenario(engineScenario)).toEqual({ ok: true, errors: [], warnings: [] });
   });
 
