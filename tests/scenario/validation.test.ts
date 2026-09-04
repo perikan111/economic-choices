@@ -91,6 +91,58 @@ describe("scenario validation", () => {
     });
   });
 
+  test("佐藤美咲のデフォルトと5表情を論理パスで定義する", () => {
+    const misaki = breadPriceScenario.characters.find(({ id }) => id === "misaki");
+    expect(misaki).toMatchObject({
+      portrait: "bread-price/characters/misaki/misaki_neutral.png",
+      defaultExpression: "neutral",
+      expressions: {
+        neutral: "bread-price/characters/misaki/misaki_neutral.png",
+        relieved: "bread-price/characters/misaki/misaki_relieved.png",
+        frustrated: "bread-price/characters/misaki/misaki_frustrated.png",
+        concern: "bread-price/characters/misaki/misaki_concern.png",
+        serious: "bread-price/characters/misaki/misaki_serious.png",
+      },
+    });
+
+    const usedExpressions = new Set([
+      ...breadPriceScenario.scenes.flatMap((scene) => scene.lines),
+      ...breadPriceScenario.endings.flatMap((ending) => ending.lines),
+    ].filter((line) => line.speaker === "misaki").map((line) => line.expression ?? misaki?.defaultExpression));
+    expect(usedExpressions).toEqual(new Set(["neutral", "relieved", "frustrated", "concern", "serious"]));
+  });
+
+  test("山田浩一のデフォルトと5表情を論理パスで定義する", () => {
+    const yamada = breadPriceScenario.characters.find(({ id }) => id === "yamada");
+    expect(yamada).toMatchObject({
+      portrait: "bread-price/characters/yamada/yamada_neutral.png",
+      defaultExpression: "neutral",
+      expressions: {
+        neutral: "bread-price/characters/yamada/yamada_neutral.png",
+        concern: "bread-price/characters/yamada/yamada_concern.png",
+        frustrated: "bread-price/characters/yamada/yamada_frustrated.png",
+        relieved: "bread-price/characters/yamada/yamada_relieved.png",
+        serious: "bread-price/characters/yamada/yamada_serious.png",
+      },
+    });
+
+    const lines = [
+      ...breadPriceScenario.scenes.flatMap((scene) => scene.lines),
+      ...breadPriceScenario.endings.flatMap((ending) => ending.lines),
+    ].filter((line) => line.speaker === "yamada");
+
+    expect(lines).toHaveLength(32);
+    expect(lines.every((line) => line.expression !== undefined)).toBe(true);
+
+    const usedExpressions = new Set(lines.map((line) => line.expression ?? yamada?.defaultExpression));
+    expect(usedExpressions).toEqual(new Set(["neutral", "relieved", "frustrated", "concern", "serious"]));
+
+    // 山田は怒鳴る人物ではないため frustrated の使用頻度は低い。
+    const frustrated = lines.filter((line) => line.expression === "frustrated");
+    expect(frustrated.length).toBeGreaterThan(0);
+    expect(frustrated.length).toBeLessThanOrEqual(3);
+  });
+
   test("14種類のEconomics解説を割り当てる（two-marketsのみ3枚）", () => {
     const assignments = Object.fromEntries(
       breadPriceScenario.endings.map((ending) => [

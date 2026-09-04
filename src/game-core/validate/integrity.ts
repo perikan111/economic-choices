@@ -69,6 +69,13 @@ export function validateIntegrity(scenario: Scenario, errors: string[], warnings
   const walkLine = (line: Line, path: string): void => {
     if (!characterIds.has(line.speaker)) {
       errors.push(`${path}.speaker: 未定義の話者 "${line.speaker}" を参照しています。`);
+    } else if (line.expression) {
+      const character = scenario.characters.find((candidate) => candidate.id === line.speaker)!;
+      if (!character.expressions?.[line.expression]) {
+        errors.push(
+          `${path}.expression: 話者 "${line.speaker}" に表情 "${line.expression}" が定義されていません。`,
+        );
+      }
     }
     if (line.condition) walkCondition(line.condition, `${path}.condition`);
     for (const match of line.text.matchAll(/\{\{param\.([A-Za-z0-9_-]+)\}\}/g)) {
@@ -77,6 +84,14 @@ export function validateIntegrity(scenario: Scenario, errors: string[], warnings
       }
     }
   };
+
+  scenario.characters.forEach((character, characterIndex) => {
+    if (character.defaultExpression && !character.expressions?.[character.defaultExpression]) {
+      errors.push(
+        `characters[${characterIndex}].defaultExpression: 表情 "${character.defaultExpression}" が expressions に定義されていません。`,
+      );
+    }
+  });
 
   const walkNext = (next: Next, path: string): void => {
     if (next.type === "goto") {

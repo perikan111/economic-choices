@@ -16,6 +16,20 @@ function optionalString(object: UnknownRecord, key: string, path: string, errors
   }
 }
 
+function optionalStringRecord(object: UnknownRecord, key: string, path: string, errors: string[]): void {
+  const value = object[key];
+  if (value === undefined) return;
+  if (!isRecord(value)) {
+    errors.push(`${path}.${key}: 文字列を値に持つオブジェクトが必要です。`);
+    return;
+  }
+  Object.entries(value).forEach(([entryKey, entryValue]) => {
+    if (typeof entryValue !== "string") {
+      errors.push(`${path}.${key}.${entryKey}: 文字列が必要です。`);
+    }
+  });
+}
+
 function validateCondition(value: unknown, path: string, errors: string[], depth = 0): value is Condition {
   if (depth > 64 || !isRecord(value)) {
     errors.push(`${path}: 正しい条件オブジェクトが必要です。`);
@@ -197,6 +211,9 @@ export function validateStructure(raw: unknown, errors: string[]): raw is Scenar
       requiredString(character, "name", path, errors);
       optionalString(character, "role", path, errors);
       optionalString(character, "color", path, errors);
+      optionalString(character, "portrait", path, errors);
+      optionalString(character, "defaultExpression", path, errors);
+      optionalStringRecord(character, "expressions", path, errors);
     }
   });
 

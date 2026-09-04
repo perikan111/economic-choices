@@ -73,6 +73,7 @@ export interface CharacterDef {
   role?: string;
   color?: string;
   portrait?: string;
+  defaultExpression?: string;
   expressions?: Record<string, string>;
   voice?: Record<string, string | number>;
 }

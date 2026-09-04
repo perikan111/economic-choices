@@ -265,6 +265,32 @@ button { color: inherit; }
   background: rgba(10, 15, 25, 0.88);
 }
 
+.dialogue-presentation.has-portrait {
+  display: grid;
+  grid-template-columns: minmax(min(360px, 44vw), 0.52fr) minmax(0, 1fr);
+  gap: clamp(18px, 4vw, 42px);
+  align-items: end;
+}
+
+.character-portrait-slot {
+  height: clamp(330px, 52vh, 540px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.character-portrait-image {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.34));
+  user-select: none;
+}
+
 .speaker-name { margin: 0 0 10px; font-weight: 800; }
 .dialogue-text { margin: 0; font-size: clamp(1rem, 2.5vw, 1.22rem); white-space: pre-wrap; }
 .dialogue-text.narration { color: #d8deea; font-style: italic; }
@@ -330,6 +356,8 @@ button { color: inherit; }
   .parameter-card:last-child { grid-column: 1 / -1; }
   .novel-stage { min-height: 0; padding: 16px; }
   .dialogue-box { min-height: 150px; padding: 18px; }
+  .dialogue-presentation.has-portrait { grid-template-columns: 1fr; gap: 10px; }
+  .character-portrait-slot { height: min(52vh, 390px); }
   .advance-row { align-items: stretch; flex-direction: column-reverse; }
   .advance-row span { text-align: center; }
   .primary-button { width: 100%; }

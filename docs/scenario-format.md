@@ -85,6 +85,7 @@
     "role": "財政補佐官",
     "color": "#a5603b",
     "portrait": "aide/base.png",
+    "defaultExpression": "normal",
     "expressions": { "normal": "aide/normal.png", "worried": "aide/worried.png" },
     "voice": { "engine": "aivisspeech", "speakerId": 888753760, "styleId": 0 }
   }
@@ -94,6 +95,8 @@
 - `role` は任意。UI 上で人物名と併記する短い役割・肩書き（例: `財政補佐官｜リーゼ`）。
   `portrait` や `voice` と同じ表示用 metadata であり、条件・効果・ゲーム状態には影響しない。
 - `portrait` / `expressions` は**論理パス**。URL への変換はプラットフォーム層の責務（[architecture.md](./architecture.md) §6）。
+- `defaultExpression` は台詞側で `expression` を省略したときの表情ラベル。指定する場合は
+  `expressions` に同名のキーが必要。画像 ID は `<characterId>.<expression>` として扱う。
 - `voice` は将来の一括音声生成用。MVP では読み飛ばして構わない（存在しても無視できる）。
 - `id: "narrator"` は慣習として地の文に使う。エンジン上の特別扱いはしない（`name` が空なら名前欄を出さない、という UI 側の判断だけ）。
 
@@ -267,6 +270,8 @@
 ```
 
 - `condition` を満たさない行は**その場でスキップ**される。シーンを分けずに細かい出し分けができる。
+- `expression` は話者の `characters[].expressions` にある表情ラベルを指定する。省略時は
+  `characters[].defaultExpression`、それもなければ `portrait` を使う。
 - `id` は音声ファイルの対応付けに使う。**音声を付ける予定の行には必ず付ける**（配列の添字だと行の挿入でずれる）。
 - `text` 内で `{{param.<id>}}` を使うと、表示時点の値に置換される。置換は**表示直前**に行う（保存されるのは元の文字列）。
   - 使えるのは `{{param.<id>}}` のみ。式は書けない。未定義 ID は検証エラー。
@@ -635,6 +640,17 @@ export interface Choice {
   next: Next;
 }
 
+export interface CharacterDef {
+  id: string;
+  name: string;
+  role?: string;
+  color?: string;
+  portrait?: string;
+  defaultExpression?: string;
+  expressions?: Record<string, string>;
+  voice?: Record<string, string | number>;
+}
+
 export interface Line {
   id?: string;
   speaker: string;
@@ -700,13 +716,14 @@ export interface Scenario {
 3. すべての `ending.ending` 参照が実在する
 4. 条件・効果が参照する `param` / `flag` がすべて宣言済み
 5. `line.speaker` がすべて `characters` に存在する
-6. `{{param.x}}` の `x` がすべて宣言済み
-7. `branch` に `else` がある
-8. すべての `choices` に、条件なし（＝常に選べる）選択肢が1つ以上ある
-9. `endings` の最後の要素に `condition` がなく、最後より前に条件なし ending がない
-10. `initialState.params` が各パラメータ定義の `min` / `max` 内にある
-11. 到達不能なシーンがない（`startScene` からのグラフ探索で警告）
-12. `resolveEnding` または `ending` に到達しない経路がない（終端のないループの検出。警告）
+6. `defaultExpression` / `line.expression` が話者の `expressions` に存在する
+7. `{{param.x}}` の `x` がすべて宣言済み
+8. `branch` に `else` がある
+9. すべての `choices` に、条件なし（＝常に選べる）選択肢が1つ以上ある
+10. `endings` の最後の要素に `condition` がなく、最後より前に条件なし ending がない
+11. `initialState.params` が各パラメータ定義の `min` / `max` 内にある
+12. 到達不能なシーンがない（`startScene` からのグラフ探索で警告）
+13. `resolveEnding` または `ending` に到達しない経路がない（終端のないループの検出。警告）
 
 ---
 

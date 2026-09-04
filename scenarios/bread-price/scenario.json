@@ -24,13 +24,31 @@
       "id": "misaki",
       "name": "佐藤 美咲",
       "role": "市民代表",
-      "color": "#7fb2e5"
+      "color": "#7fb2e5",
+      "portrait": "bread-price/characters/misaki/misaki_neutral.png",
+      "defaultExpression": "neutral",
+      "expressions": {
+        "neutral": "bread-price/characters/misaki/misaki_neutral.png",
+        "relieved": "bread-price/characters/misaki/misaki_relieved.png",
+        "frustrated": "bread-price/characters/misaki/misaki_frustrated.png",
+        "concern": "bread-price/characters/misaki/misaki_concern.png",
+        "serious": "bread-price/characters/misaki/misaki_serious.png"
+      }
     },
     {
       "id": "yamada",
       "name": "山田 浩一",
       "role": "パン屋",
-      "color": "#d9a05b"
+      "color": "#d9a05b",
+      "portrait": "bread-price/characters/yamada/yamada_neutral.png",
+      "defaultExpression": "neutral",
+      "expressions": {
+        "neutral": "bread-price/characters/yamada/yamada_neutral.png",
+        "concern": "bread-price/characters/yamada/yamada_concern.png",
+        "frustrated": "bread-price/characters/yamada/yamada_frustrated.png",
+        "relieved": "bread-price/characters/yamada/yamada_relieved.png",
+        "serious": "bread-price/characters/yamada/yamada_serious.png"
+      }
     },
     {
       "id": "kuroda",
@@ -210,11 +228,13 @@
         {
           "id": "ps-03",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "……二百四十円。先週より、また十円上がってる。"
         },
         {
           "id": "ps-04",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "上の子が「おかわり」って言うのを、聞こえなかったふりをしました。"
         },
         {
@@ -230,6 +250,7 @@
         {
           "id": "ps-07",
           "speaker": "misaki",
+          "expression": "serious",
           "text": "ただ、明日の朝、子どもに何を食べさせればいいのか教えてください。"
         },
         {
@@ -255,17 +276,20 @@
         {
           "id": "pb-02",
           "speaker": "yamada",
-          "text": "小麦が一・八倍、電気が一・四倍。運送屋にも先月、値上げを頼まれました。"
+          "text": "小麦が一・八倍、電気が一・四倍。運送屋にも先月、値上げを頼まれました。",
+          "expression": "concern"
         },
         {
           "id": "pb-03",
           "speaker": "yamada",
-          "text": "二百四十円で売って、ようやく去年と同じくらいです。"
+          "text": "二百四十円で売って、ようやく去年と同じくらいです。",
+          "expression": "concern"
         },
         {
           "id": "pb-04",
           "speaker": "yamada",
-          "text": "儲けたくて上げてるわけじゃないんです。明日も窯に火を入れたいだけで。"
+          "text": "儲けたくて上げてるわけじゃないんです。明日も窯に火を入れたいだけで。",
+          "expression": "concern"
         },
         {
           "id": "pb-05",
@@ -275,6 +299,7 @@
         {
           "id": "pb-06",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "でも、分かっていても、財布の中身は増えないんです。"
         },
         {
@@ -572,17 +597,20 @@
         {
           "id": "c1-02",
           "speaker": "misaki",
+          "expression": "relieved",
           "text": "百六十円。……本当に、百六十円でした。"
         },
         {
           "id": "c1-03",
           "speaker": "misaki",
+          "expression": "relieved",
           "text": "久しぶりに、レジで小銭を数えなくていい買い物をしました。"
         },
         {
           "id": "c1-04",
           "speaker": "yamada",
-          "text": "今日の分は焼きました。明日の分の小麦を、まだ買っていません。"
+          "text": "今日の分は焼きました。明日の分の小麦を、まだ買っていません。",
+          "expression": "concern"
         },
         {
           "id": "c1-05",
@@ -607,7 +635,8 @@
         {
           "id": "s1-02",
           "speaker": "yamada",
-          "text": "助かります。来月の仕入れの心配を、しなくて済みます。"
+          "text": "助かります。来月の仕入れの心配を、しなくて済みます。",
+          "expression": "relieved"
         },
         {
           "id": "s1-03",
@@ -647,12 +676,14 @@
         {
           "id": "g1-03",
           "speaker": "yamada",
-          "text": "……駅前に、うちより安い臨時の店が出ました。"
+          "text": "……駅前に、うちより安い臨時の店が出ました。",
+          "expression": "concern"
         },
         {
           "id": "g1-04",
           "speaker": "yamada",
-          "text": "恨んではいません。ただ、うちには三代分の設備の借金があるので。"
+          "text": "恨んではいません。ただ、うちには三代分の設備の借金があるので。",
+          "expression": "serious"
         },
         {
           "id": "g1-05",
@@ -682,11 +713,13 @@
         {
           "id": "t1-03",
           "speaker": "misaki",
+          "expression": "relieved",
           "text": "うちは……対象でした。正直、助かりました。"
         },
         {
           "id": "t1-04",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "隣の家は、少しだけ収入が多くて外れたそうです。気まずくて、まだ話していません。"
         },
         {
@@ -749,22 +782,26 @@
         {
           "id": "w3c-03",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "朝七時に並んで、買えたのは二回だけです。"
         },
         {
           "id": "w3c-04",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "安いんです。安いんですけど、無いんです。"
         },
         {
           "id": "w3c-05",
           "speaker": "yamada",
-          "text": "百六十円だと、焼くほど赤字になります。だから焼く数を減らしました。"
+          "text": "百六十円だと、焼くほど赤字になります。だから焼く数を減らしました。",
+          "expression": "serious"
         },
         {
           "id": "w3c-06",
           "speaker": "yamada",
-          "text": "昨日、知らない人に声をかけられました。「うちに卸さないか」と。"
+          "text": "昨日、知らない人に声をかけられました。「うちに卸さないか」と。",
+          "expression": "concern"
         },
         {
           "id": "w3c-07",
@@ -816,7 +853,8 @@
         {
           "id": "w3s-02",
           "speaker": "yamada",
-          "text": "おかげさまで、いつもどおり焼けています。従業員も戻しました。"
+          "text": "おかげさまで、いつもどおり焼けています。従業員も戻しました。",
+          "expression": "relieved"
         },
         {
           "id": "w3s-03",
@@ -831,6 +869,7 @@
         {
           "id": "w3s-05",
           "speaker": "misaki",
+          "expression": "relieved",
           "text": "二百五円。……高いままですけど、買えるだけましです。"
         },
         {
@@ -898,17 +937,20 @@
         {
           "id": "w3g-04",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "買えるようになりました。……ただ、どこの小麦か書いていない袋もあって。"
         },
         {
           "id": "w3g-05",
           "speaker": "yamada",
-          "text": "先週、同じ商店街の一軒が店を閉めました。四十年やっていた店です。"
+          "text": "先週、同じ商店街の一軒が店を閉めました。四十年やっていた店です。",
+          "expression": "serious"
         },
         {
           "id": "w3g-06",
           "speaker": "yamada",
-          "text": "うちはまだ大丈夫です。「まだ」ですが。"
+          "text": "うちはまだ大丈夫です。「まだ」ですが。",
+          "expression": "concern"
         },
         {
           "id": "w3g-07",
@@ -970,6 +1012,7 @@
         {
           "id": "w3t-04",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "助かっている人がいるのは知っています。でも、うちの隣は助かっていません。"
         },
         {
@@ -985,7 +1028,8 @@
         {
           "id": "w3t-07",
           "speaker": "yamada",
-          "text": "値段は下がっていませんが、お客さんは戻ってきました。それだけでもありがたい。"
+          "text": "値段は下がっていませんが、お客さんは戻ってきました。それだけでもありがたい。",
+          "expression": "relieved"
         }
       ],
       "next": {
@@ -1415,16 +1459,19 @@
         {
           "id": "rc-02",
           "speaker": "misaki",
+          "expression": "serious",
           "text": "商店街の裏に、車で来る人がいるんです。パン、あります。二百九十円で。"
         },
         {
           "id": "rc-03",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "高いです。高いですけど、あるんです。"
         },
         {
           "id": "rc-04",
           "speaker": "misaki",
+          "expression": "serious",
           "text": "昨日は買いました。安くて無いより、高くてあるほうが、今日は助かるので。",
           "condition": {
             "param": "informalMarket",
@@ -1436,6 +1483,7 @@
           "id": "rc-05",
           "speaker": "yamada",
           "text": "うちの整理券を、駅前で買い取っている人がいます。",
+          "expression": "frustrated",
           "condition": {
             "flag": "rationingActive"
           }
@@ -1506,7 +1554,8 @@
         {
           "id": "ro-03",
           "speaker": "yamada",
-          "text": "お客さんの顔ぶれが、少し戻りました。"
+          "text": "お客さんの顔ぶれが、少し戻りました。",
+          "expression": "relieved"
         },
         {
           "id": "ro-04",
@@ -1570,11 +1619,13 @@
         {
           "id": "ii-03",
           "speaker": "misaki",
+          "expression": "serious",
           "text": "私、そこで買っています。隠しません。"
         },
         {
           "id": "ii-04",
           "speaker": "misaki",
+          "expression": "serious",
           "text": "正規のお店は、安いけれど朝で終わります。私は仕事があります。"
         },
         {
@@ -1883,11 +1934,13 @@
         {
           "id": "ica-03",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "……買えなくなりました。正規のお店には、やっぱり朝しかありません。"
         },
         {
           "id": "ica-04",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "悪いことをしていた自覚は、正直ありません。ただ、無くなりました。"
         },
         {
@@ -1918,6 +1971,7 @@
         {
           "id": "irg-03",
           "speaker": "misaki",
+          "expression": "relieved",
           "text": "販売は続いています。仕事の帰りにも買えるので、前より助かる人は増えました。"
         },
         {
@@ -1953,6 +2007,7 @@
         {
           "id": "ita-03",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "前より買いやすくなりました。値段は高いままです。"
         },
         {
@@ -1983,11 +2038,13 @@
         {
           "id": "ira-02",
           "speaker": "yamada",
-          "text": "焼けます。二百十五円なら、焼けます。"
+          "text": "焼けます。二百十五円なら、焼けます。",
+          "expression": "relieved"
         },
         {
           "id": "ira-03",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "値上げですよね、これ。……分かっています。分かっていますけど。"
         },
         {
@@ -2090,11 +2147,13 @@
         {
           "id": "m6c-02",
           "speaker": "yamada",
-          "text": "週三日にしました。焼く日を減らせば、赤字の日も減るので。"
+          "text": "週三日にしました。焼く日を減らせば、赤字の日も減るので。",
+          "expression": "serious"
         },
         {
           "id": "m6c-03",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "正規のお店で買えたのは、今月に入って一度です。"
         },
         {
@@ -2152,7 +2211,8 @@
         {
           "id": "m6s-02",
           "speaker": "yamada",
-          "text": "助かっています。ただ、補助がいつまでかを聞かれると、答えられません。"
+          "text": "助かっています。ただ、補助がいつまでかを聞かれると、答えられません。",
+          "expression": "concern"
         },
         {
           "id": "m6s-03",
@@ -2219,12 +2279,14 @@
         {
           "id": "m6m-03",
           "speaker": "misaki",
+          "expression": "relieved",
           "text": "買えます。値段も、去年ほどではないけれど戻ってきました。"
         },
         {
           "id": "m6m-04",
           "speaker": "yamada",
-          "text": "うちは残りました。商店街で二軒、残りませんでした。"
+          "text": "うちは残りました。商店街で二軒、残りませんでした。",
+          "expression": "serious"
         },
         {
           "id": "m6m-05",
@@ -2313,12 +2375,14 @@
         {
           "id": "m6n-02",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "慣れました。……慣れたくは、なかったんですけど。"
         },
         {
           "id": "m6n-03",
           "speaker": "yamada",
-          "text": "続いています。良くも悪くも、続いています。"
+          "text": "続いています。良くも悪くも、続いています。",
+          "expression": "neutral"
         },
         {
           "id": "m6n-04",
@@ -3412,6 +3476,7 @@
           "id": "dr-02",
           "speaker": "yamada",
           "text": "続くと分かれば、設備の更新もできます。……続くなら。",
+          "expression": "serious",
           "condition": {
             "flag": "permanentized"
           }
@@ -3419,6 +3484,7 @@
         {
           "id": "dr-03",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "終わるんですね。……分かりました。準備します。",
           "condition": {
             "all": [
@@ -3449,6 +3515,7 @@
         {
           "id": "dr-05",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "何も変わらないと聞きました。それが答えなんですね。",
           "condition": {
             "not": {
@@ -3494,6 +3561,7 @@
         {
           "id": "ep-03",
           "speaker": "misaki",
+          "expression": "relieved",
           "text": "今日は買えました。",
           "condition": {
             "param": "foodAccess",
@@ -3504,6 +3572,7 @@
         {
           "id": "ep-03-mid",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "前よりは買えます。でも、仕事が遅くなった日は、売り切れていることもあります。",
           "condition": {
             "all": [
@@ -3523,6 +3592,7 @@
         {
           "id": "ep-04",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "今日も、買えませんでした。",
           "condition": {
             "param": "foodAccess",
@@ -3533,7 +3603,8 @@
         {
           "id": "ep-05",
           "speaker": "yamada",
-          "text": "窯には火を入れています。何年か先のことは、まだ考えられません。"
+          "text": "窯には火を入れています。何年か先のことは、まだ考えられません。",
+          "expression": "concern"
         },
         {
           "id": "ep-06",
@@ -3637,6 +3708,7 @@
           "id": "tcp-05",
           "speaker": "yamada",
           "text": "補助が切れたら、その日から二百四十円に戻します。戻すしかありません。",
+          "expression": "serious",
           "condition": {
             "all": [
               {
@@ -3654,6 +3726,7 @@
           "id": "tcp-05-capped",
           "speaker": "yamada",
           "text": "補助が切れれば採算はまた悪くなります。値段を上げられないなら、焼く量を減らすしかありません。",
+          "expression": "serious",
           "condition": {
             "all": [
               {
@@ -3720,7 +3793,8 @@
         {
           "id": "pd-02",
           "speaker": "yamada",
-          "text": "設備の見積もりを二回取って、二回とも断りました。三か月後が分からないので。"
+          "text": "設備の見積もりを二回取って、二回とも断りました。三か月後が分からないので。",
+          "expression": "serious"
         },
         {
           "id": "pd-03",
@@ -3730,6 +3804,7 @@
         {
           "id": "pd-04",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "どれが今の制度なのか、正直、もう分かりません。"
         },
         {
@@ -3810,17 +3885,20 @@
         {
           "id": "tm-03",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "高いです。おかしいとも思います。"
         },
         {
           "id": "tm-04",
           "speaker": "misaki",
+          "expression": "relieved",
           "text": "でも、うちの子は今週も朝ごはんを食べました。"
         },
         {
           "id": "tm-05",
           "speaker": "yamada",
-          "text": "表の店を続けているのは、意地みたいなものです。"
+          "text": "表の店を続けているのは、意地みたいなものです。",
+          "expression": "serious"
         },
         {
           "id": "tm-06",
@@ -3843,6 +3921,7 @@
         {
           "id": "tm-07-risky",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "品質は、その場では確かめきれません。買った場所も言いたくないです。明日そこまで無くなるのが怖いので。",
           "condition": {
             "param": "marketRisk",
@@ -3908,16 +3987,19 @@
         {
           "id": "ces-03",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "安いんです。ずっと、安いままなんです。"
         },
         {
           "id": "ces-04",
           "speaker": "yamada",
-          "text": "週に二日だけ焼いています。それ以上焼くと、赤字の日が増えるので。"
+          "text": "週に二日だけ焼いています。それ以上焼くと、赤字の日が増えるので。",
+          "expression": "serious"
         },
         {
           "id": "ces-05",
           "speaker": "misaki",
+          "expression": "concern",
           "text": "少し前まで、裏で買えました。今はそれもありません。",
           "condition": {
             "flag": "everCrackdown"
@@ -4029,12 +4111,14 @@
         {
           "id": "owb-04",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "でも、買う場所そのものも減りました。正規のお店の棚は、まだ朝で空になります。"
         },
         {
           "id": "owb-05",
           "speaker": "yamada",
-          "text": "店へ戻ってきた分はあります。足りない分まで戻ったわけではありません。"
+          "text": "店へ戻ってきた分はあります。足りない分まで戻ったわけではありません。",
+          "expression": "neutral"
         },
         {
           "id": "owb-06",
@@ -4099,6 +4183,7 @@
         {
           "id": "ftn-03",
           "speaker": "misaki",
+          "expression": "relieved",
           "text": "うちは支給を受けています。それで、なんとかなっています。"
         },
         {
@@ -4114,7 +4199,8 @@
         {
           "id": "ftn-06",
           "speaker": "yamada",
-          "text": "値段を決めるのはうちです。払えない人を支えるのは市です。……分かりやすくは、なりました。"
+          "text": "値段を決めるのはうちです。払えない人を支えるのは市です。……分かりやすくは、なりました。",
+          "expression": "neutral"
         },
         {
           "id": "ftn-06-rationing",
@@ -4207,17 +4293,20 @@
         {
           "id": "pcb-04",
           "speaker": "misaki",
+          "expression": "frustrated",
           "text": "高い時期は、本当にきつかったです。あれを「調整」と呼ぶ人とは、まだ話せません。"
         },
         {
           "id": "pcb-05",
           "speaker": "yamada",
-          "text": "商店街で二軒、閉まりました。四十年と、六十年の店です。"
+          "text": "商店街で二軒、閉まりました。四十年と、六十年の店です。",
+          "expression": "serious"
         },
         {
           "id": "pcb-06",
           "speaker": "yamada",
-          "text": "残ったのが、うちが正しかったからだとは思っていません。"
+          "text": "残ったのが、うちが正しかったからだとは思っていません。",
+          "expression": "serious"
         },
         {
           "id": "pcb-07",
@@ -4265,12 +4354,14 @@
         {
           "id": "ml-03",
           "speaker": "misaki",
+          "expression": "serious",
           "text": "去年よりましです。おととしよりは、ずっと悪いです。"
         },
         {
           "id": "ml-04",
           "speaker": "yamada",
-          "text": "続いています。それ以上のことは、言えません。"
+          "text": "続いています。それ以上のことは、言えません。",
+          "expression": "neutral"
         },
         {
           "id": "ml-05",

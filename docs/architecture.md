@@ -352,7 +352,13 @@ Effect は配列順に1件ずつ適用する。各パラメータ効果は演算
 export interface GameView {
   phase: 'line' | 'choice' | 'ending';
   background?: string;
-  speaker: { id: string; name: string; role?: string; color?: string } | null;
+  speaker: {
+    id: string;
+    name: string;
+    role?: string;
+    color?: string;
+    portrait?: { imageId: string; logicalPath: string; expression?: string };
+  } | null;
   text: string;                 // {{param.x}} 補間済み
   canAdvance: boolean;
   prompt?: string;
@@ -507,13 +513,14 @@ export const webAssets: AssetResolver = {
 // Tauri では convertFileSrc() を使った実装に差し替える
 ```
 
-### 8.2 MVP でのプレースホルダー
+### 8.2 Web UI での描画
 
 - 背景 … CSS のグラデーション。`scene.background` の文字列をハッシュして色相を決めると、
   シーンが変わったことが視覚的に伝わる（画像を用意する前でも「場面が変わった感」が出る）。
-- 立ち絵 … 描画しない。話者名の色付きラベルのみ（`characters[].color`）。
-- 画像を追加するときに**シナリオ側の変更が不要**であること（既に `portrait` / `background` の
-  フィールドが定義済み）を確認しておく。
+- 立ち絵 … `view.ts` が `portrait` / `defaultExpression` / `Line.expression` を解決し、
+  UI は `SpeakerView.portrait.logicalPath` を `AssetResolver` へ渡して描画する。
+- 画像 ID は `<characterId>.<expression>`。表情を増やすときも UI にキャラクター固有処理を追加しない。
+- 立ち絵の論理パスと選択は game-core、URL 化と実描画はプラットフォーム / UI の責務として分離する。
 
 ### 8.3 配置
 

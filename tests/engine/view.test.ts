@@ -19,6 +19,60 @@ describe("getView choices", () => {
     });
   });
 
+  test("characterのデフォルト表情を画像IDと論理パスへ解決する", () => {
+    const scenario: Scenario = {
+      ...engineScenario,
+      characters: engineScenario.characters.map((character) =>
+        character.id === "narrator" ? {
+          ...character,
+          portrait: "fixture/guide-neutral.png",
+          defaultExpression: "neutral",
+          expressions: {
+            neutral: "fixture/guide-neutral.png",
+            concern: "fixture/guide-concern.png",
+          },
+        } : character,
+      ),
+    };
+
+    expect(getView(scenario, createInitialState(scenario)).speaker?.portrait).toEqual({
+      imageId: "narrator.neutral",
+      logicalPath: "fixture/guide-neutral.png",
+      expression: "neutral",
+    });
+  });
+
+  test("lineの表情指定をデフォルトより優先する", () => {
+    const scenario: Scenario = {
+      ...engineScenario,
+      characters: engineScenario.characters.map((character) =>
+        character.id === "narrator" ? {
+          ...character,
+          portrait: "fixture/guide-neutral.png",
+          defaultExpression: "neutral",
+          expressions: {
+            neutral: "fixture/guide-neutral.png",
+            concern: "fixture/guide-concern.png",
+          },
+        } : character,
+      ),
+      scenes: engineScenario.scenes.map((scene, sceneIndex) =>
+        sceneIndex === 0 ? {
+          ...scene,
+          lines: scene.lines.map((line, lineIndex) =>
+            lineIndex === 0 ? { ...line, expression: "concern" } : line,
+          ),
+        } : scene,
+      ),
+    };
+
+    expect(getView(scenario, createInitialState(scenario)).speaker?.portrait).toEqual({
+      imageId: "narrator.concern",
+      logicalPath: "fixture/guide-concern.png",
+      expression: "concern",
+    });
+  });
+
   test("ifUnmet: hideの条件未達選択肢を配列から除外する", () => {
     const state = reachNextChoice(engineScenario, createInitialState(engineScenario));
     const view = getView(engineScenario, state);

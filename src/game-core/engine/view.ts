@@ -1,10 +1,32 @@
 import { EngineError } from "../errors";
-import type { Line, Scenario } from "../types/scenario";
+import type { CharacterDef, Line, Scenario } from "../types/scenario";
 import type { GameState } from "../types/state";
 import type { GameView, SpeakerView } from "../types/view";
 import { evaluateCondition } from "./conditions";
 import { getVisibleLines, interpolateText } from "./lines";
 import { getPendingChoices } from "./transition";
+
+function portraitFor(character: CharacterDef, line: Line): SpeakerView["portrait"] {
+  const expression = line.expression ?? character.defaultExpression;
+  if (expression) {
+    const logicalPath = character.expressions?.[expression];
+    if (!logicalPath) {
+      throw new EngineError(
+        `話者 "${character.id}" に表情 "${expression}" の立ち絵が定義されていません。`,
+      );
+    }
+    return {
+      imageId: `${character.id}.${expression}`,
+      logicalPath,
+      expression,
+    };
+  }
+  if (!character.portrait) return undefined;
+  return {
+    imageId: `${character.id}.default`,
+    logicalPath: character.portrait,
+  };
+}
 
 function speakerFor(scenario: Scenario, line: Line | undefined): SpeakerView | null {
   if (!line) return null;
@@ -15,6 +37,7 @@ function speakerFor(scenario: Scenario, line: Line | undefined): SpeakerView | n
     name: character.name,
     role: character.role,
     color: character.color,
+    portrait: portraitFor(character, line),
   };
 }
 

@@ -6,4 +6,11 @@ describe("GitHub Pages asset resolver", () => {
     expect(webAssets.image("backgrounds/street.png")).toBe("/economic-choices/images/backgrounds/street.png");
     expect(webAssets.audio("/bread-price/line-01.wav")).toBe("/economic-choices/voice/bread-price/line-01.wav");
   });
+
+  test("キャラクター立ち絵の論理パスへもbasePathを付与する", () => {
+    expect(webAssets.image("bread-price/characters/misaki/misaki_neutral.png"))
+      .toBe("/economic-choices/images/bread-price/characters/misaki/misaki_neutral.png");
+    expect(webAssets.image("bread-price/characters/yamada/yamada_serious.png"))
+      .toBe("/economic-choices/images/bread-price/characters/yamada/yamada_serious.png");
+  });
 });

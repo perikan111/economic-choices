@@ -768,4 +768,30 @@ describe("bread-price scenario semantic audit", () => {
     const register = findChoice("informal-decision", "informal-register");
     expect(register.description).toContain("残れない");
   });
+
+  test("山田のexpression付きlineが立ち絵としてviewへ解決される", () => {
+    const yamada = breadPriceScenario.characters.find(({ id }) => id === "yamada");
+    const expressions = yamada?.expressions;
+    if (!expressions) throw new Error("yamadaのexpressionsが未定義です。");
+
+    const seen = new Set<string>();
+    for (const states of AUDIT.sceneStates.values()) {
+      for (const state of states) {
+        const view = getView(breadPriceScenario, state);
+        const portrait = view.speaker?.id === "yamada" ? view.speaker.portrait : undefined;
+        if (!portrait) continue;
+
+        const expression = portrait.expression ?? "";
+        expect(portrait.imageId).toBe(`yamada.${expression}`);
+        expect(portrait.logicalPath).toBe(expressions[expression]);
+        expect(portrait.logicalPath.startsWith("bread-price/characters/yamada/")).toBe(true);
+        seen.add(expression);
+      }
+    }
+
+    expect(seen.size).toBeGreaterThanOrEqual(4);
+    for (const expression of seen) {
+      expect(Object.keys(expressions)).toContain(expression);
+    }
+  });
 });

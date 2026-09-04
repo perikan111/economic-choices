@@ -3,6 +3,11 @@ export interface SpeakerView {
   name: string;
   role?: string;
   color?: string;
+  portrait?: {
+    imageId: string;
+    logicalPath: string;
+    expression?: string;
+  };
 }
 
 export interface ChoiceView {

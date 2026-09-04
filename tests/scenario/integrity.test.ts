@@ -79,6 +79,19 @@ describe("scenario integrity validator", () => {
     expectInvalid(scenario, "scenes[0].lines: ID \"intro-1\" が重複");
   });
 
+  test("characterの未定義defaultExpressionを拒否する", () => {
+    const scenario = cloneFixture();
+    scenario.characters[0].defaultExpression = "missing";
+    scenario.characters[0].expressions = { neutral: "fixture/neutral.png" };
+    expectInvalid(scenario, "defaultExpression");
+  });
+
+  test("lineの未定義expressionを拒否する", () => {
+    const scenario = cloneFixture();
+    scenario.scenes[0].lines[0].expression = "missing";
+    expectInvalid(scenario, ".expression");
+  });
+
   test("途中の無条件endingによる後続endingの遮蔽を拒否する", () => {
     const scenario = cloneFixture();
     scenario.endings.splice(1, 0, {
