@@ -300,8 +300,6 @@ button { color: inherit; }
   border-radius: 16px;
   background: var(--surface);
 }
-.ending-view.rank-good { border-top-color: var(--good); }
-.ending-view.rank-bad { border-top-color: var(--bad); }
 .ending-view h1 { margin: 0 0 20px; font-size: clamp(2rem, 6vw, 3.5rem); }
 .ending-narrative { color: #e3e6ed; font-size: 1.08rem; }
 .ending-summary { margin: 24px 0; padding: 16px; border-left: 3px solid var(--accent); background: rgba(255, 255, 255, 0.035); }

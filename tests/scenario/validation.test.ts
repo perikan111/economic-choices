@@ -61,11 +61,11 @@ describe("scenario validation", () => {
       ]),
     );
 
-    expect(baseLines).toHaveLength(236);
-    expect(analystLines).toHaveLength(32);
-    expect(lines).toHaveLength(268);
-    expect(speakerCounts).toEqual({ narrator: 72, misaki: 43, fujii: 45, yamada: 31, takahashi: 30, kuroda: 15 });
-    expect(baseLines.filter((line) => line.text.includes("{{param."))).toHaveLength(24);
+    expect(baseLines).toHaveLength(245);
+    expect(analystLines).toHaveLength(31);
+    expect(lines).toHaveLength(276);
+    expect(speakerCounts).toEqual({ narrator: 77, misaki: 44, fujii: 45, yamada: 32, takahashi: 32, kuroda: 15 });
+    expect(baseLines.filter((line) => line.text.includes("{{param."))).toHaveLength(25);
     expect(lineIds.every((id) => id !== undefined)).toBe(true);
     expect(new Set(lineIds).size).toBe(lines.length);
   });
@@ -91,7 +91,7 @@ describe("scenario validation", () => {
     });
   });
 
-  test("14種類のEconomics解説を設計どおり各endingへ4枚ずつ割り当てる", () => {
+  test("14種類のEconomics解説を割り当てる（two-marketsのみ3枚）", () => {
     const assignments = Object.fromEntries(
       breadPriceScenario.endings.map((ending) => [
         ending.id,
@@ -102,7 +102,7 @@ describe("scenario validation", () => {
     expect(assignments).toEqual({
       "the-city-pays": ["E05", "E08", "E02", "E12"],
       "policy-drift": ["E13", "E03", "E08", "E12"],
-      "two-markets": ["E04", "E10", "E11", "E12"],
+      "two-markets": ["E04", "E11", "E12"],
       "cheap-bread-empty-shelves": ["E01", "E04", "E10", "E12"],
       "order-without-bread": ["E10", "E11", "E14", "E12"],
       "for-those-who-need": ["E07", "E03", "E08", "E12"],
@@ -187,14 +187,8 @@ describe("scenario validation", () => {
     expect(monitorEffects).not.toHaveProperty("informalMarket");
   });
 
-  test("分岐・条件付きeffect専用sceneは空のまま維持する", () => {
-    for (const sceneId of [
-      "d2-router",
-      "m6-router",
-      "d3-nothing-expire-price",
-      "d3-nothing-expire-support",
-      "d3-nothing-no-expiry",
-    ]) {
+  test("分岐専用router sceneは空のまま維持する", () => {
+    for (const sceneId of ["d2-router", "m6-router"]) {
       expect(breadPriceScenario.scenes.find((scene) => scene.id === sceneId)?.lines).toEqual([]);
     }
   });

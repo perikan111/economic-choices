@@ -6,6 +6,20 @@
 このドキュメントは「何を作るのか」を定義する。
 データ形式は [scenario-format.md](./scenario-format.md)、実装構造は [architecture.md](./architecture.md) を参照。
 
+> ## ⚠ 第一作「パンの値段を下げろ！」の正本について
+>
+> **本ドキュメントは MVP 第一段階の企画書であり、現在の bread-price 実装仕様ではない。**
+> パラメータ構成・シーン数・エンディング・選択肢・数値バランスは、
+> 本文の記述より後の設計・実装で大きく変わっている
+> （例：本文の `blackMarket` は `informalMarket` に置き換わり、
+> `foodAccess` / `marketRisk` / `policyChanges` が追加され、エンディングは 5 → 8 になった）。
+>
+> **bread-price の現在の実装仕様は
+> [docs/scenarios/bread-price-design.md](./scenarios/bread-price-design.md) を正本とする。**
+> 本文の第一作に関する記述（§4 など）は、企画時点の初期構想の記録として読むこと。
+> ゲーム全体の目的・プレイヤー体験・題材の扱い方（§1〜§3）と、
+> Web版から Steam版への発展方針（§7）は現在も有効である。
+
 ---
 
 ## 1. ゲームの目的

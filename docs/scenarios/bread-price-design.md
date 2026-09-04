@@ -151,7 +151,12 @@ UI は `goodDirection` を使って増減を「良い変化／悪い変化」に
 
 ## 4. 登場人物
 
-| id | 名前 | 色 | 役割 | 話し方 |
+> **`role` と「役割」は用途が異なる。**
+> `scenario.json` の `characters[].role`（「市民代表」「パン屋」など）は **UI 表示用の短いラベル**で、
+> 画面上で話者名に添える。本設計書の「役割」列と §4 の人物設計は **執筆者向けの人物設定**であり、
+> UI には出さない。両者は一致させる必要がなく、`role` を詳しくしても表示が崩れるだけである。
+
+| id | 名前 | 色 | 役割（設定） | 話し方 |
 | --- | --- | --- | --- | --- |
 | `narrator` | （地の文） | `#9aa3b5` | 状況描写 | 短い断定文。感情を説明しない |
 | `misaki` | 佐藤 美咲 | `#7fb2e5` | 市民代表・二児の母 | 生活の具体。「今日食べられるか」 |
@@ -302,8 +307,8 @@ Decision 3では、価格上限から市場価格へ戻す、補助・配給を�
 | 28 | `m6-common` | 6か月後 | `market-street.png` | narrator, misaki, yamada, takahashi, fujii | 6 | goto `m6-council` |
 | 29 | `m6-council` | 共通 | `council-room.png` | narrator, fujii, takahashi | 10 | goto `decision-3` |
 | 30 | `decision-3` | 判断③ | `mayors-office-night.png` | narrator, fujii, takahashi | 6 | choices ×8 |
-| 31 | `d3-nothing-expire-price` | 条件付きeffect | — | **なし（行数 0）** | 0 | goto `d3-results` |
-| 32 | `d3-nothing-expire-support` | 条件付きeffect | — | **なし（行数 0）** | 0 | goto `d3-results` |
+| 31 | `d3-nothing-expire-price` | 自然失効 | — | narrator | 2 | goto `d3-results` |
+| 32 | `d3-nothing-expire-support` | 自然失効 | — | narrator | 2 | goto `d3-results` |
 | 33 | `d3-nothing-no-expiry` | 条件付きeffect | — | **なし（行数 0）** | 0 | goto `d3-results` |
 | 34 | `d3-results` | 結果 | `council-room.png` | narrator, yamada, misaki, takahashi, fujii | 6 | goto `m9-epilogue` |
 | 35 | `m9-epilogue` | 3か月後 | `street-morning.png` | narrator, misaki, yamada, kuroda, takahashi, fujii | 9 | `resolveEnding` |
@@ -362,7 +367,7 @@ next: `{ "type": "goto", "scene": "prologue-office" }`
 
 | line id | 話者 | 台詞 | condition |
 | --- | --- | --- | --- |
-| `po-01` | narrator | 市長室の机には、三つの書類が並んでいる。どれも「至急」と押してある。 | — |
+| `po-01` | narrator | 市長室の机には、何枚もの書類が並んでいる。どれも「至急」と押してある。 | — |
 | `po-02` | fujii | 市の政策余力は {{param.budget}}。今年度、自由に動かせる分です。 ⚠ | — |
 | `po-03` | fujii | 先に申し上げます。何をするにも、この数字から引かれます。 | — |
 | `po-04` | takahashi | 就学援助と生活相談の窓口が、先月から混んでいます。 | — |
@@ -427,8 +432,8 @@ next: goto `d1-subsidy`
 
 #### 選択肢 C `d1-deregulate` 「流通・販売・参入の規制を緩和する」
 
-> 市外業者の搬入と臨時販売所を認める。荷は増える。
-> 地元の店と商店会は反発する。効果が出るまで少し時間がかかる。
+> 市外業者の搬入と臨時販売所を認める。供給経路は増える。
+> 地元の店は新しい競争にさらされ、商店会は反発する。効果が出るまで少し時間がかかる。
 
 condition: なし（**無条件選択肢**）
 
@@ -683,7 +688,7 @@ next: goto `d2-router`
 
 #### `d2-rationing` 「一人あたりの購入量を制限する」
 
-> 並んだ人に行き渡らせる。整理券の管理と、その転売が始まる。
+> 一人あたりの購入量に上限を設け、整理券で管理する。より多くの人へ行き渡らせやすくなる。配布と確認の事務は増える。
 
 condition: `{ "param": "budget", "op": ">=", "value": 15 }` / ifUnmet: `disable`
 unmetText: 「政策余力が足りません（15 必要）」
@@ -831,7 +836,8 @@ next: goto `informal-crackdown-after`
 #### `informal-register` 「届出と表示を条件に、食品の非公式販売を認める」
 
 > 売り手に届出と表示を求め、そのうえで食品の取引は認める。
-> 買える人は増え、誰が売っているかも分かる。境界線を引き、維持する仕事が市に残る。
+> 誰が何を売っているか確認できる一方、届出に応じない売り手はこの制度では残れない。
+> 境界線を引き、維持する仕事も市に残る。
 
 condition: `{ "param": "budget", "op": ">=", "value": 20 }` / ifUnmet: `disable`
 unmetText: **「行政コストを負担できません（20 必要）」**
@@ -894,7 +900,8 @@ next: goto `informal-relax-after`
 | line id | 話者 | 台詞 |
 | --- | --- | --- |
 | `ica-01` | narrator | 一斉指導の翌週、公民館の駐車場は空になった。 |
-| `ica-02` | takahashi | 出所不明の商品と、偽の支給券が数件見つかりました。そこは成果です。 |
+| `ica-02` | takahashi | 出所を説明できない商品が数件見つかりました。そこは成果です。 |
+| `ica-02-ration` | takahashi | 偽造された整理券も数件見つかりました。 ※`{ "flag": "everRationing" }` |
 | `ica-03` | misaki | ……買えなくなりました。正規のお店には、やっぱり朝しかありません。 |
 | `ica-04` | misaki | 悪いことをしていた自覚は、正直ありません。ただ、無くなりました。 |
 | `ica-05` | narrator | 取引は消えた。需要は消えなかった。 |
@@ -913,7 +920,7 @@ next: goto `m6-router`
 | `irg-02` | takahashi | 食品を売る人には届け出てもらいました。何を、誰が売っているかは確認できます。 |
 | `irg-03` | misaki | 販売は続いています。仕事の帰りにも買えるので、前より助かる人は増えました。 |
 | `irg-04` | fujii | 食べ物の話と、それ以外の話を分けて決めた。その境界を保つ確認作業は、市に残ります。 |
-| `irg-05` | takahashi | 非公式だから無秩序、とは限りません。ただ、表示を確かめ続けなければ、この制度は保てません。 |
+| `irg-05` | takahashi | 表示を出した人の商品は、こちらでも追えます。ただ、確かめ続けなければ、この制度は保てません。 |
 
 next: goto `m6-router`
 
@@ -977,7 +984,7 @@ next:
 
 | line id | 話者 | 台詞 |
 | --- | --- | --- |
-| `m6c-01` | narrator | 六か月後。条例は生きている。値札も百六十円のままだ。 |
+| `m6c-01` | narrator | 六か月後。条例は生きている。値札も {{param.price}} 円のままだ。 ⚠ |
 | `m6c-02` | yamada | 週三日にしました。焼く日を減らせば、赤字の日も減るので。 |
 | `m6c-03` | misaki | 正規のお店で買えたのは、今月に入って一度です。 |
 | `m6c-04` | kuroda | この街への正規の便は、来月から半分にします。採算が合わないので。 |
@@ -1190,9 +1197,22 @@ choice自体にはeffectを置かず、選択時のactive flagを見て表示行
 - `priceCapActive`の場合（`d3-nothing-expire-price`）:
   `price` +28 / `supply` +14 / `informalMarket` −12 / `foodAccess` +2 /
   `marketRisk` −3 / `popularity` −12 / `budget` −3
+
+  | line id | 話者 | 台詞 |
+  | --- | --- | --- |
+  | `dne-price-01` | narrator | 期限の日、条例は更新されなかった。議場では別の議案が続いていた。 |
+  | `dne-price-02` | narrator | 翌朝、店頭の値札が書き換えられた。告示も、会見もなかった。 |
 - price capなしで`subsidyActive`または`rationingActive`の場合（`d3-nothing-expire-support`）:
   `price` +14 / `supply` +4 / `informalMarket` −7 / `foodAccess` −3 /
   `marketRisk` −2 / `popularity` −12 / `budget` −2
+
+  | line id | 話者 | 台詞 |
+  | --- | --- | --- |
+  | `dne-support-01` | narrator | 期限の日、補助と購入制限は更新されなかった。 |
+  | `dne-support-02` | narrator | 窓口の掲示が一枚はがされ、翌週には誰も並ばなくなった。 |
+
+> **自然失効は評価を書かない。** 起きたことだけを記す。
+> 「誰も説明しなかった決定」（`mc-05-active`）の帰結として、告示も会見もないことを描写に含める。
 - 終了対象なし（`d3-nothing-no-expiry`）:
   `popularity` −5 / `foodAccess` −2 / `informalMarket` +4 / `budget` −3
 
@@ -1212,7 +1232,7 @@ next: branch → `d3-nothing-*` → `d3-results`
 | --- | --- | --- | --- |
 | `dr-01` | narrator | 決定は三日後に告示された。 | — |
 | `dr-02` | yamada | 続くと分かれば、設備の更新もできます。……続くなら。 | `{ "flag": "permanentized" }` |
-| `dr-03` | misaki | 終わるんですね。……分かりました。準備します。 | `{ "flag": "justEnded" }` |
+| `dr-03` | misaki | 終わるんですね。……分かりました。準備します。 | `justEnded` かつ `not visited d3-nothing-expire-price` かつ `not visited d3-nothing-expire-support` |
 | `dr-04` | takahashi | 対象世帯の名簿を、毎年更新する仕事が増えました。 | `{ "flag": "targetedSupportActive" }` |
 | `dr-05` | misaki | 何も変わらないと聞きました。それが答えなんですね。 | `{ "not": { "any": [ { "flag": "permanentized" }, { "flag": "justEnded" }, { "flag": "targetedSupportActive" } ] } }` |
 | `dr-06` | fujii | 三か月後、また同じ机で報告します。 | — |
@@ -1233,6 +1253,7 @@ next: goto `m9-epilogue`
 | `ep-01` | narrator | それから三か月。市の朝は、以前と同じ音で始まる。 | — |
 | `ep-02` | narrator | 商店街のシャッターが上がる。上がらないシャッターも、二枚ある。 | — |
 | `ep-03` | misaki | 今日は買えました。 | `{ "param": "foodAccess", "op": ">=", "value": 60 }` |
+| `ep-03-mid` | misaki | 前よりは買えます。でも、仕事が遅くなった日は、売り切れていることもあります。 | `foodAccess >= 45` かつ `foodAccess < 60` |
 | `ep-04` | misaki | 今日も、買えませんでした。 | `{ "param": "foodAccess", "op": "<", "value": 45 }` |
 | `ep-05` | yamada | 窯には火を入れています。何年か先のことは、まだ考えられません。 | — |
 | `ep-06` | kuroda | 私は次の街へ行きます。ここはもう、普通の相場に戻ったので。 | `supply >= 85` かつ `not subsidyActive` |
@@ -1252,12 +1273,12 @@ next: `{ "type": "resolveEnding" }`
 | # | id | タイトル | rank | 条件 |
 | --- | --- | --- | --- | --- |
 | 1 | `the-city-pays` | 市が払います | `normal` | `budget <= 15` |
-| 2 | `policy-drift` | 政策迷走 | `bad` | `policyChanges >= 3` **かつ** `popularity <= 45` |
+| 2 | `policy-drift` | 予定の立たない街 | `bad` | `policyChanges >= 3` **かつ** `popularity <= 45` |
 | 3 | `two-markets` | 表の市場、裏の市場 | `normal` | `informalMarket >= 45` **かつ** `supply <= 60` |
 | 4 | `cheap-bread-empty-shelves` | 安いパン、空の棚 | `bad` | `priceCapActive` **かつ** `supply <= 50` |
 | 5 | `order-without-bread` | 秩序は戻った、棚は戻らない | `normal` | `everCrackdown` かつ `marketRisk <= 12` かつ `foodAccess <= 50` |
 | 6 | `for-those-who-need` | 必要な人へ | `good` | `targetedSupportActive` **かつ** `foodAccess >= 65` |
-| 7 | `price-called-bread` | 高値が呼んだパン | `good` | `supply >= 85` かつ `foodAccess >= 65` かつ `not priceCapActive` かつ `not rationingActive` かつ `everDeregulate` |
+| 7 | `price-called-bread` | 高値が呼んだパン | `good` | `supply >= 85` かつ `foodAccess >= 65` かつ `not priceCapActive` かつ `not rationingActive` かつ **`not subsidyActive`** かつ `everDeregulate` |
 | 8 | `mixed-ledger` | 混ざった帳簿 | `normal` | **条件なし（フォールバック）** |
 
 ### 到達検証（20代表経路をシミュレーションした結果の抜粋）
@@ -1269,7 +1290,7 @@ next: `{ "type": "resolveEnding" }`
 | A統制→維持→**摘発**→恒久化 | 55 | 44 | 20 | 160 | 34 | **29** | 12 | 0 | 安いパン、空の棚 |
 | A統制→限定支援→**摘発**→市場価格＋限定支援 | 55 | 29 | 40 | 180 | 16 | **48** | 7 | 1 | 秩序は戻った、棚は戻らない |
 | A統制→配給→黙認→恒久化 | 68 | 41 | 15 | 160 | 80 | **62** | 41 | 1 | 表の市場、裏の市場 |
-| A統制→配給→価格緩和→補助・購入制限終了 | 43 | 68 | 59 | 230 | 24 | 57 | 15 | **3** | 政策迷走 |
+| A統制→配給→価格緩和→補助・購入制限終了 | 43 | 68 | 59 | 230 | 24 | 57 | 15 | **3** | 予定の立たない街 |
 | A統制→緩和→情報公開 | 47 | 82 | 68 | 195 | 13 | 60 | 9 | 1 | 混ざった帳簿 |
 | B補助→補助増額→恒久化 | 64 | **0** | 96 | 175 | 8 | 79 | 12 | 0 | 市が払います |
 | B補助→維持→補助終了 | 40 | 27 | 92 | 215 | 0 | 72 | 7 | 1 | 混ざった帳簿 |
@@ -1281,7 +1302,7 @@ next: `{ "type": "resolveEnding" }`
 
 全経路の機械列挙結果は **114経路**。Ending別は `the-city-pays` 13 / `policy-drift` 1 /
 `two-markets` 26 / `cheap-bread-empty-shelves` 4 / `order-without-bread` 12 /
-`for-those-who-need` 26 / `price-called-bread` 7 / `mixed-ledger` 25。
+`for-those-who-need` 26 / `price-called-bread` 6 / `mixed-ledger` 26。
 全8 Endingへ到達でき、条件付きlineにdead codeはない。
 
 非公式市場イベント後に完走する経路と最終レンジは次のとおり。分布はバランス確認用であり、テストの固定値にはしない。
@@ -1300,8 +1321,9 @@ next: `{ "type": "resolveEnding" }`
 
 **全 8 エンディングが到達可能。** そして、
 
-- **完全勝利は存在しない。** 表中で最高の `foodAccess` 89 を出す経路は支持率 47。
-  支持率最高の 69 を出す経路は正規供給 15。`budget` 88 を残す経路は支持率 39。
+- **完全勝利は存在しない。** 最高の `foodAccess` 89 を出す経路は支持率 47。
+  支持率最高の 70 を出す経路は正規供給 46・`budget` 13。
+  `budget` 最大 90 を残す経路は支持率 33。`marketRisk` 最大 41 の経路は正規供給 15。
 - **同じ「価格統制」から、正反対の結末に分かれる。**（1行目と2行目）
 - **`informalMarket` が増えて `marketRisk` が下がる**届出制が成立する。
   規模と不確実性は同じ方向へしか動かない指標ではない。
@@ -1317,12 +1339,13 @@ next: `{ "type": "resolveEnding" }`
 | `tcp-02` | narrator | 市の口座には、ほとんど何も残っていなかった。 | — |
 | `tcp-03` | fujii | 来年度の予算編成を始めました。削る欄から埋めています。 | — |
 | `tcp-04` | fujii | 学校の防水、橋の点検、図書館の開館日。どれも、今日は困りません。 | — |
-| `tcp-05` | yamada | 補助が切れたら、その日から二百四十円に戻します。戻すしかありません。 | `{ "flag": "subsidyActive" }` |
+| `tcp-05` | yamada | 補助が切れたら、その日から二百四十円に戻します。戻すしかありません。 | `subsidyActive` かつ `not priceCapActive` |
+| `tcp-05-capped` | yamada | 補助が切れれば採算はまた悪くなります。値段を上げられないなら、焼く量を減らすしかありません。 | `subsidyActive` かつ `priceCapActive` |
 | `tcp-06` | narrator | 市は、危機を買い取った。支払いは、これから何年もかけて行われる。 | — |
 
 summary: 市は支払いを続けた。その成果の大小にかかわらず、費用はまだ来ていない年度から前借りされている。
 
-#### 2. `policy-drift` 「政策迷走」 rank: `bad`
+#### 2. `policy-drift` 「予定の立たない街」 rank: `bad`
 
 | line id | 話者 | 台詞 | condition |
 | --- | --- | --- | --- |
@@ -1380,7 +1403,8 @@ condition: `everCrackdown=true` かつ `marketRisk <= 12` かつ `foodAccess <= 
 | line id | 話者 | 台詞 |
 | --- | --- | --- |
 | `owb-01` | narrator | 非公式販売の折りたたみ机は、通りから消えた。 |
-| `owb-02` | takahashi | 偽の支給券と出所を説明できない商品は、目に見えて減りました。 |
+| `owb-02` | takahashi | 出所を説明できない商品は、目に見えて減りました。 |
+| `owb-02-ration` | takahashi | 偽造された整理券も、今は出回っていません。 ※`{ "flag": "everRationing" }` |
 | `owb-03` | narrator | 取引上の不確実性は大きく下がった。誰から何を買うのか分からない取引も減った。 |
 | `owb-04` | misaki | でも、買う場所そのものも減りました。正規のお店の棚は、まだ朝で空になります。 |
 | `owb-05` | yamada | 店へ戻ってきた分はあります。足りない分まで戻ったわけではありません。 |
@@ -1402,6 +1426,7 @@ summary: 取引上の不確実性は下がった。しかし食料を買える�
 | `ftn-04` | takahashi | 対象は千四百世帯。毎年、名簿を作り直します。 | — |
 | `ftn-05` | takahashi | 基準の一円外側にいる人からは、今年も電話が来ます。私はまだ、答えを持っていません。 | — |
 | `ftn-06` | yamada | 値段を決めるのはうちです。払えない人を支えるのは市です。……分かりやすくは、なりました。 | — |
+| `ftn-06-rationing` | narrator | 購入量の上限も残った。棚の前では、今も一人あたりの数を確認している。 | `{ "flag": "rationingActive" }` |
 | `ftn-07` | narrator | 誰も歓声を上げなかった。窓口だけが、これからも開き続ける。 | — |
 
 summary: 価格を市場に任せ、生活の保障は行政が引き受けた。線引きの負担と事務費は、毎年ここに残る。
@@ -1409,6 +1434,9 @@ summary: 価格を市場に任せ、生活の保障は行政が引き受けた�
 #### 7. `price-called-bread` 「高値が呼んだパン」 rank: `good`
 
 conditionには`everDeregulate=true`を含め、市外参入・流通緩和を一度も経験していない経路を除外する。
+あわせて`not subsidyActive`を含め、補助金が継続中のまま供給が戻った経路も除外する。
+このEndingは「高い価格シグナルが市外から荷を呼んだ」因果を語るため、
+市の補助で棚が保たれている状態を同じ因果として扱わない。
 
 | line id | 話者 | 台詞 | condition |
 | --- | --- | --- | --- |
@@ -1427,7 +1455,7 @@ summary: 価格の上昇が市外から供給を呼び戻し、棚は埋まっ�
 | line id | 話者 | 台詞 | condition |
 | --- | --- | --- | --- |
 | `ml-01` | narrator | 一年が過ぎた。都市は、はっきりした答えを出さなかった。 | — |
-| `ml-02` | narrator | いくつかの政策は効いた。いくつかは、効く前に終わった。 | — |
+| `ml-02` | narrator | いくつかの政策は効いた。いくつかは、別の代償を残した。 | — |
 | `ml-03` | misaki | 去年よりましです。おととしよりは、ずっと悪いです。 | — |
 | `ml-04` | yamada | 続いています。それ以上のことは、言えません。 | — |
 | `ml-05` | fujii | 記録には、こう書きます。「複数の措置を併用し、決定的な悪化は避けた」。 | — |
@@ -1444,11 +1472,27 @@ summary: 複数の政策の長所と短所が打ち消し合った。破綻は�
 
 | 表示要素 | データ源 | 備考 |
 | --- | --- | --- |
-| エンディング名・rank | `ending.title` / `ending.rank` | |
+| エンディング名 | `ending.title` | **`rank` は表示しない**（下記） |
 | 本文 | `ending.narrative`（＝表示された ending lines） | |
 | 一行総括 | `ending.summary` | |
 | 最終パラメータ | `view.params` | `policyChanges` は非表示設定のため出ない |
 | 選択履歴 | `state.choiceHistory` | 選んだ選択肢の `text` が並ぶ |
+
+### Ending rank をプレイヤーに見せない
+
+`rank`（`good` / `normal` / `bad`）は **内部 metadata として保持し、UI には一切出さない。**
+
+- `EndingView` の見出しは `ENDING` のみ。`ENDING · good` のような表示はしない。
+- CSS で `rank-good` を緑、`rank-bad` を赤にするなどの**色による評価表現も置かない**。
+  全 Ending を同一の中立スタイルで表示する。
+
+**理由** — §1 の「単一の正解を用意しない」と正面から衝突するため。
+プレイヤーが結末を読む前に作者の採点が見えてしまうと、
+「価格を下げることと、商品を豊富にすることは同じか」という問いが、
+「どうすれば good を取れるか」に置き換わる。
+
+`rank` はスキーマから削除しない。実績・統計・シナリオ検証など、
+**プレイヤーに見せない用途**では引き続き使う。
 
 ### プレイヤーに読み取ってほしい対比
 
@@ -1470,7 +1514,8 @@ Result 画面で `price` と `foodAccess` が並ぶことに意味がある。
 ### 実装方式（UI を変更しない前提）
 
 現行エンジンにはエンディング後の追加画面がない。そこで、
-**各エンディングの `lines` の末尾に、そのルートに関係する解説カードを 4 枚だけ `analyst` の台詞として追加する。**
+**各エンディングの `lines` の末尾に、そのルートに関係する解説カードを `analyst` の台詞として追加する。**
+原則 4 枚。ただし `two-markets` のみ 3 枚とする（理由は下記）。
 `EndingView` の `narrative` にそのまま並ぶため、UI 変更は不要。
 
 全 14 枚は以下に全文を書く。将来 Result 画面に解説パネルを作る場合は、ここから全文を流用する。
@@ -1523,18 +1568,24 @@ Result 画面で `price` と `foodAccess` が並ぶことに意味がある。
 > 中央で正しく決めるのが難しいのは、意欲や能力の問題ではなく、情報がそもそも散らばっているからです。
 
 **E10 非公式市場**
+
+`two-markets` / `cheap-bread-empty-shelves` 版：
 > 取引を禁じても、需要と供給そのものは消えません。
 > 買いたい人と売りたい人が残っていれば、取引は別の場所へ移ります。
 > 公民館の駐車場に人が集まったのは、そこにしか市場が残っていなかったからです。
+
+`order-without-bread` 版（**JSON が正本**。摘発ルート専用の末尾2行を持つ）：
+> 取引を禁じても、需要と供給そのものは消えません。
+> 買いたい人と売りたい人が残っていれば、取引は別の場所へ移るか、成立しなくなります。
+> 摘発で机が消えた後も、食料を必要とする人は残りました。
 
 **E11 非公式市場の秩序と保証**
 > 非公式市場は犯罪市場と同義ではなく、正規市場からこぼれた需要と供給を再接続することがあります。
 > 顔の見える地域では、繰り返す取引、評判、共同体からの排除が、一定の秩序を作ることもあります。
 > 一方で、通常の契約・返品・品質保証は弱くなりがちです。
-> 届出や表示は、市の費用と引き換えに、市場の規模を保ちながら取引上の不確実性だけを下げることがあります。
 
 **E12 「値段」と「手に入るか」は別の数字**
-> このゲームには、価格と `foodAccess` という二つの数字がありました。
+> このゲームには、価格と、食料入手のしやすさという二つの数字がありました。
 > 公定価格が最も低かった結末で、市民が最も食べられていたわけではありません。
 > 合法な価格、実際に払われた価格、実際に手に入ったかどうか。この三つは、いつも同じではありません。
 
@@ -1548,13 +1599,15 @@ Result 画面で `price` と `foodAccess` が並ぶことに意味がある。
 > 同時に、取引の場そのものを閉じれば、そこで食料を得ていた人の経路も消えます。
 > 安全性と入手しやすさは別の指標で、一方だけを改善する政策にも正当な理由と明確な代償があります。
 
-### エンディング別の解説カード割り当て（各4枚）
+### エンディング別の解説カード割り当て
+
+**`two-markets` のみ 3 枚。他の 7 エンディングは 4 枚。**
 
 | エンディング | 解説カード |
 | --- | --- |
 | `the-city-pays` | E05 補助金 / E08 機会費用 / E02 需要と供給 / E12 値段と入手 |
 | `policy-drift` | **E13 予測可能性** / E03 価格シグナル / E08 機会費用 / E12 値段と入手 |
-| `two-markets` | E04 価格上限 / **E10 非公式市場** / **E11 秩序と保証** / E12 値段と入手 |
+| `two-markets` | E04 価格上限 / **E11 秩序と保証** / E12 値段と入手 **（3枚）** |
 | `cheap-bread-empty-shelves` | E01 希少性 / E04 価格上限 / E10 非公式市場 / E12 値段と入手 |
 | `order-without-bread` | E10 非公式市場 / E11 秩序と保証 / **E14 取引安全とアクセス** / E12 値段と入手 |
 | `for-those-who-need` | E07 限定支援 / E03 価格シグナル / E08 機会費用 / E12 値段と入手 |
@@ -1562,6 +1615,12 @@ Result 画面で `price` と `foodAccess` が並ぶことに意味がある。
 | `mixed-ledger` | E02 需要と供給 / E08 機会費用 / E09 分散した知識 / E12 値段と入手 |
 
 **E12 はすべてのエンディングに入れる。** これが本作の問いそのものだからである。
+
+**`two-markets` だけ E10 を外して 3 枚にする。** このエンディングは `tm-09`
+「市場を禁じることと、取引そのものを消すことは、同じだろうか。」という問いで終わる。
+E10 の冒頭「取引を禁じても、需要と供給そのものは消えません。」がその問いへの直接の回答になり、
+プレイヤーが考える前に作者が答えてしまう。**問いを問いのまま残すため、ここでは解説を1枚減らす。**
+`cheap-bread-empty-shelves` と `order-without-bread` の E10 は残す（どちらも問いで終わらないため）。
 E10は`two-markets`と`cheap-bread-empty-shelves`では `visited informal-intro` のときだけ表示し、
 非公式市場イベント未経験者には見せない。`order-without-bread`は定義上必ず同イベントを経るため無条件で表示する。
 
@@ -1609,6 +1668,10 @@ H-8再設計ではフォーマットを変えず、シナリオデータだけ�
 7. **台詞 ID は全編で一意。** 将来の音声キーは `bread-price/<sceneId>/<lineId>`。
 
 8. **⚠ 印の行は `{{param.x}}` を含む。** 音声を付ける段階で `voiceText`（数値を含まない読み上げ文）が必要。
+   とくに `m6c-01`（「値札も {{param.price}} 円のままだ」）は、到達時の公定価格が
+   **140 / 160 / 165 円の3種類**に分かれるため事前生成できない。
+   音声を付ける際は `voiceText` に「値札も、あの日決めた額のままだ」のような
+   数値を含まない文面を別途用意すること。
    例: 表示「余力は {{param.budget}}。」/ 音声「余力は、お手元の数字のとおりです。」
 
 9. 実装後に `pnpm validate` と `pnpm test` を回す。
@@ -1734,7 +1797,7 @@ H8-5（`marketRisk`レンジ幅）とH8-6（摘発経路の`mixed-ledger`比率�
   **全指標で勝つ政策は存在しない。**
 - 価格統制ルートは、非公式市場の扱い次第で `foodAccess` 29にも57にもなる。
   **政策そのものではなく、その後の判断が結末を分ける。**
-- 摘発（`informal-crackdown`）には実際の成果（`marketRisk` −12、偽支給券の摘発）がある。
+- 摘発（`informal-crackdown`）には実際の成果（`marketRisk` −12、出所不明商品の摘発）がある。
   単なる悪手として設計していない。
 - 届出制では非公式市場を+8しながら`marketRisk`を−2する。
   **規模と不確実性は同じ方向にしか動かない指標ではない。**

@@ -166,6 +166,31 @@ function completedAfterChoice(choiceId: string): GameState[] {
   );
 }
 
+function endingStates(endingId: string): GameState[] {
+  return AUDIT.completed.filter(
+    (state) => state.cursor.phase === "ending" && state.cursor.endingId === endingId,
+  );
+}
+
+function visibleLineIds(state: GameState, lines: ConditionalLine[]): string[] {
+  return lines
+    .filter((line) => isVisible(state, line))
+    .map((line) => line.id)
+    .filter((id): id is string => Boolean(id));
+}
+
+function visibleSceneLineIds(state: GameState, sceneId: string): string[] {
+  const scene = breadPriceScenario.scenes.find(({ id }) => id === sceneId);
+  if (!scene) throw new Error(`scene ${sceneId} が見つかりません。`);
+  return visibleLineIds(state, scene.lines);
+}
+
+function visibleEndingLineIds(state: GameState, endingId: string): string[] {
+  const ending = breadPriceScenario.endings.find(({ id }) => id === endingId);
+  if (!ending) throw new Error(`ending ${endingId} が見つかりません。`);
+  return visibleLineIds(state, ending.lines);
+}
+
 function balanceReport() {
   const crackdownStates = completedAfterChoice("informal-crackdown");
   const crackdownMixedLedger = crackdownStates.filter(
@@ -389,7 +414,7 @@ describe("bread-price scenario semantic audit", () => {
     const e10Lines = breadPriceScenario.endings.flatMap((ending) =>
       ending.lines.filter(({ id }) => id?.endsWith("e10")),
     );
-    expect(e10Lines).toHaveLength(3);
+    expect(e10Lines).toHaveLength(2);
 
     for (const state of AUDIT.completed) {
       const endingId = state.cursor.phase === "ending" ? state.cursor.endingId : undefined;
@@ -535,5 +560,212 @@ describe("bread-price scenario semantic audit", () => {
     );
 
     expect([...AUDIT.conditionalLineIds].sort()).toEqual([...conditionalLineIds].sort());
+  });
+
+  test("偽造整理券の摘発成果は購入量制限を実施した経路だけで表示する", () => {
+    const states = AUDIT.sceneStates.get("informal-crackdown-after") ?? [];
+    expect(states.length).toBeGreaterThan(0);
+
+    for (const state of states) {
+      const visible = visibleSceneLineIds(state, "informal-crackdown-after");
+      expect(visible).toContain("ica-02");
+      expect(visible.includes("ica-02-ration")).toBe(state.flags.everRationing);
+    }
+
+    expect(states.some((state) => state.flags.everRationing)).toBe(true);
+    expect(states.some((state) => !state.flags.everRationing)).toBe(true);
+  });
+
+  test("order-without-breadの偽造整理券も購入量制限の履歴に一致する", () => {
+    const states = endingStates("order-without-bread");
+    expect(states.length).toBeGreaterThan(0);
+
+    for (const state of states) {
+      const visible = visibleEndingLineIds(state, "order-without-bread");
+      expect(visible).toContain("owb-02");
+      expect(visible.includes("owb-02-ration")).toBe(state.flags.everRationing);
+    }
+
+    expect(states.some((state) => state.flags.everRationing)).toBe(true);
+    expect(states.some((state) => !state.flags.everRationing)).toBe(true);
+  });
+
+  test("摘発成果の無条件本文は購入量制限に依存する用語を使わない", () => {
+    const lines = [
+      ...(breadPriceScenario.scenes.find(({ id }) => id === "informal-crackdown-after")?.lines ?? []),
+      ...(breadPriceScenario.endings.find(({ id }) => id === "order-without-bread")?.lines ?? []),
+    ];
+    const unconditional = lines.filter((line) => !line.condition);
+
+    expect(unconditional.length).toBeGreaterThan(0);
+    for (const line of unconditional) {
+      expect(line.text).not.toContain("整理券");
+      expect(line.text).not.toContain("支給券");
+    }
+  });
+
+  test("m6-capの値札は固定値ではなく到達時のpriceを表示する", () => {
+    const states = AUDIT.sceneStates.get("m6-cap") ?? [];
+    expect(states.length).toBeGreaterThan(0);
+
+    const observed = new Set<number>();
+    for (const state of states) {
+      const view = getView(breadPriceScenario, state);
+      if (!view.text.startsWith("六か月後。条例は生きている")) continue;
+      observed.add(state.parameters.price);
+      expect(view.text).toContain(`${state.parameters.price} 円`);
+      expect(view.text).not.toContain("百六十円");
+    }
+
+    expect(observed.size).toBeGreaterThan(1);
+  });
+
+  test("for-those-who-needは購入量制限が残る経路でだけ上限を説明する", () => {
+    const states = endingStates("for-those-who-need");
+    expect(states.length).toBeGreaterThan(0);
+
+    for (const state of states) {
+      const visible = visibleEndingLineIds(state, "for-those-who-need");
+      expect(visible.includes("ftn-06-rationing")).toBe(state.flags.rationingActive);
+    }
+
+    expect(states.some((state) => state.flags.rationingActive)).toBe(true);
+  });
+
+  test("the-city-paysの山田の台詞は価格上限の有無で排他的に切り替わる", () => {
+    const states = endingStates("the-city-pays");
+    expect(states.length).toBeGreaterThan(0);
+
+    for (const state of states) {
+      const visible = visibleEndingLineIds(state, "the-city-pays");
+      const shown = ["tcp-05", "tcp-05-capped"].filter((id) => visible.includes(id));
+      expect(shown).toHaveLength(state.flags.subsidyActive ? 1 : 0);
+      if (state.flags.subsidyActive) {
+        expect(shown[0]).toBe(state.flags.priceCapActive ? "tcp-05-capped" : "tcp-05");
+      }
+    }
+
+    expect(states.some((state) => state.flags.subsidyActive && state.flags.priceCapActive)).toBe(true);
+    expect(states.some((state) => state.flags.subsidyActive && !state.flags.priceCapActive)).toBe(true);
+  });
+
+  test("m9-epilogueの生活描写はfoodAccessの三帯からちょうど1本を表示する", () => {
+    const states = AUDIT.sceneStates.get("m9-epilogue") ?? [];
+    expect(states.length).toBeGreaterThan(0);
+
+    const bands = new Set<string>();
+    for (const state of states) {
+      const visible = visibleSceneLineIds(state, "m9-epilogue");
+      const shown = ["ep-03", "ep-03-mid", "ep-04"].filter((id) => visible.includes(id));
+      expect(shown).toHaveLength(1);
+      bands.add(shown[0]);
+    }
+
+    expect([...bands].sort()).toEqual(["ep-03", "ep-03-mid", "ep-04"]);
+  });
+
+  test("price-called-breadへは補助金継続中には到達しない", () => {
+    const states = endingStates("price-called-bread");
+    expect(states.length).toBeGreaterThan(0);
+
+    for (const state of states) {
+      expect(state.flags.subsidyActive).toBe(false);
+      expect(state.flags.everDeregulate).toBe(true);
+    }
+  });
+
+  test("two-marketsはtm-09の問いを解説で即答しない（E10を持たない）", () => {
+    const twoMarkets = breadPriceScenario.endings.find(({ id }) => id === "two-markets");
+    if (!twoMarkets) throw new Error("two-marketsが見つかりません。");
+    const cards = twoMarkets.lines
+      .filter((line) => line.speaker === "analyst")
+      .map((line) => line.id?.slice(-3).toUpperCase());
+
+    expect(cards).toEqual(["E04", "E11", "E12"]);
+    expect(twoMarkets.lines.at(-1)?.id).not.toBe("tm-09");
+    expect(twoMarkets.lines.some((line) => line.id === "tm-09")).toBe(true);
+  });
+
+  test("Economics解説に内部parameter idを露出しない", () => {
+    const analystLines = breadPriceScenario.endings.flatMap((ending) =>
+      ending.lines.filter((line) => line.speaker === "analyst"),
+    );
+    expect(analystLines.length).toBeGreaterThan(0);
+
+    for (const line of analystLines) {
+      for (const parameter of breadPriceScenario.parameters) {
+        expect(line.text).not.toContain(parameter.id);
+      }
+    }
+  });
+
+  test("endingタイトルに評価語を使わない", () => {
+    const titles = Object.fromEntries(breadPriceScenario.endings.map((ending) => [ending.id, ending.title]));
+    expect(titles["policy-drift"]).toBe("予定の立たない街");
+
+    for (const title of Object.values(titles)) {
+      for (const word of ["迷走", "失敗", "成功", "正解", "誤り"]) {
+        expect(title).not.toContain(word);
+      }
+    }
+  });
+
+  test("E11は届出制を最適解として後出し評価しない", () => {
+    const e11Lines = breadPriceScenario.endings.flatMap((ending) =>
+      ending.lines.filter(({ id }) => id?.endsWith("e11")),
+    );
+    expect(e11Lines).toHaveLength(2);
+
+    for (const line of e11Lines) {
+      expect(line.text).not.toContain("届出や表示は");
+      expect(line.text.split("\n")).toHaveLength(4);
+    }
+  });
+
+  test("自然失効ルートでは失効が描写され、決定を告げる台詞は出ない", () => {
+    const expiryScenes = ["d3-nothing-expire-price", "d3-nothing-expire-support"];
+    for (const sceneId of expiryScenes) {
+      const scene = breadPriceScenario.scenes.find(({ id }) => id === sceneId);
+      expect(scene?.lines.length).toBeGreaterThan(0);
+      expect(scene?.lines.every((line) => line.speaker === "narrator")).toBe(true);
+    }
+
+    const expired = AUDIT.completed.filter((state) =>
+      expiryScenes.some((sceneId) => state.visitedScenes.includes(sceneId)),
+    );
+    const deliberate = AUDIT.completed.filter(
+      (state) =>
+        state.flags.justEnded &&
+        !expiryScenes.some((sceneId) => state.visitedScenes.includes(sceneId)),
+    );
+    expect(expired.length).toBeGreaterThan(0);
+    expect(deliberate.length).toBeGreaterThan(0);
+
+    for (const state of expired) {
+      expect(visibleSceneLineIds(state, "d3-results")).not.toContain("dr-03");
+    }
+    for (const state of deliberate) {
+      expect(visibleSceneLineIds(state, "d3-results")).toContain("dr-03");
+    }
+  });
+
+  test("choice descriptionは結果を断定せず、代償を明示する", () => {
+    const findChoice = (sceneId: string, choiceId: string): Choice => {
+      const scene = breadPriceScenario.scenes.find(({ id }) => id === sceneId);
+      if (!scene || scene.next.type !== "choices") throw new Error(`${sceneId}のchoicesが見つかりません。`);
+      const choice = scene.next.choices.find(({ id }) => id === choiceId);
+      if (!choice) throw new Error(`choice ${choiceId} が見つかりません。`);
+      return choice;
+    };
+
+    const rationing = findChoice("decision-2", "d2-rationing");
+    expect(rationing.description).toContain("整理券");
+    expect(rationing.description).not.toContain("転売");
+
+    const deregulate = findChoice("decision-1", "d1-deregulate");
+    expect(deregulate.description).toContain("競争");
+
+    const register = findChoice("informal-decision", "informal-register");
+    expect(register.description).toContain("残れない");
   });
 });

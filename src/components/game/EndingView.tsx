@@ -10,8 +10,8 @@ interface EndingViewProps {
 
 export function EndingView({ ending, parameters, choices, onRestart }: EndingViewProps) {
   return (
-    <section className={`ending-view rank-${ending.rank ?? "normal"}`}>
-      <p className="eyebrow">ENDING · {ending.rank ?? "normal"}</p>
+    <section className="ending-view">
+      <p className="eyebrow">ENDING</p>
       <h1>{ending.title}</h1>
       {ending.narrative.map((line, index) => <p className="ending-narrative" key={index}>{line}</p>)}
       {ending.summary && <p className="ending-summary">{ending.summary}</p>}
