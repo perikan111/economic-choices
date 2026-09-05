@@ -1,6 +1,7 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
+import { breadPriceScenario } from "@/content/scenarios";
 
 const expressions = ["neutral", "relieved", "frustrated", "concern", "serious"] as const;
 
@@ -14,7 +15,15 @@ interface PortraitSpec {
 const PORTRAITS: PortraitSpec[] = [
   { characterId: "misaki", label: "佐藤美咲", width: 384, height: 1040 },
   { characterId: "yamada", label: "山田浩一", width: 1024, height: 1536 },
+  { characterId: "kuroda", label: "黒田誠", width: 360, height: 1008 },
+  { characterId: "takahashi", label: "高橋玲奈", width: 320, height: 976 },
+  { characterId: "fujii", label: "藤井慎一", width: 1024, height: 1568 },
 ];
+
+// .character-portrait-slot の最小カラム幅 360px / 最大スロット高 540px。
+// 縦横比がこれを超えるとカラム幅が足りず、そのキャラだけ高さが頭打ちになる。
+const MAX_SLOT_HEIGHT = 540;
+const MIN_COLUMN_WIDTH = 360;
 
 function readPortrait(characterId: string, expression: string): Buffer {
   return readFileSync(
@@ -54,6 +63,39 @@ describe("キャラクター間の立ち絵スケール", () => {
     for (const ratio of ratios) {
       expect(ratio).toBeGreaterThan(0);
       expect(ratio).toBeLessThan(1);
+    }
+  });
+
+  test("最大スロット高でもカラム幅に収まり高さが頭打ちにならない", () => {
+    for (const { characterId, width, height } of PORTRAITS) {
+      const requiredWidth = MAX_SLOT_HEIGHT * (width / height);
+      expect(`${characterId}:${requiredWidth <= MIN_COLUMN_WIDTH}`).toBe(`${characterId}:true`);
+    }
+  });
+});
+
+describe("シナリオが宣言する立ち絵アセット", () => {
+  const withPortraits = breadPriceScenario.characters.filter(({ expressions }) => expressions);
+
+  test("立ち絵を持つ5人が寸法表に登録されている", () => {
+    expect(withPortraits.map(({ id }) => id).sort())
+      .toEqual(PORTRAITS.map(({ characterId }) => characterId).sort());
+  });
+
+  test("宣言された全expressionの画像ファイルがpublic配下に実在する", () => {
+    const missing = withPortraits.flatMap((character) =>
+      Object.values(character.expressions ?? {})
+        .filter((logicalPath) => !existsSync(resolve(process.cwd(), "public/images", logicalPath))),
+    );
+
+    expect(missing).toEqual([]);
+  });
+
+  test("defaultExpressionとportraitが同じ画像を指す", () => {
+    for (const character of withPortraits) {
+      const expressions = character.expressions ?? {};
+      expect(Object.keys(expressions)).toContain(character.defaultExpression);
+      expect(character.portrait).toBe(expressions[character.defaultExpression ?? ""]);
     }
   });
 });

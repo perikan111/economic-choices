@@ -54,19 +54,46 @@
       "id": "kuroda",
       "name": "黒田 誠",
       "role": "食品卸",
-      "color": "#9b8ec4"
+      "color": "#9b8ec4",
+      "portrait": "bread-price/characters/kuroda/kuroda_neutral.png",
+      "defaultExpression": "neutral",
+      "expressions": {
+        "neutral": "bread-price/characters/kuroda/kuroda_neutral.png",
+        "concern": "bread-price/characters/kuroda/kuroda_concern.png",
+        "frustrated": "bread-price/characters/kuroda/kuroda_frustrated.png",
+        "relieved": "bread-price/characters/kuroda/kuroda_relieved.png",
+        "serious": "bread-price/characters/kuroda/kuroda_serious.png"
+      }
     },
     {
       "id": "takahashi",
       "name": "高橋 玲奈",
       "role": "市・福祉担当",
-      "color": "#7ec9a5"
+      "color": "#7ec9a5",
+      "portrait": "bread-price/characters/takahashi/takahashi_neutral.png",
+      "defaultExpression": "neutral",
+      "expressions": {
+        "neutral": "bread-price/characters/takahashi/takahashi_neutral.png",
+        "concern": "bread-price/characters/takahashi/takahashi_concern.png",
+        "frustrated": "bread-price/characters/takahashi/takahashi_frustrated.png",
+        "relieved": "bread-price/characters/takahashi/takahashi_relieved.png",
+        "serious": "bread-price/characters/takahashi/takahashi_serious.png"
+      }
     },
     {
       "id": "fujii",
       "name": "藤井 慎一",
       "role": "市・財政担当",
-      "color": "#e08a7a"
+      "color": "#e08a7a",
+      "portrait": "bread-price/characters/fujii/fujii_neutral.png",
+      "defaultExpression": "neutral",
+      "expressions": {
+        "neutral": "bread-price/characters/fujii/fujii_neutral.png",
+        "concern": "bread-price/characters/fujii/fujii_concern.png",
+        "frustrated": "bread-price/characters/fujii/fujii_frustrated.png",
+        "relieved": "bread-price/characters/fujii/fujii_relieved.png",
+        "serious": "bread-price/characters/fujii/fujii_serious.png"
+      }
     },
     {
       "id": "analyst",
@@ -325,36 +352,43 @@
         {
           "id": "po-02",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "市の政策余力は {{param.budget}}。今年度、自由に動かせる分です。"
         },
         {
           "id": "po-03",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "先に申し上げます。何をするにも、この数字から引かれます。"
         },
         {
           "id": "po-04",
           "speaker": "takahashi",
+          "expression": "concern",
           "text": "就学援助と生活相談の窓口が、先月から混んでいます。"
         },
         {
           "id": "po-05",
           "speaker": "takahashi",
+          "expression": "neutral",
           "text": "全員が同じように困っているわけではありません。困り方に差があります。"
         },
         {
           "id": "po-06",
           "speaker": "kuroda",
+          "expression": "neutral",
           "text": "市外の卸です。呼ばれたので来ました。"
         },
         {
           "id": "po-07",
           "speaker": "kuroda",
+          "expression": "serious",
           "text": "言っておきますが、私はこの街のために運ぶわけじゃない。採算が合えば運びます。"
         },
         {
           "id": "po-08",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "支持率は {{param.popularity}}。三か月後の議会までに、何かは決めないと。"
         },
         {
@@ -375,11 +409,13 @@
         {
           "id": "d1-01",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "四つ、案があります。"
         },
         {
           "id": "d1-02",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "どれも筋は通っています。通らないのは、代償のほうです。"
         }
       ],
@@ -615,6 +651,7 @@
         {
           "id": "c1-05",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "支持率が {{param.popularity}} まで上がりました。歓迎されています、今は。"
         }
       ],
@@ -646,11 +683,13 @@
         {
           "id": "s1-04",
           "speaker": "fujii",
+          "expression": "concern",
           "text": "残りの余力は {{param.budget}}。申し上げたとおり、確実に減りました。"
         },
         {
           "id": "s1-05",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "それと、これは毎月です。一度きりの支出ではありません。"
         }
       ],
@@ -671,6 +710,7 @@
         {
           "id": "g1-02",
           "speaker": "kuroda",
+          "expression": "relieved",
           "text": "手続きが減ったので、来週から週二便に増やします。採算が合うので。"
         },
         {
@@ -688,6 +728,7 @@
         {
           "id": "g1-05",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "商店会から抗議文が届いています。支持率は {{param.popularity}} です。"
         }
       ],
@@ -708,6 +749,7 @@
         {
           "id": "t1-02",
           "speaker": "takahashi",
+          "expression": "concern",
           "text": "千二百世帯に通知を出しました。申請してくれたのは、まだ七割です。"
         },
         {
@@ -725,6 +767,7 @@
         {
           "id": "t1-05",
           "speaker": "fujii",
+          "expression": "concern",
           "text": "余力は {{param.budget}} まで下がりました。価格は二百四十円のままです。"
         }
       ],
@@ -806,6 +849,7 @@
         {
           "id": "w3c-07",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "正規の供給は {{param.supply}}。届け出のない取引の話が、こちらにも入っています。"
         }
       ],
@@ -859,11 +903,13 @@
         {
           "id": "w3s-03",
           "speaker": "kuroda",
+          "expression": "neutral",
           "text": "補助が出ると聞いて、うちも卸値を少し上げさせてもらいました。"
         },
         {
           "id": "w3s-04",
           "speaker": "kuroda",
+          "expression": "serious",
           "text": "悪く思わないでください。市が払うと決まった以上、そこに合わせるのが商売です。"
         },
         {
@@ -875,11 +921,13 @@
         {
           "id": "w3s-06",
           "speaker": "fujii",
+          "expression": "concern",
           "text": "補助の実績が積み上がっています。余力は {{param.budget}}。"
         },
         {
           "id": "w3s-07",
           "speaker": "fujii",
+          "expression": "concern",
           "text": "来年度の道路と学校の修繕を、どこかで削る話になります。"
         }
       ],
@@ -927,6 +975,7 @@
         {
           "id": "w3g-02",
           "speaker": "kuroda",
+          "expression": "relieved",
           "text": "週二便が四便になりました。他社も入ってきています。"
         },
         {
@@ -955,6 +1004,7 @@
         {
           "id": "w3g-07",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "支持率は {{param.popularity}}。商店会は、もう次の選挙の話をしています。"
         }
       ],
@@ -1002,11 +1052,13 @@
         {
           "id": "w3t-02",
           "speaker": "takahashi",
+          "expression": "relieved",
           "text": "支給は届いています。対象世帯の欠食の相談は、はっきり減りました。"
         },
         {
           "id": "w3t-03",
           "speaker": "takahashi",
+          "expression": "concern",
           "text": "問題は、対象の外側です。基準を一万円超えただけの世帯から、毎日電話が来ます。"
         },
         {
@@ -1023,6 +1075,7 @@
         {
           "id": "w3t-06",
           "speaker": "fujii",
+          "expression": "concern",
           "text": "審査と支給の事務費が、想定より膨らんでいます。余力は {{param.budget}}。"
         },
         {
@@ -1049,21 +1102,25 @@
         {
           "id": "wc-02",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "現状です。価格 {{param.price}} 円、正規の供給 {{param.supply}}、余力 {{param.budget}}。"
         },
         {
           "id": "wc-03",
           "speaker": "takahashi",
+          "expression": "neutral",
           "text": "それと、市民が実際に食べ物を手に入れられている度合い。今は {{param.foodAccess}} 程度と見ています。"
         },
         {
           "id": "wc-04",
           "speaker": "takahashi",
+          "expression": "serious",
           "text": "値段と、買えるかどうかは、別の数字です。ここを一緒にすると判断を誤ります。"
         },
         {
           "id": "wc-05",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "次の一手を決めましょう。前回と違う方向でも構いません。"
         }
       ],
@@ -1079,16 +1136,19 @@
         {
           "id": "d2-01",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "方向を変えるなら、変える理由を説明できるようにしてください。"
         },
         {
           "id": "d2-02",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "制度が三か月ごとに変わる街では、誰も来年の計画を立てられません。"
         },
         {
           "id": "d2-03",
           "speaker": "takahashi",
+          "expression": "serious",
           "text": "それでも、間違いを認めないよりはましです。"
         }
       ],
@@ -1491,6 +1551,7 @@
         {
           "id": "rc-06",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "正規の供給は {{param.supply}}。非公式の取引規模は {{param.informalMarket}} と見ています。"
         }
       ],
@@ -1549,6 +1610,7 @@
         {
           "id": "ro-02",
           "speaker": "kuroda",
+          "expression": "serious",
           "text": "値段が付いていれば、荷は動きます。付かなければ止まります。単純な話です。"
         },
         {
@@ -1570,6 +1632,7 @@
         {
           "id": "ro-05",
           "speaker": "takahashi",
+          "expression": "relieved",
           "text": "支給の対象世帯からは、苦情がほとんど来なくなりました。",
           "condition": {
             "flag": "targetedSupportActive"
@@ -1578,6 +1641,7 @@
         {
           "id": "ro-06",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "正規の供給は {{param.supply}}、価格は {{param.price}} 円です。"
         }
       ],
@@ -1631,21 +1695,25 @@
         {
           "id": "ii-05",
           "speaker": "kuroda",
+          "expression": "concern",
           "text": "私の荷も、一部はそちらへ流れています。買う人がいるので。"
         },
         {
           "id": "ii-06",
           "speaker": "takahashi",
+          "expression": "concern",
           "text": "食品衛生の担当が困っています。誰が売っているのか、把握できていません。"
         },
         {
           "id": "ii-07",
           "speaker": "takahashi",
+          "expression": "concern",
           "text": "それと、同じ場所で食品以外のものも売られ始めています。出所の説明がつかない物です。"
         },
         {
           "id": "ii-08",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "食べ物の話と、それ以外の話を、同じ紙に書かないでください。分けて決めましょう。"
         }
       ],
@@ -1661,11 +1729,13 @@
         {
           "id": "id-01",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "非公式の取引を、市としてどう扱いますか。"
         },
         {
           "id": "id-02",
           "speaker": "takahashi",
+          "expression": "frustrated",
           "text": "どれを選んでも、誰かの今日の食事に影響します。"
         }
       ],
@@ -1921,11 +1991,13 @@
         {
           "id": "ica-02",
           "speaker": "takahashi",
+          "expression": "serious",
           "text": "出所を説明できない商品が数件見つかりました。そこは成果です。"
         },
         {
           "id": "ica-02-ration",
           "speaker": "takahashi",
+          "expression": "serious",
           "text": "偽造された整理券も数件見つかりました。",
           "condition": {
             "flag": "everRationing"
@@ -1966,6 +2038,7 @@
         {
           "id": "irg-02",
           "speaker": "takahashi",
+          "expression": "serious",
           "text": "食品を売る人には届け出てもらいました。何を、誰が売っているかは確認できます。"
         },
         {
@@ -1977,11 +2050,13 @@
         {
           "id": "irg-04",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "食べ物の話と、それ以外の話を分けて決めた。その境界を保つ確認作業は、市に残ります。"
         },
         {
           "id": "irg-05",
           "speaker": "takahashi",
+          "expression": "serious",
           "text": "表示を出した人の商品は、こちらでも追えます。ただ、確かめ続けなければ、この制度は保てません。"
         }
       ],
@@ -2002,6 +2077,7 @@
         {
           "id": "ita-02",
           "speaker": "takahashi",
+          "expression": "neutral",
           "text": "売り手の届け出も、商品の表示も義務にはしていません。現場へ注意書きを渡しただけです。"
         },
         {
@@ -2013,11 +2089,13 @@
         {
           "id": "ita-04",
           "speaker": "takahashi",
+          "expression": "concern",
           "text": "ただ、同じ場所で売られている食品以外の商品については、市は何も保証できません。"
         },
         {
           "id": "ita-05",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "線を引かなかった分、取引は早く広がりました。市が確認できない範囲も、同じ速さで広がっています。"
         }
       ],
@@ -2055,6 +2133,7 @@
         {
           "id": "ira-05",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "支持率は {{param.popularity}}。説明を求める陳情が、四十七件来ています。"
         }
       ],
@@ -2159,11 +2238,13 @@
         {
           "id": "m6c-04",
           "speaker": "kuroda",
+          "expression": "serious",
           "text": "この街への正規の便は、来月から半分にします。採算が合わないので。"
         },
         {
           "id": "m6c-05",
           "speaker": "fujii",
+          "expression": "concern",
           "text": "正規の供給 {{param.supply}}、非公式の規模 {{param.informalMarket}}。差が開いています。"
         }
       ],
@@ -2217,16 +2298,19 @@
         {
           "id": "m6s-03",
           "speaker": "kuroda",
+          "expression": "concern",
           "text": "補助を見込んだ卸値になっています。市が止めれば、そこも戻ります。"
         },
         {
           "id": "m6s-04",
           "speaker": "fujii",
+          "expression": "concern",
           "text": "余力は {{param.budget}}。学校の屋上防水を、来年度に送りました。"
         },
         {
           "id": "m6s-05",
           "speaker": "takahashi",
+          "expression": "concern",
           "text": "補助は全員に届きます。困っていない家にも、同じだけ届いています。"
         }
       ],
@@ -2274,6 +2358,7 @@
         {
           "id": "m6m-02",
           "speaker": "kuroda",
+          "expression": "relieved",
           "text": "もう特別なことはしていません。普通の商売です。"
         },
         {
@@ -2291,6 +2376,7 @@
         {
           "id": "m6m-05",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "支持率は {{param.popularity}}。危機が終わると、誰も理由を覚えていません。"
         }
       ],
@@ -2387,11 +2473,13 @@
         {
           "id": "m6n-04",
           "speaker": "takahashi",
+          "expression": "neutral",
           "text": "窓口の相談件数は、危機前の一・四倍で止まっています。"
         },
         {
           "id": "m6n-05",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "価格 {{param.price}} 円、供給 {{param.supply}}、余力 {{param.budget}}。"
         }
       ],
@@ -2425,6 +2513,7 @@
         {
           "id": "mc-02-active",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "現在の臨時措置は、三か月後に期限を迎えます。",
           "condition": {
             "any": [
@@ -2443,6 +2532,7 @@
         {
           "id": "mc-03-active",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "延ばすなら議会の議決が要ります。止めるなら、止める説明が要ります。",
           "condition": {
             "any": [
@@ -2461,6 +2551,7 @@
         {
           "id": "mc-04-active",
           "speaker": "takahashi",
+          "expression": "serious",
           "text": "決めない、という選択もあります。期限が来れば、勝手に終わります。",
           "condition": {
             "any": [
@@ -2479,6 +2570,7 @@
         {
           "id": "mc-05-active",
           "speaker": "fujii",
+          "expression": "frustrated",
           "text": "それも決定です。ただ、誰も説明しなかった決定になります。",
           "condition": {
             "any": [
@@ -2517,6 +2609,7 @@
         {
           "id": "mc-02-open",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "今年度の緊急対応枠は、来月で締めます。新しく始めるなら、今です。",
           "condition": {
             "not": {
@@ -2537,6 +2630,7 @@
         {
           "id": "mc-03-open",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "制度を始めるなら予算が要ります。始めないなら、その理由を残す必要があります。",
           "condition": {
             "not": {
@@ -2557,6 +2651,7 @@
         {
           "id": "mc-04-open",
           "speaker": "takahashi",
+          "expression": "serious",
           "text": "新しい措置を始めない、という選択もあります。今の暮らしを見続けることは必要です。",
           "condition": {
             "not": {
@@ -2577,6 +2672,7 @@
         {
           "id": "mc-05-open",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "それも決定です。何を始めなかったかまで、記録に残します。",
           "condition": {
             "not": {
@@ -2625,6 +2721,7 @@
         {
           "id": "d3-02-active",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "現在の緊急措置を、どうしますか。",
           "condition": {
             "any": [
@@ -2643,6 +2740,7 @@
         {
           "id": "d3-03-active",
           "speaker": "takahashi",
+          "expression": "concern",
           "text": "今の暮らしが、この措置の上に載っている人がいます。そこだけは忘れないでください。",
           "condition": {
             "any": [
@@ -2681,6 +2779,7 @@
         {
           "id": "d3-02-open",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "緊急措置のない今、次に何を続け、何を始めますか。",
           "condition": {
             "not": {
@@ -2701,6 +2800,7 @@
         {
           "id": "d3-03-open",
           "speaker": "takahashi",
+          "expression": "serious",
           "text": "新しく始める支援にも、始めずに見守ることにも、暮らしへの責任があります。",
           "condition": {
             "not": {
@@ -3507,6 +3607,7 @@
         {
           "id": "dr-04",
           "speaker": "takahashi",
+          "expression": "frustrated",
           "text": "対象世帯の名簿を、毎年更新する仕事が増えました。",
           "condition": {
             "flag": "targetedSupportActive"
@@ -3536,6 +3637,7 @@
         {
           "id": "dr-06",
           "speaker": "fujii",
+          "expression": "neutral",
           "text": "三か月後、また同じ机で報告します。"
         }
       ],
@@ -3609,6 +3711,7 @@
         {
           "id": "ep-06",
           "speaker": "kuroda",
+          "expression": "neutral",
           "text": "私は次の街へ行きます。ここはもう、普通の相場に戻ったので。",
           "condition": {
             "all": [
@@ -3628,6 +3731,7 @@
         {
           "id": "ep-06-subsidy",
           "speaker": "kuroda",
+          "expression": "concern",
           "text": "補助が続くうちは、うちも運びます。それだけです。",
           "condition": {
             "all": [
@@ -3645,11 +3749,13 @@
         {
           "id": "ep-07",
           "speaker": "takahashi",
+          "expression": "neutral",
           "text": "窓口は、まだ開いています。"
         },
         {
           "id": "ep-08",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "記録は残します。次にこの机に座る人のために。"
         }
       ],
@@ -3697,11 +3803,13 @@
         {
           "id": "tcp-03",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "来年度の予算編成を始めました。削る欄から埋めています。"
         },
         {
           "id": "tcp-04",
           "speaker": "fujii",
+          "expression": "concern",
           "text": "学校の防水、橋の点検、図書館の開館日。どれも、今日は困りません。"
         },
         {
@@ -3799,6 +3907,7 @@
         {
           "id": "pd-03",
           "speaker": "kuroda",
+          "expression": "serious",
           "text": "この街は、今は避けています。契約が読めない街には、荷を置きにくいので。"
         },
         {
@@ -3903,6 +4012,7 @@
         {
           "id": "tm-06",
           "speaker": "takahashi",
+          "expression": "concern",
           "text": "同じ場所で、食品以外のものも動き始めています。そちらは、市が何も保証できません。",
           "condition": {
             "flag": "illicitGoodsAppeared"
@@ -3911,6 +4021,7 @@
         {
           "id": "tm-07-ordered",
           "speaker": "takahashi",
+          "expression": "neutral",
           "text": "売り手の顔と常連のつながりは見えています。悪い商品を売れば次から相手にされない。繰り返す取引と評判が、保証の代わりになっています。",
           "condition": {
             "param": "marketRisk",
@@ -4093,11 +4204,13 @@
         {
           "id": "owb-02",
           "speaker": "takahashi",
+          "expression": "relieved",
           "text": "出所を説明できない商品は、目に見えて減りました。"
         },
         {
           "id": "owb-02-ration",
           "speaker": "takahashi",
+          "expression": "relieved",
           "text": "偽造された整理券も、今は出回っていません。",
           "condition": {
             "flag": "everRationing"
@@ -4123,6 +4236,7 @@
         {
           "id": "owb-06",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "法律を守らせることと、商品を手に入るようにすることは、同じ仕事ではありませんでした。"
         },
         {
@@ -4189,11 +4303,13 @@
         {
           "id": "ftn-04",
           "speaker": "takahashi",
+          "expression": "neutral",
           "text": "対象は千四百世帯。毎年、名簿を作り直します。"
         },
         {
           "id": "ftn-05",
           "speaker": "takahashi",
+          "expression": "concern",
           "text": "基準の一円外側にいる人からは、今年も電話が来ます。私はまだ、答えを持っていません。"
         },
         {
@@ -4288,6 +4404,7 @@
         {
           "id": "pcb-03",
           "speaker": "kuroda",
+          "expression": "serious",
           "text": "高かったから運びました。それだけです。感謝はいりません。"
         },
         {
@@ -4366,11 +4483,13 @@
         {
           "id": "ml-05",
           "speaker": "fujii",
+          "expression": "relieved",
           "text": "記録には、こう書きます。「複数の措置を併用し、決定的な悪化は避けた」。"
         },
         {
           "id": "ml-06",
           "speaker": "fujii",
+          "expression": "serious",
           "text": "決定的な改善も、避けました。"
         },
         {

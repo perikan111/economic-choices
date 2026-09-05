@@ -794,4 +794,78 @@ describe("bread-price scenario semantic audit", () => {
       expect(Object.keys(expressions)).toContain(expression);
     }
   });
+
+  test("黒田のexpression付きlineがscene・endingの双方で立ち絵へ解決される", () => {
+    const kuroda = breadPriceScenario.characters.find(({ id }) => id === "kuroda");
+    const expressions = kuroda?.expressions;
+    if (!expressions) throw new Error("kurodaのexpressionsが未定義です。");
+
+    const collect = (state: GameState, seen: Set<string>): void => {
+      const view = getView(breadPriceScenario, state);
+      const portrait = view.speaker?.id === "kuroda" ? view.speaker.portrait : undefined;
+      if (!portrait) return;
+
+      const expression = portrait.expression ?? "";
+      expect(portrait.imageId).toBe(`kuroda.${expression}`);
+      expect(portrait.logicalPath).toBe(expressions[expression]);
+      expect(portrait.logicalPath.startsWith("bread-price/characters/kuroda/")).toBe(true);
+      seen.add(expression);
+    };
+
+    const inScenes = new Set<string>();
+    for (const states of AUDIT.sceneStates.values()) {
+      for (const state of states) collect(state, inScenes);
+    }
+
+    // 黒田はendingにも登場する（policy-drift / price-called-bread）。
+    const inEndings = new Set<string>();
+    for (const completed of AUDIT.completed) {
+      let state = completed;
+      for (let step = 0; step < 60 && state.cursor.phase === "ending" && !state.finished; step += 1) {
+        collect(state, inEndings);
+        state = advance(breadPriceScenario, state);
+      }
+    }
+
+    expect(inScenes).toEqual(new Set(["neutral", "concern", "relieved", "serious"]));
+    expect(inEndings).toEqual(new Set(["serious"]));
+    for (const expression of [...inScenes, ...inEndings]) {
+      expect(Object.keys(expressions)).toContain(expression);
+    }
+  });
+
+  test.each([
+    { characterId: "takahashi", label: "高橋玲奈" },
+    { characterId: "fujii", label: "藤井慎一" },
+  ])("$labelのexpression付きlineが5表情ともGameViewへ解決される", ({ characterId }) => {
+    const character = breadPriceScenario.characters.find(({ id }) => id === characterId);
+    const expressions = character?.expressions;
+    if (!expressions) throw new Error(`${characterId}のexpressionsが未定義です。`);
+
+    const seen = new Set<string>();
+    const collect = (state: GameState): void => {
+      const view = getView(breadPriceScenario, state);
+      const portrait = view.speaker?.id === characterId ? view.speaker.portrait : undefined;
+      if (!portrait) return;
+
+      const expression = portrait.expression ?? "";
+      expect(portrait.imageId).toBe(`${characterId}.${expression}`);
+      expect(portrait.logicalPath).toBe(expressions[expression]);
+      expect(portrait.logicalPath.startsWith(`bread-price/characters/${characterId}/`)).toBe(true);
+      seen.add(expression);
+    };
+
+    for (const states of AUDIT.sceneStates.values()) {
+      for (const state of states) collect(state);
+    }
+    for (const completed of AUDIT.completed) {
+      let state = completed;
+      for (let step = 0; step < 80 && state.cursor.phase === "ending" && !state.finished; step += 1) {
+        collect(state);
+        state = advance(breadPriceScenario, state);
+      }
+    }
+
+    expect(seen).toEqual(new Set(["neutral", "concern", "frustrated", "relieved", "serious"]));
+  });
 });

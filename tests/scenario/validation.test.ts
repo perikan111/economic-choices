@@ -143,6 +143,130 @@ describe("scenario validation", () => {
     expect(frustrated.length).toBeLessThanOrEqual(3);
   });
 
+  test("黒田誠のデフォルトと5表情を論理パスで定義する", () => {
+    const kuroda = breadPriceScenario.characters.find(({ id }) => id === "kuroda");
+    expect(kuroda).toMatchObject({
+      portrait: "bread-price/characters/kuroda/kuroda_neutral.png",
+      defaultExpression: "neutral",
+      expressions: {
+        neutral: "bread-price/characters/kuroda/kuroda_neutral.png",
+        concern: "bread-price/characters/kuroda/kuroda_concern.png",
+        frustrated: "bread-price/characters/kuroda/kuroda_frustrated.png",
+        relieved: "bread-price/characters/kuroda/kuroda_relieved.png",
+        serious: "bread-price/characters/kuroda/kuroda_serious.png",
+      },
+    });
+
+    const lines = [
+      ...breadPriceScenario.scenes.flatMap((scene) => scene.lines),
+      ...breadPriceScenario.endings.flatMap((ending) => ending.lines),
+    ].filter((line) => line.speaker === "kuroda");
+
+    expect(lines).toHaveLength(15);
+    expect(lines.every((line) => line.expression !== undefined)).toBe(true);
+
+    // 黒田は感情を大きく表に出さないため neutral / serious 中心で運用する。
+    const counts = lines.reduce<Record<string, number>>((total, line) => {
+      const expression = line.expression ?? kuroda?.defaultExpression ?? "";
+      return { ...total, [expression]: (total[expression] ?? 0) + 1 };
+    }, {});
+    expect(counts).toEqual({ neutral: 3, serious: 6, relieved: 3, concern: 3 });
+    expect((counts.neutral ?? 0) + (counts.serious ?? 0)).toBeGreaterThan(lines.length / 2);
+
+    // 黒田には強い苛立ちを示す台詞がないため frustrated は予備表情として温存する。
+    expect(counts.frustrated ?? 0).toBeLessThanOrEqual(1);
+  });
+
+  test("高橋玲奈のデフォルトと5表情を論理パスで定義する", () => {
+    const takahashi = breadPriceScenario.characters.find(({ id }) => id === "takahashi");
+    expect(takahashi).toMatchObject({
+      portrait: "bread-price/characters/takahashi/takahashi_neutral.png",
+      defaultExpression: "neutral",
+      expressions: {
+        neutral: "bread-price/characters/takahashi/takahashi_neutral.png",
+        concern: "bread-price/characters/takahashi/takahashi_concern.png",
+        frustrated: "bread-price/characters/takahashi/takahashi_frustrated.png",
+        relieved: "bread-price/characters/takahashi/takahashi_relieved.png",
+        serious: "bread-price/characters/takahashi/takahashi_serious.png",
+      },
+    });
+
+    const lines = [
+      ...breadPriceScenario.scenes.flatMap((scene) => scene.lines),
+      ...breadPriceScenario.endings.flatMap((ending) => ending.lines),
+    ].filter((line) => line.speaker === "takahashi");
+
+    expect(lines).toHaveLength(32);
+    expect(lines.every((line) => line.expression !== undefined)).toBe(true);
+
+    // 高橋は neutral / concern / serious 中心で運用する。
+    const counts = lines.reduce<Record<string, number>>((total, line) => {
+      const expression = line.expression ?? takahashi?.defaultExpression ?? "";
+      return { ...total, [expression]: (total[expression] ?? 0) + 1 };
+    }, {});
+    expect(counts).toEqual({ neutral: 7, concern: 10, serious: 9, relieved: 4, frustrated: 2 });
+    expect((counts.neutral ?? 0) + (counts.concern ?? 0) + (counts.serious ?? 0))
+      .toBeGreaterThan(lines.length * 0.75);
+
+    // 怒りにはしないため frustrated は線引きの場面だけに絞る。
+    expect(counts.frustrated ?? 0).toBeLessThanOrEqual(3);
+  });
+
+  test("藤井慎一のデフォルトと5表情を論理パスで定義する", () => {
+    const fujii = breadPriceScenario.characters.find(({ id }) => id === "fujii");
+    expect(fujii).toMatchObject({
+      portrait: "bread-price/characters/fujii/fujii_neutral.png",
+      defaultExpression: "neutral",
+      expressions: {
+        neutral: "bread-price/characters/fujii/fujii_neutral.png",
+        concern: "bread-price/characters/fujii/fujii_concern.png",
+        frustrated: "bread-price/characters/fujii/fujii_frustrated.png",
+        relieved: "bread-price/characters/fujii/fujii_relieved.png",
+        serious: "bread-price/characters/fujii/fujii_serious.png",
+      },
+    });
+
+    const lines = [
+      ...breadPriceScenario.scenes.flatMap((scene) => scene.lines),
+      ...breadPriceScenario.endings.flatMap((ending) => ending.lines),
+    ].filter((line) => line.speaker === "fujii");
+
+    expect(lines).toHaveLength(45);
+    expect(lines.every((line) => line.expression !== undefined)).toBe(true);
+
+    // 藤井は neutral / serious 中心で運用する。
+    const counts = lines.reduce<Record<string, number>>((total, line) => {
+      const expression = line.expression ?? fujii?.defaultExpression ?? "";
+      return { ...total, [expression]: (total[expression] ?? 0) + 1 };
+    }, {});
+    expect(counts).toEqual({ neutral: 20, serious: 15, concern: 8, frustrated: 1, relieved: 1 });
+    expect((counts.neutral ?? 0) + (counts.serious ?? 0)).toBeGreaterThan(lines.length * 0.7);
+
+    // 緊縮主義者にしないため frustrated は制度上の無理がある場面だけに絞る。
+    expect(counts.frustrated ?? 0).toBeLessThanOrEqual(2);
+  });
+
+  test("立ち絵を持つ全キャラのdefaultExpressionと各lineのexpressionが解決できる", () => {
+    const lines = [
+      ...breadPriceScenario.scenes.flatMap((scene) => scene.lines),
+      ...breadPriceScenario.endings.flatMap((ending) => ending.lines),
+    ];
+    const withPortraits = breadPriceScenario.characters.filter(({ expressions }) => expressions);
+    expect(withPortraits.map(({ id }) => id)).toEqual(["misaki", "yamada", "kuroda", "takahashi", "fujii"]);
+
+    for (const character of withPortraits) {
+      const expressions = character.expressions ?? {};
+      // expression省略時のフォールバック先が必ず存在する。
+      expect(Object.keys(expressions)).toContain(character.defaultExpression);
+      expect(character.portrait).toBe(expressions[character.defaultExpression ?? ""]);
+
+      for (const line of lines.filter((item) => item.speaker === character.id)) {
+        const expression = line.expression ?? character.defaultExpression ?? "";
+        expect(Object.keys(expressions)).toContain(expression);
+      }
+    }
+  });
+
   test("14種類のEconomics解説を割り当てる（two-marketsのみ3枚）", () => {
     const assignments = Object.fromEntries(
       breadPriceScenario.endings.map((ending) => [

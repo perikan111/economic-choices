@@ -7,7 +7,7 @@
 - 22選択肢
 - 8種類のエンディング
 - エンディング末尾のEconomics解説
-- 佐藤美咲の立ち絵5表情（`neutral` / `relieved` / `frustrated` / `concern` / `serious`）
+- 主要5人（佐藤美咲・山田浩一・黒田誠・高橋玲奈・藤井慎一）の立ち絵5表情（`neutral` / `relieved` / `frustrated` / `concern` / `serious`）
 
 シナリオversionは `1.1.0`。非公式市場の規模と取引上の不確実性を分けて扱い、登録制を選ぶと `informalRegistered` が記録されます。
 
